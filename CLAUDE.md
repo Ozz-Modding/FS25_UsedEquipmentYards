@@ -64,3 +64,73 @@ Contains all yard definitions and current inventory state.
 
 This project follows FS25 modding conventions.
 See `~/.claude/skills/fs25-modding/SKILL.md` for the full reference.
+
+## Lessons Learned (FS25 engine behaviour)
+
+### Placeable type with husbandry fence
+- Our type uses `parent="simplePlaceable"` + `PlaceableHusbandryFence` specialization
+  to get the cow-barn-style "place building then draw fence" flow.
+- The husbandry brush (`ConstructionBrushHusbandry`) is set via `<brush><type>husbandry</type>`
+  in the placeable XML. Without this, the fence customization dialog never appears.
+- The fence template (`xml/YardFence.xml`) MUST be registered as a `<storeItem>` with
+  `showInStore="true"` and a `<brush><type>newFence</type>` section. The husbandry brush
+  looks up the fence's store item to create the `ConstructionBrushNewFence`. If `showInStore`
+  is false, the brush data is nil and placement crashes.
+
+### Fence customization timing
+- `onPostFinalizePlacement` fires BEFORE the "Customize fence?" dialog. Do NOT create the
+  yard or spawn vehicles there.
+- `finishFenceCustomization` only fires if the player says "Yes" to customization.
+- `getCanCreateMeadow` is called by the brush in BOTH "Yes" and "No" paths (from
+  `onCustomizableFenceFinished`). We register this function and use it as our trigger
+  to create the yard at exactly the right moment. Return `false` (no meadow dialog).
+
+### Navigation mesh stubs
+- `PlaceableHusbandryFence` calls `deleteNavigationMeshPlacementCollision`,
+  `createNavigationMeshPlacementCollision`, and `createNavigationMeshFromContour` which
+  come from husbandry specializations we don't include. Register no-op stubs for these.
+
+### Bypassing farmland ownership for fence posts
+- Our placeable overrides (`getIsOnOwnedFarmland`, `getIsOnFarmland`, `getOwnerFarmId`)
+  only affect the initial building placement.
+- The fence customization brush has TWO separate land checks that must be patched:
+  1. `ConstructionBrush:verifyAccess` (parent class, line 85) — calls
+     `g_currentMission.accessHandler:canFarmAccessLand`. Runs every frame in update.
+  2. `ConstructionBrushNewFence:validateCurrentSegment` — calls
+     `g_farmlandManager:getIsOwnedByFarmAlongLine`. Runs on segment validation.
+- Both are patched in `main.lua` via `Utils.overwrittenFunction`, guarded by
+  `isYardFenceBrush()` check so normal fences are unaffected.
+
+### Default fence (preview square)
+- The default fence is created in `createDefaultFence` override using `localToWorld`
+  offsets from the root node. This ensures the preview moves with the placement cursor.
+- `updateHusbandryFence` override recalculates corner positions each frame to keep
+  preview segments aligned with the building position.
+- Offsets are "in front of" placement point: `{-h, 0}, {h, 0}, {h, 2h}, {-h, 2h}`
+  so the yard extends forward, not centred on the click point.
+
+### Vehicle spawn layout
+- Uses the engine's `VehicleLoadingData:setLoadingPlace(places, usedPlaces)` for
+  size-aware placement. Spawn places define rows with position, direction, and rotation.
+- Layout: perimeter parking (4 edges facing inward) + 4 corner slots at 45° + optional
+  centre island (two back-to-back rows facing outward).
+- The fence polygon (not just the AABB) is stored and used for point-in-polygon
+  containment testing (ray casting). Vehicles placed outside the polygon are deleted.
+- A minimum spacing check (2.5 m) between vehicle centres prevents overlapping spawns
+  across adjacent rows.
+- Vehicles spawn sequentially (one at a time); each callback triggers the next.
+  Filling stops when `setLoadingPlace` returns false (no room) or safety cap is reached.
+
+### Vehicle spawning API
+- `VehicleLoadingData.new()`, `:setStoreItem()`, `:setConfigurations()`,
+  `:setLoadingPlace(places, usedPlaces)`, `:setPropertyState()`, `:setOwnerFarmId()`,
+  `:load(callback, target, args)`.
+- Callback signature: `function(loadedVehicles, loadState, args)`.
+- `VehicleLoadingState.OK` indicates success.
+- Used look: `vehicle:addWearAmount(0.1–0.4)`, `vehicle:setOperatingTime(ms)`.
+- Random yaw jitter via `setRotation(rootNode, rx, ry + offset, rz)` for organic look.
+
+### Period (month) tracking
+- `g_messageCenter:subscribe(MessageType.PERIOD_CHANGED, callback)` for monthly refresh.
+- `g_currentMission.environment.currentPeriod` (0–11), `.currentYear`.
+- Period 0 = March. Calendar month = `(period + 2) % 12 + 1`.
