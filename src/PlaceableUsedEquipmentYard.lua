@@ -230,6 +230,9 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
     local segments = fence:getSegments()
     if segments == nil or #segments == 0 then return nil end
 
+    -- Build an ordered polygon from fence segment endpoints.
+    -- Each segment has a start and end; consecutive segments share endpoints.
+    local polygon = {}
     local minX, maxX =  math.huge, -math.huge
     local minZ, maxZ =  math.huge, -math.huge
 
@@ -237,6 +240,14 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
         local sx, _, sz = seg:getStartPos()
         local ex, _, ez = seg:getEndPos()
         if sx ~= nil and ex ~= nil then
+            -- Add start point (avoid near-duplicates with previous end)
+            if #polygon == 0 or
+               math.abs(polygon[#polygon].x - sx) > 0.01 or
+               math.abs(polygon[#polygon].z - sz) > 0.01 then
+                polygon[#polygon + 1] = { x = sx, z = sz }
+            end
+            polygon[#polygon + 1] = { x = ex, z = ez }
+
             minX = math.min(minX, sx, ex)
             maxX = math.max(maxX, sx, ex)
             minZ = math.min(minZ, sz, ez)
@@ -244,7 +255,7 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
         end
     end
 
-    if minX == math.huge then return nil end
+    if minX == math.huge or #polygon < 3 then return nil end
 
     local cx = (minX + maxX) * 0.5
     local cz = (minZ + maxZ) * 0.5
@@ -254,5 +265,6 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
         cx = cx, cy = cy, cz = cz,
         sizeX = maxX - minX,
         sizeZ = maxZ - minZ,
+        polygon = polygon,
     }
 end

@@ -29,12 +29,16 @@ YardInventory.CATEGORIES = {
 YardInventory.PRICE_MIN_FACTOR = 0.3
 YardInventory.PRICE_MAX_FACTOR = 0.7
 
--- Row depth for spawn place lines (metres).
-YardInventory.ROW_DEPTH = 8
+-- Parking slot depth — how far a vehicle extends nose-in from the edge (metres).
+YardInventory.SLOT_DEPTH = 6
+-- Aisle width between perimeter parking and centre island (metres).
+YardInventory.AISLE_WIDTH = 4
 -- Inset from fence boundary to avoid spawning outside non-rectangular areas (metres).
 YardInventory.BOUNDS_INSET = 3
--- Max random steering angle applied to parked vehicles (radians, ≈ ±15°).
-YardInventory.MAX_YAW_JITTER = math.rad(15)
+-- Max random yaw offset so parked vehicles look organic (radians, ≈ ±10°).
+YardInventory.MAX_YAW_JITTER = math.rad(10)
+-- Minimum yard dimension (after inset) for the full perimeter layout.
+YardInventory.MIN_PERIMETER_SIZE = 12
 
 function YardInventory.new(yard)
     local self = setmetatable({}, YardInventory._mt)
@@ -170,57 +174,160 @@ function YardInventory.usedPriceFactor(age)
 end
 
 -- ---------------------------------------------------------------------------
--- Spawn places — rows within the yard that the engine fills intelligently
+-- Spawn places — perimeter parking with optional centre island
 -- ---------------------------------------------------------------------------
+--
+-- Layout (viewed from above):
+--
+--         +--- top row (face south) ---+
+--         |                            |
+--     left|   [aisle]  centre  [aisle] |right
+--     col |   [aisle]  island  [aisle] |col
+--         |                            |
+--         +-- bottom row (face north) -+
+--
+-- Vehicles park nose-in around the perimeter. If the yard is wide enough a
+-- centre island is added with two back-to-back rows. Aisles between the
+-- perimeter and centre keep the fronts of vehicles accessible.
 
---- Build spawn place rows across the yard. Each row spans the full width
---- of the yard (sizeX) and is ROW_DEPTH metres deep. The engine's
---- PlacementUtil.getPlace uses vehicle dimensions to find a free spot.
 function YardInventory:buildSpawnPlaces()
     local b = self.yard.bounds
     local inset = YardInventory.BOUNDS_INSET
-    local rowDepth = YardInventory.ROW_DEPTH
-
-    -- Shrink the usable area inward to avoid spawning outside irregular fences.
-    local usableW = math.max(0, b.sizeX - inset * 2)
-    local usableD = math.max(0, b.sizeZ - inset * 2)
-    local rows = math.max(1, math.floor(usableD / rowDepth))
+    local slot  = YardInventory.SLOT_DEPTH
+    local aisle = YardInventory.AISLE_WIDTH
 
     self.spawnPlaces = {}
     self.usedPlaces  = {}
 
-    local startZ = b.cz - usableD * 0.5 + rowDepth * 0.5
-    local startX = b.cx - usableW * 0.5
+    -- Usable rectangle after inset
+    local halfW = b.sizeX * 0.5 - inset
+    local halfD = b.sizeZ * 0.5 - inset
 
-    for r = 0, rows - 1 do
-        local z = startZ + r * rowDepth
-        local y = getTerrainHeightAtWorldPos(g_terrainNode, b.cx, 0, z)
+    if halfW < 3 or halfD < 3 then return end -- yard too small
 
-        local place = {
-            startX   = startX,
-            startY   = y,
-            startZ   = z,
-            width    = usableW,    -- inset row width
-            length   = rowDepth,   -- depth available
-            yOffset  = 1,
-            rotX     = 0,
-            rotY     = 0,
-            rotZ     = 0,
-            dirX     = 1,          -- row runs along +X
-            dirY     = 0,
-            dirZ     = 0,
-            dirPerpX = 0,          -- perpendicular is +Z (into the row)
-            dirPerpY = 0,
-            dirPerpZ = 1,
-            maxWidth  = math.huge,
-            maxLength = math.huge,
-            maxHeight = math.huge,
-            palletRotationOffset = 0,
-        }
+    local minX = b.cx - halfW
+    local maxX = b.cx + halfW
+    local minZ = b.cz - halfD
+    local maxZ = b.cz + halfD
+    local fullW = halfW * 2
+    local fullD = halfD * 2
 
-        self.spawnPlaces[#self.spawnPlaces + 1] = place
-        self.usedPlaces[place] = 0
+    -- For very small yards fall back to a single row along the longest edge.
+    if fullW < YardInventory.MIN_PERIMETER_SIZE or fullD < YardInventory.MIN_PERIMETER_SIZE then
+        if fullW >= fullD then
+            self:addSpawnPlace(minX, b.cz - slot * 0.5, fullW, slot, 1,0,0, 0,0,1, 0)
+        else
+            self:addSpawnPlace(b.cx - slot * 0.5, minZ, fullD, slot, 0,0,1, 1,0,0, -math.pi * 0.5)
+        end
+        return
     end
+
+    -- -----------------------------------------------------------------------
+    -- Corner slots (angled 45° so vehicles can drive out into the aisle)
+    -- -----------------------------------------------------------------------
+    local corner = 5  -- corner square size — fits 1 vehicle
+
+    -- Top-left — faces south-east
+    self:addSpawnPlace(minX, minZ, corner, corner,
+                       1,0,0,  0,0,1,  math.pi + math.pi * 0.25)
+    -- Top-right — faces south-west
+    self:addSpawnPlace(maxX - corner, minZ, corner, corner,
+                       1,0,0,  0,0,1,  math.pi - math.pi * 0.25)
+    -- Bottom-left — faces north-east
+    self:addSpawnPlace(minX, maxZ - corner, corner, corner,
+                       1,0,0,  0,0,-1,  -math.pi * 0.25)
+    -- Bottom-right — faces north-west
+    self:addSpawnPlace(maxX - corner, maxZ - corner, corner, corner,
+                       1,0,0,  0,0,-1,  math.pi * 0.25)
+
+    -- -----------------------------------------------------------------------
+    -- Perimeter rows (shortened to leave room for corner slots)
+    -- -----------------------------------------------------------------------
+    local edgeW = fullW - corner * 2  -- top/bottom row width after corners
+    local edgeD = fullD - corner * 2  -- side column length after corners
+
+    if edgeW > 4 then
+        -- Top row — vehicles face south (into the yard, +Z)
+        self:addSpawnPlace(minX + corner, minZ, edgeW, slot,
+                           1,0,0,  0,0,1,  math.pi)
+
+        -- Bottom row — vehicles face north (into the yard, -Z)
+        self:addSpawnPlace(minX + corner, maxZ - slot, edgeW, slot,
+                           1,0,0,  0,0,-1,  0)
+    end
+
+    if edgeD > 4 then
+        -- Left column — vehicles face east (+X)
+        self:addSpawnPlace(minX, minZ + corner, edgeD, slot,
+                           0,0,1,  1,0,0,  -math.pi * 0.5)
+
+        -- Right column — vehicles face west (-X)
+        self:addSpawnPlace(maxX - slot, minZ + corner, edgeD, slot,
+                           0,0,1,  -1,0,0,  math.pi * 0.5)
+    end
+
+    -- -----------------------------------------------------------------------
+    -- Centre island (two back-to-back rows facing outward)
+    -- -----------------------------------------------------------------------
+    local centreAvail = fullW - 2 * (slot + aisle)
+    if centreAvail >= 5 and edgeD > 4 then
+        local gap        = 2   -- gap between back-to-back rears
+        local rowDepth   = (centreAvail - gap) * 0.5
+        local centreX    = b.cx
+        local islandZ    = minZ + corner
+        local islandLen  = edgeD
+
+        -- West row — vehicles face west (away from centre)
+        self:addSpawnPlace(centreX - gap * 0.5, islandZ, islandLen, rowDepth,
+                           0,0,1,  -1,0,0,  math.pi * 0.5)
+
+        -- East row — vehicles face east (away from centre)
+        self:addSpawnPlace(centreX + gap * 0.5, islandZ, islandLen, rowDepth,
+                           0,0,1,  1,0,0,  -math.pi * 0.5)
+    end
+end
+
+--- Helper: create one spawn-place row and register it.
+function YardInventory:addSpawnPlace(sx, sz, width, depth, dx,dy,dz, px,py,pz, rotY)
+    local y = getTerrainHeightAtWorldPos(g_terrainNode, sx, 0, sz)
+    local place = {
+        startX   = sx,
+        startY   = y,
+        startZ   = sz,
+        width    = width,
+        length   = depth,
+        yOffset  = 1,
+        rotX     = 0,
+        rotY     = rotY,
+        rotZ     = 0,
+        dirX     = dx,
+        dirY     = dy,
+        dirZ     = dz,
+        dirPerpX = px,
+        dirPerpY = py,
+        dirPerpZ = pz,
+        maxWidth  = math.huge,
+        maxLength = math.huge,
+        maxHeight = math.huge,
+        palletRotationOffset = 0,
+    }
+    self.spawnPlaces[#self.spawnPlaces + 1] = place
+    self.usedPlaces[place] = 0
+end
+
+--- Returns true if (x, z) is within MIN_SPACING of any already-spawned vehicle.
+YardInventory.MIN_SPACING = 2.5  -- metres
+
+function YardInventory:isTooCloseToExisting(x, z)
+    local minSq = YardInventory.MIN_SPACING * YardInventory.MIN_SPACING
+    for _, v in ipairs(self.vehicles) do
+        local ex, _, ez = getWorldTranslation(v.rootNode)
+        local dx, dz = x - ex, z - ez
+        if dx * dx + dz * dz < minSq then
+            return true
+        end
+    end
+    return false
 end
 
 -- ---------------------------------------------------------------------------
@@ -292,16 +399,22 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
     end
 
     for _, vehicle in ipairs(loadedVehicles) do
-        vehicle:addWearAmount(math.random() * 0.3 + 0.1)
-        vehicle:setOperatingTime(3600000 * (math.random() * 40 + 30))
+        -- Check if the vehicle ended up inside the fence polygon.
+        local vx, _, vz = getWorldTranslation(vehicle.rootNode)
+        if not self.yard:containsPoint(vx, vz) or self:isTooCloseToExisting(vx, vz) then
+            vehicle:delete()
+        else
+            vehicle:addWearAmount(math.random() * 0.3 + 0.1)
+            vehicle:setOperatingTime(3600000 * (math.random() * 40 + 30))
 
-        -- Apply a slight random yaw so vehicles don't look rigidly parked.
-        local jitter = YardInventory.MAX_YAW_JITTER
-        local rx, ry, rz = getRotation(vehicle.rootNode)
-        setRotation(vehicle.rootNode, rx, ry + (math.random() * 2 - 1) * jitter, rz)
+            -- Apply a slight random yaw so vehicles don't look rigidly parked.
+            local jitter = YardInventory.MAX_YAW_JITTER
+            local rx, ry, rz = getRotation(vehicle.rootNode)
+            setRotation(vehicle.rootNode, rx, ry + (math.random() * 2 - 1) * jitter, rz)
 
-        item.vehicle = vehicle
-        self.vehicles[#self.vehicles + 1] = vehicle
+            item.vehicle = vehicle
+            self.vehicles[#self.vehicles + 1] = vehicle
+        end
     end
 
     -- Try to fit another vehicle.

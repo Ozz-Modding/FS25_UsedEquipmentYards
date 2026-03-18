@@ -2,8 +2,9 @@
 -- Data class for a single yard. Holds its bounds, identity, and inventory.
 --
 -- bounds = {
---   cx, cy, cz   -- world-space centre point
---   sizeX, sizeZ -- full width/depth of the yard rectangle
+--   cx, cy, cz       -- world-space centre of the AABB
+--   sizeX, sizeZ     -- full width/depth of the AABB
+--   polygon          -- ordered list of { x, z } fence vertices (may be nil for legacy saves)
 -- }
 
 UsedEquipmentYard = {}
@@ -23,25 +24,37 @@ function UsedEquipmentYard:delete()
 end
 
 -- ---------------------------------------------------------------------------
--- Spatial query
+-- Spatial query — point-in-polygon (ray casting algorithm)
 -- ---------------------------------------------------------------------------
 
--- Returns true if world position (x, z) falls inside this yard's rectangle.
-function UsedEquipmentYard:containsPoint(x, z)
-    local halfX = self.bounds.sizeX * 0.5
-    local halfZ = self.bounds.sizeZ * 0.5
-    return math.abs(x - self.bounds.cx) <= halfX
-       and math.abs(z - self.bounds.cz) <= halfZ
-end
+--- Returns true if (px, pz) is inside the fence polygon.
+--- Falls back to AABB check if no polygon is stored (legacy saves).
+function UsedEquipmentYard:containsPoint(px, pz)
+    local poly = self.bounds.polygon
+    if poly == nil or #poly < 3 then
+        -- Fallback: AABB check
+        local halfX = self.bounds.sizeX * 0.5
+        local halfZ = self.bounds.sizeZ * 0.5
+        return math.abs(px - self.bounds.cx) <= halfX
+           and math.abs(pz - self.bounds.cz) <= halfZ
+    end
 
--- Returns a random world position (x, y, z) somewhere inside the yard bounds.
-function UsedEquipmentYard:randomSpawnPosition()
-    local halfX = self.bounds.sizeX * 0.5
-    local halfZ = self.bounds.sizeZ * 0.5
-    local x = self.bounds.cx + math.random() * self.bounds.sizeX - halfX
-    local z = self.bounds.cz + math.random() * self.bounds.sizeZ - halfZ
-    local y = getTerrainHeightAtWorldPos(g_terrainNode, x, 0, z)
-    return x, y, z
+    -- Ray casting: shoot a ray in +X from the test point and count edge crossings.
+    local inside = false
+    local n = #poly
+    local j = n
+    for i = 1, n do
+        local ix, iz = poly[i].x, poly[i].z
+        local jx, jz = poly[j].x, poly[j].z
+        if (iz > pz) ~= (jz > pz) then
+            local intersectX = jx + (pz - jz) / (iz - jz) * (ix - jx)
+            if px < intersectX then
+                inside = not inside
+            end
+        end
+        j = i
+    end
+    return inside
 end
 
 -- ---------------------------------------------------------------------------
@@ -56,6 +69,17 @@ function UsedEquipmentYard:saveToXML(xmlFile, key)
     setXMLFloat(xmlFile,  key .. ".bounds#cz",   self.bounds.cz)
     setXMLFloat(xmlFile,  key .. ".bounds#sizeX", self.bounds.sizeX)
     setXMLFloat(xmlFile,  key .. ".bounds#sizeZ", self.bounds.sizeZ)
+
+    -- Persist fence polygon so containsPoint works after load.
+    local poly = self.bounds.polygon
+    if poly ~= nil then
+        for i, pt in ipairs(poly) do
+            local pKey = ("%s.bounds.vertex(%d)"):format(key, i - 1)
+            setXMLFloat(xmlFile, pKey .. "#x", pt.x)
+            setXMLFloat(xmlFile, pKey .. "#z", pt.z)
+        end
+    end
+
     self.inventory:saveToXML(xmlFile, key .. ".inventory")
 end
 
@@ -71,6 +95,22 @@ function UsedEquipmentYard.loadFromXML(xmlFile, key)
         sizeX = getXMLFloat(xmlFile, key .. ".bounds#sizeX") or 10,
         sizeZ = getXMLFloat(xmlFile, key .. ".bounds#sizeZ") or 10,
     }
+
+    -- Restore fence polygon.
+    local polygon = {}
+    local i = 0
+    while true do
+        local pKey = ("%s.bounds.vertex(%d)"):format(key, i)
+        if not hasXMLProperty(xmlFile, pKey) then break end
+        polygon[#polygon + 1] = {
+            x = getXMLFloat(xmlFile, pKey .. "#x") or 0,
+            z = getXMLFloat(xmlFile, pKey .. "#z") or 0,
+        }
+        i = i + 1
+    end
+    if #polygon >= 3 then
+        bounds.polygon = polygon
+    end
 
     local yard = UsedEquipmentYard.new(id, name, bounds)
     yard.inventory:loadFromXML(xmlFile, key .. ".inventory")
