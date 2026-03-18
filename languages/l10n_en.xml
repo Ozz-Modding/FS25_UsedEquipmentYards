@@ -19,6 +19,7 @@
         <text name="uey_hud_wear"             text="Wear"/>
         <text name="uey_hud_hours"            text="Hours"/>
 
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>

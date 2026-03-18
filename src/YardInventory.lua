@@ -30,17 +30,17 @@ YardInventory.HOURS_PER_YEAR = 800
 
 YardInventory.QUALITY = {
     LOW = {
-        hoursMin = 2500, hoursMax = 8000,
+        hoursMin = 60, hoursMax = 120,
         damageMin = 0.35, damageMax = 0.7,
         wearMin = 0.5,  wearMax = 1.0,
     },
     MEDIUM = {
-        hoursMin = 800, hoursMax = 4000,
+        hoursMin = 25, hoursMax = 60,
         damageMin = 0.15, damageMax = 0.45,
         wearMin = 0.2, wearMax = 0.65,
     },
     HIGH = {
-        hoursMin = 100, hoursMax = 1500,
+        hoursMin = 5, hoursMax = 25,
         damageMin = 0.05, damageMax = 0.2,
         wearMin = 0.05, wearMax = 0.25,
     },
@@ -504,6 +504,14 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             -- Exclude from Tab-cycle so the player can't switch into yard vehicles.
             if vehicle.setIsTabbable ~= nil then
                 vehicle:setIsTabbable(false)
+            end
+
+            -- Block driving inputs (accelerate, brake, steer) but allow entering
+            -- and starting the engine. Uses the built-in control-allowed callback.
+            if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
+                vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function()
+                    return false, nil
+                end)
             end
 
             item.vehicle = vehicle
