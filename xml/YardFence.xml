@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="newFence">
+    <storeData>
+        <name>$l10n_uey_fenceSegment</name>
+        <functions>
+            <function>$l10n_uey_function</function>
+        </functions>
+        <image>store/store_yard.dds</image>
+        <price>50</price>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>NONE</brand>
+        <species>PLACEABLE</species>
+        <category>fences</category>
+        <canBeSold>false</canBeSold>
+        <showInStore>true</showInStore>
+
+        <brush>
+            <type>newFence</type>
+            <category>decoration</category>
+            <tab>newFences</tab>
+        </brush>
+    </storeData>
+
+    <base>
+        <filename>i3d/grass.i3d</filename>
+    </base>
+
+    <fence>
+        <segment id="SEGMENT" price="5" class="FenceSegment" maxVerticalAngle="45">
+            <poles>
+                <pole node="pole" radius="0.0"/>
+            </poles>
+            <panels maxScale="1.5">
+                <panel node="panel" length="15" />
+            </panels>
+        </segment>
+    </fence>
+
+    <i3dMappings>
+        <i3dMapping id="pole" node="0>" />
+        <i3dMapping id="panel" node="1>" />
+    </i3dMappings>
+</placeable>

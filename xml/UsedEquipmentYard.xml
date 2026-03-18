@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="FS25_UsedEquipmentYards.usedEquipmentYard">
+    <storeData>
+        <name>$l10n_uey_yardLabel</name>
+        <functions>
+            <function>$l10n_uey_function</function>
+        </functions>
+        <!-- TODO: create a proper store image -->
+        <image>store/store_yard.dds</image>
+        <price>500</price>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>NONE</brand>
+        <species>PLACEABLE</species>
+        <category>sheds</category>
+        <canBeSold>true</canBeSold>
+        <showInStore>true</showInStore>
+
+        <brush>
+            <type>husbandry</type>
+            <category>buildings</category>
+            <tab>sheds</tab>
+        </brush>
+    </storeData>
+
+    <base>
+        <!-- TODO: replace with a proper yard sign/shed i3d -->
+        <filename>i3d/grass.i3d</filename>
+    </base>
+
+    <placement useRandomYRotation="false" useManualYRotation="true">
+        <sounds>
+            <place template="smallImp" />
+        </sounds>
+    </placement>
+
+    <clearAreas />
+    <leveling />
+    <indoorAreas />
+    <tipOcclusionUpdateAreas />
+    <ai>
+        <updateAreas />
+    </ai>
+
+    <husbandry>
+        <fence xmlFilename="xml/YardFence.xml">
+            <sections>
+                <section segmentId="SEGMENT" customizable="true" />
+            </sections>
+        </fence>
+    </husbandry>
+
+    <i3dMappings>
+    </i3dMappings>
+</placeable>

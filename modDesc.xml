@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="106">
+    <author>Ozz</author>
+    <version>1.0.0.0</version>
+    <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
+    <title>
+        <en>Used Equipment Yards</en>
+        <de>Gebrauchtgerätelager</de>
+        <fr>Cours de matériel d'occasion</fr>
+    </title>
+    <description>
+        <en><![CDATA[Allows you to define custom vehicle sale yards that you can visit and buy used equipment from. Draw yard boundaries in-game, configure inventory, and watch equipment spawn and despawn dynamically.
+
+GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]></en>
+        <de><![CDATA[Ermöglicht das Definieren benutzerdefinierter Fahrzeugverkaufsplätze, auf denen Sie gebrauchte Ausrüstung kaufen können.]]></de>
+        <fr><![CDATA[Permet de définir des cours de vente de véhicules personnalisées où vous pouvez acheter de l'équipement d'occasion.]]></fr>
+    </description>
+    <extraSourceFiles>
+        <sourceFile filename="src/events/YardCreatedEvent.lua"/>
+        <sourceFile filename="src/events/YardRemovedEvent.lua"/>
+        <sourceFile filename="src/events/EquipmentPurchasedEvent.lua"/>
+        <sourceFile filename="src/UsedEquipmentYard.lua"/>
+        <sourceFile filename="src/YardInventory.lua"/>
+        <sourceFile filename="src/YardManager.lua"/>
+        <sourceFile filename="src/main.lua"/>
+    </extraSourceFiles>
+    <placeableSpecializations>
+        <specialization name="usedEquipmentYard"
+                        className="PlaceableUsedEquipmentYard"
+                        filename="src/PlaceableUsedEquipmentYard.lua" />
+    </placeableSpecializations>
+    <placeableTypes>
+        <type name="usedEquipmentYard" parent="simplePlaceable">
+            <specialization name="husbandryFence" />
+            <specialization name="usedEquipmentYard" />
+        </type>
+    </placeableTypes>
+    <storeItems>
+        <storeItem xmlFilename="xml/YardFence.xml" />
+        <storeItem xmlFilename="xml/UsedEquipmentYard.xml" />
+    </storeItems>
+    <multiplayer supported="true"/>
+    <l10n filenamePrefix="languages/l10n" />
+</modDesc>

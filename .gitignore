@@ -1,0 +1,10 @@
+.vscode/
+moveZip.bat
+moveDebug.bat
+package.bat
+FS25_UsedEquipmentYards.zip
+beta-changelog.md
+.kiro
+.DS_Store
+refs/
+.claude/

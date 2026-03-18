@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+    <translationContributors>Ozz</translationContributors>
+    <texts>
+        <text name="uey_modTitle"              text="Used Equipment Yards"/>
+        <text name="uey_yardLabel"             text="Used Equipment Yard"/>
+        <text name="uey_function"              text="Used equipment sale yard"/>
+        <text name="uey_fenceSegment"          text="Yard Boundary Fence"/>
+        <text name="uey_noItems"               text="No equipment currently available at this yard."/>
+
+        <!-- Purchase flow -->
+        <text name="uey_purchaseConfirm"       text="Purchase %s for $%s?"/>
+        <text name="uey_purchaseSuccess"       text="%s purchased for $%s."/>
+        <text name="uey_purchaseFailed_funds"  text="Not enough funds to purchase this item."/>
+
+        <!-- Console / status messages -->
+        <text name="uey_yardCreated"           text="Yard '%s' created."/>
+        <text name="uey_yardRemoved"           text="Yard '%s' removed."/>
+        <text name="uey_inventoryReset"        text="Inventory reset for '%s'."/>
+        <text name="uey_allInventoriesReset"   text="All yard inventories have been reset."/>
+    </texts>
+</l10n>
