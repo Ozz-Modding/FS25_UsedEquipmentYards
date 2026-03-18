@@ -117,4 +117,46 @@ if ConstructionBrushNewFence ~= nil then
     )
 end
 
+-- ---------------------------------------------------------------------------
+-- Vehicle → yard item lookup (populated by YardInventory on spawn)
+-- ---------------------------------------------------------------------------
+
+UsedEquipmentYards.vehicleToItem = {}
+
+function UsedEquipmentYards.findItemForVehicle(vehicle)
+    return UsedEquipmentYards.vehicleToItem[vehicle]
+end
+
+-- ---------------------------------------------------------------------------
+-- HUD: show info when looking at a yard vehicle
+-- ---------------------------------------------------------------------------
+-- The base game's showVehicleInfo skips vehicles with ownerFarmId = 0
+-- (SPECTATOR_FARM_ID). We hook into the update loop to display our own
+-- info box for yard vehicles: name, price, damage, wear, hours.
+
+if PlayerHUDUpdater ~= nil then
+    PlayerHUDUpdater.update = Utils.appendedFunction(PlayerHUDUpdater.update, function(self, dt)
+        if not Platform.playerInfo.showVehicleInfo then return end
+        if not self.isVehicle or self.object == nil then return end
+
+        local item = UsedEquipmentYards.findItemForVehicle(self.object)
+        if item == nil then return end
+
+        local vehicle = self.object
+        local box = self.objectBox
+        box:clear()
+        box:setTitle(vehicle:getFullName())
+        box:addLine(g_i18n:getText("uey_hud_forSale"), g_i18n:formatMoney(item.price))
+
+        local damagePercent = math.floor((item.damage or 0) * 100)
+        local wearPercent   = math.floor((item.wear   or 0) * 100)
+        local hours         = math.floor((item.operatingTime or 0) / 3600000)
+
+        box:addLine(g_i18n:getText("uey_hud_damage"), ("%d %%"):format(damagePercent))
+        box:addLine(g_i18n:getText("uey_hud_wear"),   ("%d %%"):format(wearPercent))
+        box:addLine(g_i18n:getText("uey_hud_hours"),   tostring(hours))
+        box:showNextFrame()
+    end)
+end
+
 addModEventListener(UsedEquipmentYards)

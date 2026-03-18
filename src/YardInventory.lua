@@ -3,10 +3,13 @@
 -- Handles spawning vehicles, monthly refresh, save/load, and purchase removal.
 --
 -- Each item = {
---   xmlFilename  string   -- store XML path for this vehicle
---   price        number   -- discounted "used" price
---   age          number   -- cosmetic age in years (drives wear/hours)
---   vehicle      table    -- FS25 Vehicle object (nil when despawned)
+--   xmlFilename    string   -- store XML path for this vehicle
+--   price          number   -- used price (from Vehicle.calculateSellPrice)
+--   age            number   -- age in months
+--   damage         number   -- 0..1 damage amount
+--   wear           number   -- 0..1 wear amount
+--   operatingTime  number   -- operating time in ms
+--   vehicle        table    -- FS25 Vehicle object (nil when despawned)
 -- }
 --
 -- Inventory refreshes once per in-game period (≈ month). The last-refreshed
@@ -18,16 +21,49 @@ YardInventory._mt = Class(YardInventory)
 -- Safety cap to prevent runaway spawning (e.g. if collision checks fail).
 YardInventory.ABSOLUTE_MAX_ITEMS = 50
 
--- Store categories to draw from when populating a yard.
-YardInventory.CATEGORIES = {
-    "TRACTORSS", "TRACTORSM", "TRACTORSL",
-    "TELELOADERS", "WHEELLOADERSM", "WHEELLOADERSL",
-    "SKIDSTEERS",
+-- ---------------------------------------------------------------------------
+-- Quality presets — control hours, damage, and wear ranges
+-- ---------------------------------------------------------------------------
+-- Hours are engine hours (what you see on the dashboard). Age in months is
+-- derived from hours for Vehicle.calculateSellPrice (~800 hours/year average).
+YardInventory.HOURS_PER_YEAR = 800
+
+YardInventory.QUALITY = {
+    LOW = {
+        hoursMin = 2500, hoursMax = 8000,
+        damageMin = 0.35, damageMax = 0.7,
+        wearMin = 0.5,  wearMax = 1.0,
+    },
+    MEDIUM = {
+        hoursMin = 800, hoursMax = 4000,
+        damageMin = 0.15, damageMax = 0.45,
+        wearMin = 0.2, wearMax = 0.65,
+    },
+    HIGH = {
+        hoursMin = 100, hoursMax = 1500,
+        damageMin = 0.05, damageMax = 0.2,
+        wearMin = 0.05, wearMax = 0.25,
+    },
 }
 
--- Price multiplier range for "used" discount (e.g. 0.3–0.7 of new price).
-YardInventory.PRICE_MIN_FACTOR = 0.3
-YardInventory.PRICE_MAX_FACTOR = 0.7
+-- ---------------------------------------------------------------------------
+-- Default yard configuration — quality tier and weighted category pool
+-- ---------------------------------------------------------------------------
+YardInventory.DEFAULT_CONFIG = {
+    quality = "MEDIUM",
+    categories = {
+        { name = "TRACTORSS",     weight = 10 },
+        { name = "TRACTORSM",     weight = 8  },
+        { name = "TRACTORSL",     weight = 5  },
+        { name = "TELELOADERS",   weight = 4  },
+        { name = "WHEELLOADERSM", weight = 3  },
+        { name = "WHEELLOADERSL", weight = 2  },
+        { name = "SKIDSTEERS",    weight = 3  },
+    },
+}
+
+-- Minimum vehicle new price to be included (filters out tiny items).
+YardInventory.MIN_VEHICLE_PRICE = 10000
 
 -- Parking slot depth — how far a vehicle extends nose-in from the edge (metres).
 YardInventory.SLOT_DEPTH = 6
@@ -43,6 +79,7 @@ YardInventory.MIN_PERIMETER_SIZE = 12
 function YardInventory.new(yard)
     local self = setmetatable({}, YardInventory._mt)
     self.yard              = yard
+    self.config            = YardInventory.DEFAULT_CONFIG
     self.items             = {}
     self.vehicles          = {}          -- spawned Vehicle objects
     self.pendingLoads      = {}          -- in-flight VehicleLoadingData
@@ -86,6 +123,7 @@ function YardInventory:despawnAll()
     self.pendingLoads = {}
 
     for _, vehicle in ipairs(self.vehicles) do
+        UsedEquipmentYards.vehicleToItem[vehicle] = nil
         vehicle:delete()
     end
     self.vehicles = {}
@@ -122,55 +160,100 @@ end
 -- Item generation
 -- ---------------------------------------------------------------------------
 
---- Generate a single random item from the store pool.
+--- Generate a single random item using the yard's config and quality preset.
+--- Uses the same pricing formula as the base game's VehicleSaleSystem.
 function YardInventory:generateOneItem()
     if self.storePool == nil then
-        self.storePool = YardInventory.buildStorePool()
+        self.storePool = self:buildStorePool()
     end
     if #self.storePool == 0 then return nil end
 
-    local storeItem = self.storePool[math.random(1, #self.storePool)]
-    local age   = math.random(1, 8)
-    local price = math.floor(storeItem.price * YardInventory.usedPriceFactor(age))
+    -- Weighted random selection from the pool.
+    local storeItem = self:pickWeightedItem()
+    if storeItem == nil then return nil end
+
+    -- Roll hours, damage, wear from the quality preset.
+    local q = YardInventory.QUALITY[self.config.quality] or YardInventory.QUALITY.MEDIUM
+    local hours   = q.hoursMin + math.random() * (q.hoursMax - q.hoursMin)
+    local damage  = q.damageMin + math.random() * (q.damageMax - q.damageMin)
+    local wear    = q.wearMin   + math.random() * (q.wearMax   - q.wearMin)
+    local operatingTime = hours * 60 * 60 * 1000  -- hours → ms
+    -- Derive age in months from hours for the price formula.
+    local age = math.max(1, math.floor(hours / YardInventory.HOURS_PER_YEAR * 12))
+
+    -- Pick a random configuration set (like VehicleSaleSystem does).
+    local configs = YardInventory.randomConfiguration(storeItem)
+
+    -- Use the game's own pricing: sell-price based on age, hours, repair & repaint.
+    local defaultPrice = StoreItemUtil.getDefaultPrice(storeItem, {})
+    local repairPrice  = 0
+    local repaintPrice = 0
+    if Wearable ~= nil then
+        repairPrice  = Wearable.calculateRepairPrice(defaultPrice, damage)
+        repaintPrice = Wearable.calculateRepaintPrice(defaultPrice, wear)
+    end
+    local price = defaultPrice
+    if Vehicle ~= nil and Vehicle.calculateSellPrice ~= nil then
+        price = Vehicle.calculateSellPrice(storeItem, age, operatingTime, defaultPrice, repairPrice, repaintPrice)
+    end
 
     local item = {
-        xmlFilename = storeItem.xmlFilename,
-        price       = price,
-        age         = age,
-        vehicle     = nil,
+        xmlFilename   = storeItem.xmlFilename,
+        price         = math.max(1, math.floor(price)),
+        age           = age,
+        damage        = damage,
+        wear          = wear,
+        operatingTime = operatingTime,
+        vehicle       = nil,
     }
     self.items[#self.items + 1] = item
     return item
 end
 
---- Build a flat list of store items matching our category pool.
-function YardInventory.buildStorePool()
-    local wantedSet = {}
-    for _, cat in ipairs(YardInventory.CATEGORIES) do
-        wantedSet[cat] = true
+--- Build a weighted pool of { storeItem, weight } entries from the config.
+function YardInventory:buildStorePool()
+    -- Map category name → weight from config.
+    local weightMap = {}
+    for _, entry in ipairs(self.config.categories) do
+        weightMap[entry.name] = entry.weight
     end
 
-    local pool = {}
-    for _, item in pairs(g_storeManager:getItems()) do
-        -- Skip DLC items to avoid missing-content errors
-        if not string.find(item.xmlFilename, "/pdlc/") then
-            for _, catName in ipairs(item.categoryNames or {}) do
-                if wantedSet[catName] then
-                    pool[#pool + 1] = item
+    local pool = {}        -- { storeItem, weight }
+    local totalWeight = 0
+
+    for _, si in pairs(g_storeManager:getItems()) do
+        if si.showInStore and si.extraContentId == nil
+           and si.price >= YardInventory.MIN_VEHICLE_PRICE
+           and StoreItemUtil.getIsVehicle(si) then
+            for _, catName in ipairs(si.categoryNames or {}) do
+                local w = weightMap[catName]
+                if w ~= nil then
+                    pool[#pool + 1] = { storeItem = si, weight = w }
+                    totalWeight = totalWeight + w
                     break
                 end
             end
         end
     end
+
+    self.poolTotalWeight = totalWeight
     return pool
 end
 
---- Return a price multiplier for a given age (older = cheaper).
-function YardInventory.usedPriceFactor(age)
-    local t = math.min(age / 10, 1) -- 0..1 over 10 years
-    local lo = YardInventory.PRICE_MIN_FACTOR
-    local hi = YardInventory.PRICE_MAX_FACTOR
-    return hi - t * (hi - lo) + (math.random() * 0.05)
+--- Weighted random pick from the store pool.
+function YardInventory:pickWeightedItem()
+    if #self.storePool == 0 or self.poolTotalWeight <= 0 then return nil end
+
+    local roll = math.random() * self.poolTotalWeight
+    local acc = 0
+    for _, entry in ipairs(self.storePool) do
+        acc = acc + entry.weight
+        if roll <= acc then
+            return entry.storeItem
+        end
+    end
+    -- Fallback (rounding edge case).
+    return self.storePool[#self.storePool].storeItem
 end
 
 -- ---------------------------------------------------------------------------
@@ -404,16 +487,28 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
         if not self.yard:containsPoint(vx, vz) or self:isTooCloseToExisting(vx, vz) then
             vehicle:delete()
         else
-            vehicle:addWearAmount(math.random() * 0.3 + 0.1)
-            vehicle:setOperatingTime(3600000 * (math.random() * 40 + 30))
+            -- Apply the item's pre-rolled condition values.
+            if vehicle.addWearAmount ~= nil then
+                vehicle:addWearAmount(item.wear or 0)
+            end
+            if vehicle.setDamageAmount ~= nil then
+                vehicle:setDamageAmount(item.damage or 0)
+            end
+            vehicle:setOperatingTime(item.operatingTime or 0)
 
             -- Apply a slight random yaw so vehicles don't look rigidly parked.
             local jitter = YardInventory.MAX_YAW_JITTER
             local rx, ry, rz = getRotation(vehicle.rootNode)
             setRotation(vehicle.rootNode, rx, ry + (math.random() * 2 - 1) * jitter, rz)
 
+            -- Exclude from Tab-cycle so the player can't switch into yard vehicles.
+            if vehicle.setIsTabbable ~= nil then
+                vehicle:setIsTabbable(false)
+            end
+
             item.vehicle = vehicle
             self.vehicles[#self.vehicles + 1] = vehicle
+            UsedEquipmentYards.vehicleToItem[vehicle] = item
         end
     end
 
@@ -457,6 +552,7 @@ function YardInventory:removeItem(item)
                 break
             end
         end
+        UsedEquipmentYards.vehicleToItem[item.vehicle] = nil
         item.vehicle:delete()
         item.vehicle = nil
     end
@@ -481,9 +577,12 @@ function YardInventory:saveToXML(xmlFile, key)
     setXMLInt(xmlFile, key .. "#lastRefreshYear",   self.lastRefreshYear)
     for i, item in ipairs(self.items) do
         local iKey = ("%s.item(%d)"):format(key, i - 1)
-        setXMLString(xmlFile, iKey .. "#xmlFilename", item.xmlFilename or "")
-        setXMLInt(xmlFile,    iKey .. "#price",       item.price or 0)
-        setXMLInt(xmlFile,    iKey .. "#age",         item.age   or 0)
+        setXMLString(xmlFile, iKey .. "#xmlFilename",    item.xmlFilename or "")
+        setXMLInt(xmlFile,    iKey .. "#price",          item.price or 0)
+        setXMLInt(xmlFile,    iKey .. "#age",            item.age   or 0)
+        setXMLFloat(xmlFile,  iKey .. "#damage",         item.damage or 0)
+        setXMLFloat(xmlFile,  iKey .. "#wear",           item.wear   or 0)
+        setXMLFloat(xmlFile,  iKey .. "#operatingTime",  (item.operatingTime or 0) / 1000)
     end
 end
 
@@ -496,10 +595,13 @@ function YardInventory:loadFromXML(xmlFile, key)
         local iKey = ("%s.item(%d)"):format(key, i)
         if not hasXMLProperty(xmlFile, iKey) then break end
         local item = {
-            xmlFilename = getXMLString(xmlFile, iKey .. "#xmlFilename") or "",
-            price       = getXMLInt(xmlFile,    iKey .. "#price")       or 0,
-            age         = getXMLInt(xmlFile,    iKey .. "#age")         or 0,
-            vehicle     = nil,
+            xmlFilename   = getXMLString(xmlFile, iKey .. "#xmlFilename") or "",
+            price         = getXMLInt(xmlFile,    iKey .. "#price")       or 0,
+            age           = getXMLInt(xmlFile,    iKey .. "#age")         or 0,
+            damage        = getXMLFloat(xmlFile,  iKey .. "#damage")     or 0,
+            wear          = getXMLFloat(xmlFile,  iKey .. "#wear")       or 0,
+            operatingTime = (getXMLFloat(xmlFile, iKey .. "#operatingTime") or 0) * 1000,
+            vehicle       = nil,
         }
         self.items[#self.items + 1] = item
         i = i + 1

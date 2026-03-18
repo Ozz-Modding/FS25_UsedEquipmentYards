@@ -13,6 +13,12 @@
         <text name="uey_purchaseSuccess"       text="%s purchased for $%s."/>
         <text name="uey_purchaseFailed_funds"  text="Not enough funds to purchase this item."/>
 
+        <!-- HUD info when looking at a yard vehicle -->
+        <text name="uey_hud_forSale"          text="For Sale"/>
+        <text name="uey_hud_damage"           text="Damage"/>
+        <text name="uey_hud_wear"             text="Wear"/>
+        <text name="uey_hud_hours"            text="Hours"/>
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>

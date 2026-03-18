@@ -85,7 +85,17 @@
             "Polygon2D",
             "AccessHandler",
             "ConstructionBrushNewFence",
-            "ConstructionBrush"
+            "ConstructionBrush",
+            "Vehicle",
+            "Wearable",
+            "ConfigurationUtil",
+            "PlayerHUDUpdater",
+            "Platform",
+            "FarmManager",
+            "ClassIds",
+            "getParent",
+            "entityExists",
+            "getHasClassId"
         ]
     }
 }
