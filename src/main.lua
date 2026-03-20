@@ -7,6 +7,8 @@ UsedEquipmentYards.dir     = g_currentModDirectory
 UsedEquipmentYards.modName = g_currentModName
 
 function UsedEquipmentYards:loadMap(filename)
+    PriceTagRenderer.load()
+
     if g_currentMission:getIsServer() then
         self.yardManager = YardManager.new(self)
         self.yardManager:load()
@@ -19,6 +21,7 @@ end
 
 function UsedEquipmentYards:delete()
     self:unregisterConsoleCommands()
+    PriceTagRenderer.delete()
     if self.yardManager ~= nil then
         self.yardManager:delete()
         self.yardManager = nil
@@ -158,5 +161,13 @@ if PlayerHUDUpdater ~= nil then
         box:showNextFrame()
     end)
 end
+
+-- ---------------------------------------------------------------------------
+-- 3D price tags on yard vehicles (client-side rendering)
+-- ---------------------------------------------------------------------------
+
+FSBaseMission.draw = Utils.appendedFunction(FSBaseMission.draw, function()
+    PriceTagRenderer.draw()
+end)
 
 addModEventListener(UsedEquipmentYards)

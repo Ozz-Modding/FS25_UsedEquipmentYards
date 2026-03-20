@@ -124,6 +124,7 @@ function YardInventory:despawnAll()
 
     for _, vehicle in ipairs(self.vehicles) do
         UsedEquipmentYards.vehicleToItem[vehicle] = nil
+        PriceTagRenderer.removeTag(vehicle)
         vehicle:delete()
     end
     self.vehicles = {}
@@ -517,6 +518,7 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             item.vehicle = vehicle
             self.vehicles[#self.vehicles + 1] = vehicle
             UsedEquipmentYards.vehicleToItem[vehicle] = item
+            PriceTagRenderer.addTag(vehicle, item)
         end
     end
 
@@ -561,6 +563,7 @@ function YardInventory:removeItem(item)
             end
         end
         UsedEquipmentYards.vehicleToItem[item.vehicle] = nil
+        PriceTagRenderer.removeTag(item.vehicle)
         item.vehicle:delete()
         item.vehicle = nil
     end
