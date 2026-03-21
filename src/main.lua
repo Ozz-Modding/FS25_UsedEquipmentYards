@@ -162,12 +162,4 @@ if PlayerHUDUpdater ~= nil then
     end)
 end
 
--- ---------------------------------------------------------------------------
--- 3D price tags on yard vehicles (client-side rendering)
--- ---------------------------------------------------------------------------
-
-FSBaseMission.draw = Utils.appendedFunction(FSBaseMission.draw, function()
-    PriceTagRenderer.draw()
-end)
-
 addModEventListener(UsedEquipmentYards)

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!--
+    Price tag plate definition for Used Equipment Yards.
+    Uses the same LicensePlate XML schema as the base game.
+    All 9 character slots accept numerical + special characters
+    so we can display formatted prices (e.g. "1,250" or "125.000").
+
+    Node 0 = rectangle (elongated) plate from priceTag.i3d.
+    Slots 0|0..0|8 are the 9 letter TransformGroups.
+    Static decals (EU flag, stripes, region) are hidden via locked="_" slots.
+-->
+<licensePlates>
+    <font name="LICENSE_PLATE_US" />
+
+    <licensePlate filename="i3d/priceTag.i3d" node="0" type="ELONGATED"
+                  width="0.52" height="0.11">
+        <font size="0.07" scaleX="0.85" scaleY="1"/>
+
+        <variations>
+            <variation>
+                <!-- 9 character slots, all accept digits + special (.,- etc) -->
+                <value node="0|0" posX="-0.216" numerical="true" special="true"/>
+                <value node="0|1" posX="-0.162" numerical="true" special="true"/>
+                <value node="0|2" posX="-0.108" numerical="true" special="true"/>
+                <value node="0|3" posX="-0.054" numerical="true" special="true"/>
+                <value node="0|4" posX="0.0"    numerical="true" special="true"/>
+                <value node="0|5" posX="0.054"  numerical="true" special="true"/>
+                <value node="0|6" posX="0.108"  numerical="true" special="true"/>
+                <value node="0|7" posX="0.162"  numerical="true" special="true"/>
+                <value node="0|8" posX="0.216"  numerical="true" special="true"/>
+
+                <!-- Hide the EU/country/stripe decals (nodes 9-13) -->
+                <value node="0|9"  character="_" locked="true" isStatic="true"/>
+                <value node="0|10" character="_" locked="true" isStatic="true"/>
+                <value node="0|11" character="_" locked="true" isStatic="true"/>
+                <value node="0|12" character="_" locked="true" isStatic="true"/>
+                <value node="0|13" character="_" locked="true" isStatic="true"/>
+            </variation>
+        </variations>
+
+        <frame node="2" widthOffset="0.005" heightOffsetTop="0.005" heightOffsetBot="0.015"/>
+    </licensePlate>
+
+    <colorConfigurations materialName="licensePlateColored_mat" useDefaultColors="false">
+        <colorConfiguration name="White" color="1.0 1.0 1.0" isDefault="true"/>
+    </colorConfigurations>
+
+    <placement defaultType="both"/>
+</licensePlates>
