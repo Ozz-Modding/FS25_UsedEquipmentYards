@@ -64,6 +64,8 @@ YardInventory.DEFAULT_CONFIG = {
 
 -- Minimum vehicle new price to be included (filters out tiny items).
 YardInventory.MIN_VEHICLE_PRICE = 10000
+-- Maximum used price — vehicles priced above this after jitter are re-rolled.
+YardInventory.MAX_VEHICLE_PRICE = 999999
 
 -- Parking slot depth — how far a vehicle extends nose-in from the edge (metres).
 YardInventory.SLOT_DEPTH = 6
@@ -73,6 +75,14 @@ YardInventory.AISLE_WIDTH = 4
 YardInventory.BOUNDS_INSET = 3
 -- Max random yaw offset so parked vehicles look organic (radians, ≈ ±10°).
 YardInventory.MAX_YAW_JITTER = math.rad(10)
+
+-- Price jitter — adds variety around the base sell-price formula.
+-- PRICE_NORMAL_CHANCE: probability of the narrow band (0–1).
+-- PRICE_NORMAL_SPREAD: ± multiplier for the narrow band (e.g. 0.10 = ±10%).
+-- PRICE_WIDE_SPREAD: ± multiplier for the remaining wide band (e.g. 0.25 = ±25%).
+YardInventory.PRICE_NORMAL_CHANCE = 0.85
+YardInventory.PRICE_NORMAL_SPREAD = 0.10
+YardInventory.PRICE_WIDE_SPREAD   = 0.25
 -- Minimum yard dimension (after inset) for the full perimeter layout.
 YardInventory.MIN_PERIMETER_SIZE = 12
 
@@ -163,12 +173,28 @@ end
 
 --- Generate a single random item using the yard's config and quality preset.
 --- Uses the same pricing formula as the base game's VehicleSaleSystem.
+--- Re-rolls (up to MAX_REROLLS times) if the final price exceeds MAX_VEHICLE_PRICE.
+local MAX_REROLLS = 5
+
 function YardInventory:generateOneItem()
     if self.storePool == nil then
         self.storePool = self:buildStorePool()
     end
     if #self.storePool == 0 then return nil end
 
+    for _ = 1, MAX_REROLLS do
+        local item = self:rollItem()
+        if item ~= nil and item.price <= YardInventory.MAX_VEHICLE_PRICE then
+            self.items[#self.items + 1] = item
+            return item
+        end
+    end
+
+    return nil
+end
+
+--- Roll a single candidate item (not yet added to self.items).
+function YardInventory:rollItem()
     -- Weighted random selection from the pool.
     local storeItem = self:pickWeightedItem()
     if storeItem == nil then return nil end
@@ -198,7 +224,13 @@ function YardInventory:generateOneItem()
         price = Vehicle.calculateSellPrice(storeItem, age, operatingTime, defaultPrice, repairPrice, repaintPrice)
     end
 
-    local item = {
+    -- Add price variety around the base sell-price formula.
+    local roll = math.random()
+    local spread = roll < YardInventory.PRICE_NORMAL_CHANCE and YardInventory.PRICE_NORMAL_SPREAD or YardInventory.PRICE_WIDE_SPREAD
+    local jitter = 1 + (math.random() * 2 - 1) * spread
+    price = price * jitter
+
+    return {
         xmlFilename   = storeItem.xmlFilename,
         price         = math.max(1, math.floor(price)),
         age           = age,
@@ -207,8 +239,6 @@ function YardInventory:generateOneItem()
         operatingTime = operatingTime,
         vehicle       = nil,
     }
-    self.items[#self.items + 1] = item
-    return item
 end
 
 --- Build a weighted pool of { storeItem, weight } entries from the config.

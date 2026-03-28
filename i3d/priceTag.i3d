@@ -2,31 +2,54 @@
 
 <i3D name="priceTag.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
   <Asset>
-    <Export program="GIANTS Editor 64bit" version="10.0.3"/>
+    <Export program="GIANTS Editor 64bit" version="10.0.5"/>
   </Asset>
 
   <Files>
-    <File fileId="4" filename="$data/shaders/vehicleShader.xml"/>
-    <File fileId="2" filename="$data/shared/default_normal.dds"/>
-    <File fileId="5" filename="$data/shared/detailLibrary/calibrated/grainSmall_specular.png"/>
-    <File fileId="6" filename="$data/shared/detailLibrary/flat_normal.png"/>
-    <File fileId="7" filename="$data/shared/detailLibrary/metallic/clear_diffuse.png"/>
-    <File fileId="16" filename="$data/shared/detailLibrary/metallic/silverScratched_diffuse.png"/>
-    <File fileId="15" filename="$data/shared/detailLibrary/metallic/silverScratched_specular.png"/>
-    <File fileId="18" filename="$data/shared/detailLibrary/nonMetallic/metal/metalPainted_diffuse.png"/>
-    <File fileId="17" filename="$data/shared/detailLibrary/nonMetallic/metal/metalPainted_specular.png"/>
-    <File fileId="20" filename="$data/shared/detailLibrary/nonMetallic/plastic/plasticPainted_diffuse.png"/>
-    <File fileId="19" filename="$data/shared/detailLibrary/nonMetallic/plastic/plasticPainted_specular.png"/>
-    <File fileId="3" filename="$data/shared/licensePlates/licensePlatesEUBody_vmask.dds"/>
-    <File fileId="13" filename="$data/shared/licensePlates/licensePlates_normal.png"/>
-    <File fileId="14" filename="$data/shared/licensePlates/licensePlates_vmask.dds"/>
-    <File fileId="12" filename="$data/shared/white_diffuse.png"/>
     <File fileId="1" filename="priceTag_diffuse.dds"/>
+    <File fileId="4" filename="$data/shaders/vehicleShader.xml"/>
+    <File fileId="2" filename="$data/shared/default_normal.png"/>
+    <File fileId="6" filename="$data/shared/detailLibrary/flat_normal.png"/>
+    <File fileId="15" filename="$data/shared/detailLibrary/metallic/silverScratched_diffuse.png"/>
+    <File fileId="14" filename="$data/shared/detailLibrary/metallic/silverScratched_specular.png"/>
+    <File fileId="7" filename="$data/shared/detailLibrary/nonMetallic/metal/metalPainted_diffuse.png"/>
+    <File fileId="5" filename="$data/shared/detailLibrary/nonMetallic/metal/metalPainted_specular.png"/>
+    <File fileId="17" filename="$data/shared/detailLibrary/nonMetallic/plastic/plasticPainted_diffuse.png"/>
+    <File fileId="16" filename="$data/shared/detailLibrary/nonMetallic/plastic/plasticPainted_specular.png"/>
+    <File fileId="13" filename="$data/shared/licensePlates/licensePlates_normal.png"/>
+    <File fileId="3" filename="$data/shared/licensePlates/licensePlates_vmask.png"/>
+    <File fileId="12" filename="$data/shared/white_diffuse.png"/>
   </Files>
 
 
   <Materials>
-    <Material name="decalCountry_mat" materialId="61" customShaderId="4" customShaderVariation="vmaskUV2">
+    <Material name="licensePlates_metalPainted_mat" materialId="5" customShaderId="4">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+      <CustomParameter name="colorScale" value="0 0.03 0.32"/>
+    </Material>
+    <Material name="licensePlates_metalPainted_mat1" materialId="6" customShaderId="4">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+    </Material>
+    <Material name="licensePlates_metalPainted_mat2" materialId="7" customShaderId="4">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+      <CustomParameter name="colorScale" value="0 0 0"/>
+    </Material>
+    <Material name="licensePlates_metalPainted_mat3" materialId="10" customShaderId="4" customShaderVariation="vmaskUV2">
       <Texture fileId="1"/>
       <Normalmap fileId="2"/>
       <Glossmap fileId="3"/>
@@ -34,48 +57,22 @@
       <Custommap name="detailNormal" fileId="6"/>
       <Custommap name="detailDiffuse" fileId="7"/>
     </Material>
-    <Material name="licensePlates_metalPainted_mat" materialId="6" customShaderId="4">
-      <Texture fileId="12"/>
-      <Normalmap fileId="13"/>
-      <Glossmap fileId="14"/>
-      <Custommap name="detailSpecular" fileId="17"/>
-      <Custommap name="detailNormal" fileId="6"/>
-      <Custommap name="detailDiffuse" fileId="18"/>
-      <CustomParameter name="colorScale" value="0 0.03 0.32"/>
-    </Material>
-    <Material name="licensePlates_metalPainted_mat1" materialId="7" customShaderId="4">
-      <Texture fileId="12"/>
-      <Normalmap fileId="13"/>
-      <Glossmap fileId="14"/>
-      <Custommap name="detailSpecular" fileId="17"/>
-      <Custommap name="detailNormal" fileId="6"/>
-      <Custommap name="detailDiffuse" fileId="18"/>
-    </Material>
-    <Material name="licensePlates_metalPainted_mat2" materialId="8" customShaderId="4">
-      <Texture fileId="12"/>
-      <Normalmap fileId="13"/>
-      <Glossmap fileId="14"/>
-      <Custommap name="detailSpecular" fileId="17"/>
-      <Custommap name="detailNormal" fileId="6"/>
-      <Custommap name="detailDiffuse" fileId="18"/>
-      <CustomParameter name="colorScale" value="0 0 0"/>
-    </Material>
     <Material name="licensePlates_metalPaintedBlack_mat" materialId="9" customShaderId="4">
       <Texture fileId="12"/>
       <Normalmap fileId="13"/>
-      <Glossmap fileId="14"/>
-      <Custommap name="detailSpecular" fileId="19"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="16"/>
       <Custommap name="detailNormal" fileId="6"/>
-      <Custommap name="detailDiffuse" fileId="20"/>
+      <Custommap name="detailDiffuse" fileId="17"/>
       <CustomParameter name="colorScale" value="0.012 0.012 0.012"/>
     </Material>
-    <Material name="licensePlates_silverScratched_mat" materialId="10" customShaderId="4">
+    <Material name="licensePlates_silverScratched_mat" materialId="8" customShaderId="4">
       <Texture fileId="12"/>
       <Normalmap fileId="13"/>
-      <Glossmap fileId="14"/>
-      <Custommap name="detailSpecular" fileId="15"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="14"/>
       <Custommap name="detailNormal" fileId="6"/>
-      <Custommap name="detailDiffuse" fileId="16"/>
+      <Custommap name="detailDiffuse" fileId="15"/>
     </Material>
   </Materials>
 
@@ -84,45 +81,37 @@
   </Shapes>
 
   <Scene>
-    <TransformGroup name="rectangle" rotation="-90 0 0" nodeId="23">
-      <TransformGroup name="symbols" rotation="90 0 0" nodeId="24">
-        <TransformGroup name="letter01" translation="-0.216102 0.002 0.000475" rotation="-90 0 0" nodeId="25"/>
-        <TransformGroup name="letter02" translation="-0.162088 0.002 0.000475" rotation="-90 0 0" nodeId="26"/>
-        <TransformGroup name="letter03" translation="-0.108 0.002 0.000475" rotation="-90 0 0" nodeId="27"/>
-        <TransformGroup name="letter04" translation="-0.054059 0.002 0.000475" rotation="-90 0 0" nodeId="28"/>
-        <TransformGroup name="letter05" translation="-4.5e-05 0.002 0.000475" rotation="-90 0 0" nodeId="29"/>
-        <TransformGroup name="letter06" translation="0.053969 0.002 0.000475" rotation="-90 0 0" nodeId="30"/>
-        <TransformGroup name="letter07" translation="0.107983 0.002 0.000475" rotation="-90 0 0" nodeId="31"/>
-        <TransformGroup name="letter08" translation="0.161998 0.002 0.000475" rotation="-90 0 0" nodeId="32"/>
-        <TransformGroup name="letter09" translation="0.215911 0.002 0.000475" rotation="-90 0 0" nodeId="33"/>
-        <Shape name="decalEu" translation="-0.232 0.005 -0.0192802" shapeId="1" clipDistance="30" nodeId="34" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalCountry" translation="-0.232 0.001 0.025" shapeId="2" clipDistance="30" nodeId="35" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalStripes1" shapeId="3" clipDistance="30" nodeId="36" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalStripes2" shapeId="4" clipDistance="30" nodeId="37" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalRegion" translation="-0.0598155 -0.002 0" shapeId="5" clipDistance="30" nodeId="38" castsShadows="true" receiveShadows="true" materialIds="61"/>
+    <TransformGroup name="rectangle" rotation="-90 0 0" nodeId="20">
+      <TransformGroup name="symbols" rotation="90 0 0" nodeId="21">
+        <TransformGroup name="letter01" translation="-0.216102 0.002 0.000475" rotation="-90 0 0" nodeId="22"/>
+        <TransformGroup name="letter02" translation="-0.162088 0.002 0.000475" rotation="-90 0 0" nodeId="23"/>
+        <TransformGroup name="letter03" translation="-0.108074 0.002 0.000475" rotation="-90 0 0" nodeId="24"/>
+        <TransformGroup name="letter04" translation="-0.054059 0.002 0.000475" rotation="-90 0 0" nodeId="25"/>
+        <TransformGroup name="letter05" translation="-4.5e-05 0.002 0.000475" rotation="-90 0 0" nodeId="26"/>
+        <TransformGroup name="letter06" translation="0.053969 0.002 0.000475" rotation="-90 0 0" nodeId="27"/>
+        <TransformGroup name="letter07" translation="0.107983 0.002 0.000475" rotation="-90 0 0" nodeId="28"/>
+        <Shape name="additionalDecals" translation="-0.006781 0.001938 0" shapeId="1" clipDistance="30" nodeId="31" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="10"/>
+        <Shape name="decals" translation="-0.232886 0.001938 -0.001062" shapeId="2" clipDistance="30" nodeId="32" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="10"/>
       </TransformGroup>
-      <Shape name="rectanglePlate" translation="0 0 0.000862" rotation="90 0 0" shapeId="6" clipDistance="300" nodeId="39" castsShadows="true" receiveShadows="true" materialIds="10,6,7,8"/>
-      <Shape name="rectangleFrame" rotation="90 0 0" shapeId="7" clipDistance="300" nodeId="40" castsShadows="true" receiveShadows="true" materialIds="9"/>
+      <Shape name="rectanglePlate" translation="0 0 0.000862" rotation="90 0 0" shapeId="3" clipDistance="300" nodeId="33" castsShadows="true" receiveShadows="true" materialIds="8,5,6,7"/>
+      <Shape name="rectangleFrame" rotation="90 0 0" shapeId="4" clipDistance="300" nodeId="34" castsShadows="true" receiveShadows="true" materialIds="9"/>
     </TransformGroup>
-    <TransformGroup name="square" translation="0 0 0.2" rotation="-90 0 0" nodeId="41">
-      <TransformGroup name="symbols" nodeId="42">
-        <TransformGroup name="letter01" translation="-0.047 0.03036 0.001942" nodeId="43"/>
-        <TransformGroup name="letter02" translation="-0.005953 0.03036 0.001942" nodeId="44"/>
-        <TransformGroup name="letter03" translation="-0.101 -0.030803 0.001942" nodeId="45"/>
-        <TransformGroup name="letter04" translation="-0.060846 -0.030803 0.001942" nodeId="46"/>
-        <TransformGroup name="letter05" translation="-0.020249 -0.030803 0.001942" nodeId="47"/>
-        <TransformGroup name="letter06" translation="0.020348 -0.030803 0.001942" nodeId="48"/>
-        <TransformGroup name="letter07" translation="0.060945 -0.030803 0.001942" nodeId="49"/>
-        <TransformGroup name="letter08" translation="0.101542 -0.030803 0.001942" nodeId="50"/>
-        <TransformGroup name="letter09" translation="0.142187 -0.030803 0.001942" nodeId="51"/>
-        <Shape name="decalEu" translation="0.130756 0.0347618 0.0238072" shapeId="8" clipDistance="30" nodeId="52" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalCountry" translation="-0.0993842 0.00953387 0.00335503" rotation="90 -0 0" shapeId="2" clipDistance="30" nodeId="53" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalStripes1" translation="-0.000221102 0.107469 0.0011983" rotation="90 -0 0" scale="0.48 1 1" shapeId="4" clipDistance="30" nodeId="54" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalStripes2" translation="-0.000221102 -0.0110054 0.00119826" rotation="90 -0 0" scale="0.48 1 1" shapeId="4" clipDistance="30" nodeId="55" castsShadows="true" receiveShadows="true" materialIds="61"/>
-        <Shape name="decalRegion" translation="-0.00315979 -0.002 0" shapeId="9" clipDistance="30" nodeId="56" castsShadows="true" receiveShadows="true" materialIds="61"/>
+    <TransformGroup name="square" translation="0 0 0.2" rotation="-90 0 0" nodeId="35">
+      <TransformGroup name="symbols" nodeId="36">
+        <TransformGroup name="letter01" translation="-0.04655 0.03036 0.001942" nodeId="37"/>
+        <TransformGroup name="letter02" translation="-0.005953 0.03036 0.001942" nodeId="38"/>
+        <TransformGroup name="letter03" translation="-0.101442 -0.030803 0.001942" nodeId="39"/>
+        <TransformGroup name="letter04" translation="-0.060846 -0.030803 0.001942" nodeId="40"/>
+        <TransformGroup name="letter05" translation="-0.020249 -0.030803 0.001942" nodeId="41"/>
+        <TransformGroup name="letter06" translation="0.020348 -0.030803 0.001942" nodeId="42"/>
+        <TransformGroup name="letter07" translation="0.060945 -0.030803 0.001942" nodeId="43"/>
+        <TransformGroup name="letter08" translation="0.101542 -0.030803 0.001942" nodeId="44"/>
+        <TransformGroup name="letter09" translation="0.142187 -0.030803 0.001942" nodeId="45"/>
+        <Shape name="additionalDecals" translation="0.095489 0.025393 0.001938" rotation="90 0 0" shapeId="1" clipDistance="30" nodeId="46" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="10"/>
+        <Shape name="decals" translation="-0.101443 0.031077 0.001997" rotation="90 0 0" shapeId="5" clipDistance="30" nodeId="47" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="10"/>
       </TransformGroup>
-      <Shape name="squarePlate" translation="0 0.005004 0.000765" rotation="90 0 0" shapeId="10" clipDistance="300" nodeId="57" castsShadows="true" receiveShadows="true" materialIds="8,10,6,7"/>
-      <Shape name="squareFrame" translation="0 0 0.001938" rotation="90 0 0" shapeId="11" clipDistance="300" nodeId="58" castsShadows="true" receiveShadows="true" materialIds="9"/>
+      <Shape name="squarePlate" translation="0 0.005004 0.000765" rotation="90 0 0" shapeId="6" clipDistance="300" nodeId="48" castsShadows="true" receiveShadows="true" materialIds="7,8,5,6"/>
+      <Shape name="squareFrame" translation="0 0 0.001938" rotation="90 0 0" shapeId="7" clipDistance="300" nodeId="49" castsShadows="true" receiveShadows="true" materialIds="9"/>
     </TransformGroup>
   </Scene>
 
