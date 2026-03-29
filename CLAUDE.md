@@ -110,16 +110,17 @@ See `~/.claude/skills/fs25-modding/SKILL.md` for the full reference.
   so the yard extends forward, not centred on the click point.
 
 ### Vehicle spawn layout
-- Uses the engine's `VehicleLoadingData:setLoadingPlace(places, usedPlaces)` for
-  size-aware placement. Spawn places define rows with position, direction, and rotation.
-- Layout: perimeter parking (4 edges facing inward) + 4 corner slots at 45° + optional
-  centre island (two back-to-back rows facing outward).
-- The fence polygon (not just the AABB) is stored and used for point-in-polygon
-  containment testing (ray casting). Vehicles placed outside the polygon are deleted.
-- A minimum spacing check (2.5 m) between vehicle centres prevents overlapping spawns
-  across adjacent rows.
+- Uses **random scatter placement**: positions are sampled randomly within the fence
+  polygon's inset AABB, validated with point-in-polygon containment and radius-aware
+  clearance checks against all existing vehicles.
+- `VehicleLoadingData:setPosition` / `setRotation` / `setIgnoreShopOffset(true)` are
+  used for direct world-space placement (no `setLoadingPlace` row system).
+- Vehicle clearance = `max(width, length)/2 + VEHICLE_CLEARANCE_BUFFER (3m)`.
+  Size comes from `StoreItemUtil.getSizeValues` for the specific vehicle + config.
+- Yaw is a random cardinal direction (N/E/S/W) ± 30° jitter for an organic look.
 - Vehicles spawn sequentially (one at a time); each callback triggers the next.
-  Filling stops when `setLoadingPlace` returns false (no room) or safety cap is reached.
+  If a vehicle can't find a position after 50 attempts, a different (potentially
+  smaller) vehicle is tried. After n consecutive failures the yard is declared full.
 
 ### Vehicle spawning API
 - `VehicleLoadingData.new()`, `:setStoreItem()`, `:setConfigurations()`,

@@ -80,14 +80,26 @@ YardInventory.MIN_VEHICLE_PRICE = 10000
 -- Maximum used price — vehicles priced above this after jitter are re-rolled.
 YardInventory.MAX_VEHICLE_PRICE = 999999
 
--- Parking slot depth — how far a vehicle extends nose-in from the edge (metres).
-YardInventory.SLOT_DEPTH = 6
--- Aisle width between perimeter parking and centre island (metres).
-YardInventory.AISLE_WIDTH = 4
 -- Inset from fence boundary to avoid spawning outside non-rectangular areas (metres).
 YardInventory.BOUNDS_INSET = 3
--- Max random yaw offset so parked vehicles look organic (radians, ≈ ±10°).
-YardInventory.MAX_YAW_JITTER = math.rad(10)
+
+-- ---------------------------------------------------------------------------
+-- Scatter placement constants
+-- ---------------------------------------------------------------------------
+-- Buffer distance (metres) added around each vehicle's bounding radius.
+-- Ensures vehicles have enough clearance to be driven out.
+YardInventory.VEHICLE_CLEARANCE_BUFFER = 3.0
+-- Maximum random positions to try before giving up on one vehicle.
+YardInventory.MAX_PLACEMENT_ATTEMPTS = 50
+-- After this many consecutive vehicles fail to find a position, declare
+-- the yard full and stop spawning.
+YardInventory.MAX_CONSECUTIVE_FAILURES = 5
+-- Yaw jitter range (radians). Vehicles pick a random cardinal direction
+-- then add uniform noise within this range. ≈ ±30°.
+YardInventory.YAW_JITTER = math.rad(30)
+-- Terrain offset (metres) when calling setPosition — lifts the vehicle
+-- slightly above the ground to avoid clipping.
+YardInventory.TERRAIN_OFFSET = 0.5
 
 -- Price jitter — adds variety around the base sell-price formula.
 -- PRICE_NORMAL_CHANCE: probability of the narrow band (0–1).
@@ -96,8 +108,6 @@ YardInventory.MAX_YAW_JITTER = math.rad(10)
 YardInventory.PRICE_NORMAL_CHANCE = 0.85
 YardInventory.PRICE_NORMAL_SPREAD = 0.10
 YardInventory.PRICE_WIDE_SPREAD   = 0.25
--- Minimum yard dimension (after inset) for the full perimeter layout.
-YardInventory.MIN_PERIMETER_SIZE = 12
 
 -- ---------------------------------------------------------------------------
 -- TTL (time to live) — how long a spawned vehicle stays before expiring.
@@ -128,8 +138,8 @@ function YardInventory.new(yard)
     self.items             = {}
     self.vehicles          = {}          -- spawned Vehicle objects
     self.pendingLoads      = {}          -- in-flight VehicleLoadingData
-    self.spawnPlaces       = nil         -- built on first spawn
-    self.usedPlaces        = nil         -- tracks consumed width per row
+    self.placedPositions   = {}          -- { x, z, radius } for clearance checks
+    self.consecutiveFailures = 0
     self.filling           = false       -- true while the fill loop is running
     self.spawnMode         = YardInventory.SPAWN_FILL
     return self
@@ -165,20 +175,21 @@ end
 
 --- Called on yard creation and load. Respects FILL_ON_CREATE.
 function YardInventory:spawn()
-    self:buildSpawnPlaces()
     if YardInventory.FILL_ON_CREATE then
         self.spawnMode = YardInventory.SPAWN_FILL
         self.filling = true
+        self.consecutiveFailures = 0
+        self.placedPositions = {}
         self:spawnNext()
     end
 end
 
 --- Attempt to spawn a single vehicle (hourly tick).
---- Rebuilds spawn places so freed slots are available after TTL expiries.
 function YardInventory:trySpawnOne()
     self.spawnMode = YardInventory.SPAWN_SINGLE
-    self:buildSpawnPlaces()
     self.filling = true
+    self.consecutiveFailures = 0
+    self:rebuildPlacedPositions()
     self:spawnNext()
 end
 
@@ -201,12 +212,7 @@ function YardInventory:despawnAll()
         item.vehicle = nil
     end
 
-    -- Reset spawn place usage so the next spawn cycle has a clean slate.
-    if self.usedPlaces ~= nil then
-        for place, _ in pairs(self.usedPlaces) do
-            self.usedPlaces[place] = 0
-        end
-    end
+    self.placedPositions = {}
 end
 
 --- Full reset — despawns everything and fills from scratch.
@@ -215,9 +221,10 @@ function YardInventory:reset()
     self:despawnAll()
     self.items = {}
     self.storePool = nil
-    self:buildSpawnPlaces()
+    self.placedPositions = {}
     self.spawnMode = YardInventory.SPAWN_FILL
     self.filling = true
+    self.consecutiveFailures = 0
     self:spawnNext()
 end
 
@@ -345,168 +352,117 @@ function YardInventory:pickWeightedItem()
 end
 
 -- ---------------------------------------------------------------------------
--- Spawn places — perimeter parking with optional centre island
+-- Scatter placement — random positions within the fence polygon
 -- ---------------------------------------------------------------------------
---
--- Layout (viewed from above):
---
---         +--- top row (face south) ---+
---         |                            |
---     left|   [aisle]  centre  [aisle] |right
---     col |   [aisle]  island  [aisle] |col
---         |                            |
---         +-- bottom row (face north) -+
---
--- Vehicles park nose-in around the perimeter. If the yard is wide enough a
--- centre island is added with two back-to-back rows. Aisles between the
--- perimeter and centre keep the fronts of vehicles accessible.
 
-function YardInventory:buildSpawnPlaces()
+--- Find a random (x, z, yaw) within the yard polygon that has sufficient
+--- clearance from all existing vehicles.
+---@param candidateRadius number  half the diagonal of the vehicle's footprint
+---@return number|nil x
+---@return number|nil z
+---@return number|nil yaw
+function YardInventory:findSpawnPosition(candidateRadius)
     local b = self.yard.bounds
     local inset = YardInventory.BOUNDS_INSET
-    local slot  = YardInventory.SLOT_DEPTH
-    local aisle = YardInventory.AISLE_WIDTH
 
-    self.spawnPlaces = {}
-    self.usedPlaces  = {}
-
-    -- Usable rectangle after inset
+    -- Inset AABB for random sampling
     local halfW = b.sizeX * 0.5 - inset
     local halfD = b.sizeZ * 0.5 - inset
-
-    if halfW < 3 or halfD < 3 then return end -- yard too small
+    if halfW < 2 or halfD < 2 then
+        return nil, nil, nil
+    end
 
     local minX = b.cx - halfW
-    local maxX = b.cx + halfW
     local minZ = b.cz - halfD
-    local maxZ = b.cz + halfD
-    local fullW = halfW * 2
-    local fullD = halfD * 2
+    local rangeX = halfW * 2
+    local rangeZ = halfD * 2
+    local buffer = YardInventory.VEHICLE_CLEARANCE_BUFFER
 
-    -- For very small yards fall back to a single row along the longest edge.
-    if fullW < YardInventory.MIN_PERIMETER_SIZE or fullD < YardInventory.MIN_PERIMETER_SIZE then
-        if fullW >= fullD then
-            self:addSpawnPlace(minX, b.cz - slot * 0.5, fullW, slot, 1,0,0, 0,0,1, 0)
-        else
-            self:addSpawnPlace(b.cx - slot * 0.5, minZ, fullD, slot, 0,0,1, 1,0,0, -math.pi * 0.5)
+    for _ = 1, YardInventory.MAX_PLACEMENT_ATTEMPTS do
+        local x = minX + math.random() * rangeX
+        local z = minZ + math.random() * rangeZ
+
+        if self.yard:containsPoint(x, z)
+           and not self:isPositionTooClose(x, z, candidateRadius + buffer) then
+            local yaw = self:randomParkingYaw()
+            return x, z, yaw
         end
-        return
     end
 
-    -- -----------------------------------------------------------------------
-    -- Corner slots (angled 45° so vehicles can drive out into the aisle)
-    -- -----------------------------------------------------------------------
-    local corner = 5  -- corner square size — fits 1 vehicle
-
-    -- Top-left — faces south-east
-    self:addSpawnPlace(minX, minZ, corner, corner,
-                       1,0,0,  0,0,1,  math.pi + math.pi * 0.25)
-    -- Top-right — faces south-west
-    self:addSpawnPlace(maxX - corner, minZ, corner, corner,
-                       1,0,0,  0,0,1,  math.pi - math.pi * 0.25)
-    -- Bottom-left — faces north-east
-    self:addSpawnPlace(minX, maxZ - corner, corner, corner,
-                       1,0,0,  0,0,-1,  -math.pi * 0.25)
-    -- Bottom-right — faces north-west
-    self:addSpawnPlace(maxX - corner, maxZ - corner, corner, corner,
-                       1,0,0,  0,0,-1,  math.pi * 0.25)
-
-    -- -----------------------------------------------------------------------
-    -- Perimeter rows (shortened to leave room for corner slots)
-    -- -----------------------------------------------------------------------
-    local edgeW = fullW - corner * 2  -- top/bottom row width after corners
-    local edgeD = fullD - corner * 2  -- side column length after corners
-
-    if edgeW > 4 then
-        -- Top row — vehicles face south (into the yard, +Z)
-        self:addSpawnPlace(minX + corner, minZ, edgeW, slot,
-                           1,0,0,  0,0,1,  math.pi)
-
-        -- Bottom row — vehicles face north (into the yard, -Z)
-        self:addSpawnPlace(minX + corner, maxZ - slot, edgeW, slot,
-                           1,0,0,  0,0,-1,  0)
-    end
-
-    if edgeD > 4 then
-        -- Left column — vehicles face east (+X)
-        self:addSpawnPlace(minX, minZ + corner, edgeD, slot,
-                           0,0,1,  1,0,0,  -math.pi * 0.5)
-
-        -- Right column — vehicles face west (-X)
-        self:addSpawnPlace(maxX - slot, minZ + corner, edgeD, slot,
-                           0,0,1,  -1,0,0,  math.pi * 0.5)
-    end
-
-    -- -----------------------------------------------------------------------
-    -- Centre island (two back-to-back rows facing outward)
-    -- -----------------------------------------------------------------------
-    local centreAvail = fullW - 2 * (slot + aisle)
-    if centreAvail >= 5 and edgeD > 4 then
-        local gap        = 2   -- gap between back-to-back rears
-        local rowDepth   = (centreAvail - gap) * 0.5
-        local centreX    = b.cx
-        local islandZ    = minZ + corner
-        local islandLen  = edgeD
-
-        -- West row — vehicles face west (away from centre)
-        self:addSpawnPlace(centreX - gap * 0.5, islandZ, islandLen, rowDepth,
-                           0,0,1,  -1,0,0,  math.pi * 0.5)
-
-        -- East row — vehicles face east (away from centre)
-        self:addSpawnPlace(centreX + gap * 0.5, islandZ, islandLen, rowDepth,
-                           0,0,1,  1,0,0,  -math.pi * 0.5)
-    end
+    return nil, nil, nil
 end
 
---- Helper: create one spawn-place row and register it.
-function YardInventory:addSpawnPlace(sx, sz, width, depth, dx,dy,dz, px,py,pz, rotY)
-    local y = getTerrainHeightAtWorldPos(g_terrainNode, sx, 0, sz)
-    local place = {
-        startX   = sx,
-        startY   = y,
-        startZ   = sz,
-        width    = width,
-        length   = depth,
-        yOffset  = 1,
-        rotX     = 0,
-        rotY     = rotY,
-        rotZ     = 0,
-        dirX     = dx,
-        dirY     = dy,
-        dirZ     = dz,
-        dirPerpX = px,
-        dirPerpY = py,
-        dirPerpZ = pz,
-        maxWidth  = math.huge,
-        maxLength = math.huge,
-        maxHeight = math.huge,
-        palletRotationOffset = 0,
-    }
-    self.spawnPlaces[#self.spawnPlaces + 1] = place
-    self.usedPlaces[place] = 0
-end
-
---- Returns true if (x, z) is within MIN_SPACING of any already-spawned vehicle.
-YardInventory.MIN_SPACING = 2.5  -- metres
-
-function YardInventory:isTooCloseToExisting(x, z)
-    local minSq = YardInventory.MIN_SPACING * YardInventory.MIN_SPACING
-    for _, v in ipairs(self.vehicles) do
-        local ex, _, ez = getWorldTranslation(v.rootNode)
-        local dx, dz = x - ex, z - ez
-        if dx * dx + dz * dz < minSq then
+--- Returns true if (x, z) is too close to any existing vehicle.
+--- Checks both the pre-spawn position cache and live vehicles.
+---@param x number
+---@param z number
+---@param requiredDist number  minimum distance from candidate centre to any vehicle's edge
+---@return boolean
+function YardInventory:isPositionTooClose(x, z, requiredDist)
+    -- Check against cached placed positions (includes the existing vehicle's radius).
+    for _, placed in ipairs(self.placedPositions) do
+        local dx = x - placed.x
+        local dz = z - placed.z
+        local minDist = requiredDist + placed.radius
+        if dx * dx + dz * dz < minDist * minDist then
             return true
         end
     end
+
+    -- Fallback: check live vehicles not yet in the cache (e.g. loaded from save
+    -- before the cache was rebuilt).
+    for _, v in ipairs(self.vehicles) do
+        local ex, _, ez = getWorldTranslation(v.rootNode)
+        local dx = x - ex
+        local dz = z - ez
+        local minDist = requiredDist + 3.0  -- conservative default radius
+        if dx * dx + dz * dz < minDist * minDist then
+            return true
+        end
+    end
+
     return false
 end
 
+--- Pick a random yaw that looks like organic parking.
+--- Chooses a cardinal direction then adds ± YAW_JITTER.
+---@return number yaw in radians
+function YardInventory:randomParkingYaw()
+    local cardinals = { 0, math.pi * 0.5, math.pi, -math.pi * 0.5 }
+    local base = cardinals[math.random(1, 4)]
+    local jitter = (math.random() * 2 - 1) * YardInventory.YAW_JITTER
+    return base + jitter
+end
+
+--- Record a vehicle's placement for future clearance checks.
+function YardInventory:recordPlacedPosition(x, z, radius)
+    self.placedPositions[#self.placedPositions + 1] = { x = x, z = z, radius = radius }
+end
+
+--- Remove the most recently recorded position (used when a post-spawn
+--- safety check rejects the vehicle).
+function YardInventory:removeLastPlacedPosition()
+    if #self.placedPositions > 0 then
+        self.placedPositions[#self.placedPositions] = nil
+    end
+end
+
+--- Rebuild the placedPositions cache from live vehicles.
+--- Called before trySpawnOne so the clearance check sees existing vehicles.
+function YardInventory:rebuildPlacedPositions()
+    self.placedPositions = {}
+    for _, v in ipairs(self.vehicles) do
+        local vx, _, vz = getWorldTranslation(v.rootNode)
+        self.placedPositions[#self.placedPositions + 1] = { x = vx, z = vz, radius = 3.0 }
+    end
+end
+
 -- ---------------------------------------------------------------------------
--- Vehicle spawning (sequential — one at a time, size-aware via setLoadingPlace)
+-- Vehicle spawning (sequential — one at a time via random scatter placement)
 -- ---------------------------------------------------------------------------
 
---- Generate one item, try to place it. If it fits, load it; the callback
---- will call spawnNext again. If it doesn't fit, the yard is full — stop.
+--- Generate one item, find a random position, and load the vehicle. The
+--- callback will call spawnNext again in FILL mode.
 function YardInventory:spawnNext()
     if not self.filling then return end
     if #self.items >= YardInventory.ABSOLUTE_MAX_ITEMS then
@@ -522,26 +478,48 @@ function YardInventory:spawnNext()
 
     local storeItem = g_storeManager:getItemByXMLFilename(item.xmlFilename)
     if storeItem == nil then
-        -- Bad item — try another.
+        self:removeItemByRef(item)
         self:spawnNext()
         return
     end
 
-    local data = VehicleLoadingData.new()
-    data:setStoreItem(storeItem)
-
+    -- Get vehicle dimensions for clearance calculation.
     local config = YardInventory.randomConfiguration(storeItem)
-    data:setConfigurations(config)
+    local rotation = storeItem.rotation or 0
+    local sizeValues = StoreItemUtil.getSizeValues(storeItem.xmlFilename, "vehicle", rotation, config)
+    local radius = math.max(sizeValues.width, sizeValues.length) * 0.5
 
-    if not data:setLoadingPlace(self.spawnPlaces, self.usedPlaces) then
-        -- No room left — yard is full. Remove the item we just added.
-        table.remove(self.items)
-        self.filling = false
-        print(("[UsedEquipmentYards] Yard '%s' full — placed %d vehicles."):format(
-            self.yard.name, #self.vehicles))
+    -- Find a valid scatter position.
+    local x, z, yaw = self:findSpawnPosition(radius)
+    if x == nil then
+        -- Can't place this vehicle — remove and track failure.
+        self:removeItemByRef(item)
+        self.consecutiveFailures = self.consecutiveFailures + 1
+
+        if self.consecutiveFailures >= YardInventory.MAX_CONSECUTIVE_FAILURES then
+            self.filling = false
+            print(("[UsedEquipmentYards] Yard '%s' full — placed %d vehicles (%d consecutive failures)."):format(
+                self.yard.name, #self.vehicles, self.consecutiveFailures))
+            return
+        end
+
+        -- Try again with a different (potentially smaller) vehicle.
+        self:spawnNext()
         return
     end
 
+    self.consecutiveFailures = 0
+
+    -- Record position BEFORE async load so the next spawn sees it.
+    self:recordPlacedPosition(x, z, radius)
+
+    -- Build VehicleLoadingData with direct position.
+    local data = VehicleLoadingData.new()
+    data:setStoreItem(storeItem)
+    data:setConfigurations(config)
+    data:setPosition(x, nil, z, YardInventory.TERRAIN_OFFSET)
+    data:setRotation(0, yaw, 0)
+    data:setIgnoreShopOffset(true)
     data:setPropertyState(VehiclePropertyState.OWNED)
     data:setOwnerFarmId(0)
 
@@ -565,16 +543,20 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
         for _, v in ipairs(loadedVehicles) do
             v:delete()
         end
+        self:removeItemByRef(item)
+        self:removeLastPlacedPosition()
         self:spawnNext()
         return
     end
 
+    local vehicleAccepted = false
     for _, vehicle in ipairs(loadedVehicles) do
-        -- Check if the vehicle ended up inside the fence polygon.
+        -- Safety check: did the vehicle end up inside the fence polygon?
         local vx, _, vz = getWorldTranslation(vehicle.rootNode)
-        if not self.yard:containsPoint(vx, vz) or self:isTooCloseToExisting(vx, vz) then
+        if not self.yard:containsPoint(vx, vz) then
             vehicle:delete()
         else
+            vehicleAccepted = true
             -- Apply the item's pre-rolled condition values.
             if vehicle.addWearAmount ~= nil then
                 vehicle:addWearAmount(item.wear or 0)
@@ -591,11 +573,6 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
                 local dirt = base + (math.random() * 2 - 1) * range
                 vehicle:setDirtAmount(math.max(0, math.min(1, dirt)))
             end
-
-            -- Apply a slight random yaw so vehicles don't look rigidly parked.
-            local jitter = YardInventory.MAX_YAW_JITTER
-            local rx, ry, rz = getRotation(vehicle.rootNode)
-            setRotation(vehicle.rootNode, rx, ry + (math.random() * 2 - 1) * jitter, rz)
 
             -- Exclude from Tab-cycle so the player can't switch into yard vehicles.
             if vehicle.setIsTabbable ~= nil then
@@ -623,11 +600,27 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
         end
     end
 
-    -- Continue filling if in fill mode, otherwise stop after this one vehicle.
-    if self.spawnMode == YardInventory.SPAWN_FILL then
+    if not vehicleAccepted then
+        -- Post-spawn safety check rejected the vehicle — clean up.
+        self:removeItemByRef(item)
+        self:removeLastPlacedPosition()
+        self:spawnNext()
+    elseif self.spawnMode == YardInventory.SPAWN_FILL then
         self:spawnNext()
     else
+        -- SPAWN_SINGLE: one vehicle placed successfully — done.
         self.filling = false
+    end
+end
+
+--- Remove an item from self.items by reference (no vehicle cleanup — caller
+--- already deleted or never had a live vehicle for this item).
+function YardInventory:removeItemByRef(item)
+    for i, v in ipairs(self.items) do
+        if v == item then
+            table.remove(self.items, i)
+            return
+        end
     end
 end
 
