@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUIProfiles>
+
+    <!-- Scrollable settings list -->
+    <Profile name="ueyConfigList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
+    </Profile>
+
+    <!-- List item row -->
+    <Profile name="ueyConfigListItem" extends="baseReference" with="anchorTopStretchingX alternating">
+        <height value="50px"/>
+        <imageColor value="$preset_fs25_colorGrey"/>
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+        <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+    </Profile>
+
+    <!-- Setting name (left aligned) -->
+    <Profile name="ueyConfigSettingName" extends="baseReference" with="anchorTopLeft">
+        <textBold value="false"/>
+        <textSize value="17px"/>
+        <textAlignment value="left"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+    </Profile>
+
+    <!-- Setting value (right aligned, bold) -->
+    <Profile name="ueyConfigSettingValue" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="true"/>
+        <textSize value="17px"/>
+        <textAlignment value="right"/>
+        <textColor value="$preset_fs25_colorMainHighlight"/>
+        <textSelectedColor value="$preset_fs25_colorMainDark"/>
+    </Profile>
+
+</GUIProfiles>

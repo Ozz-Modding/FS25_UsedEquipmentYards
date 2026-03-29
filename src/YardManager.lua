@@ -59,7 +59,7 @@ function YardManager:load()
         yard.inventory:spawn()
     end
 
-    g_messageCenter:subscribe(MessageType.PERIOD_CHANGED, self.onPeriodChanged, self)
+    g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
 end
 
 function YardManager:save()
@@ -83,14 +83,14 @@ function YardManager:save()
     delete(xmlFile)
 end
 
-function YardManager:onPeriodChanged()
+function YardManager:onHourChanged()
     for _, yard in pairs(self.yards) do
-        yard.inventory:onPeriodChanged()
+        yard.inventory:onHourChanged()
     end
 end
 
 function YardManager:delete()
-    g_messageCenter:unsubscribe(MessageType.PERIOD_CHANGED, self)
+    g_messageCenter:unsubscribe(MessageType.HOUR_CHANGED, self)
     for _, yard in pairs(self.yards) do
         yard:delete()
     end
@@ -107,6 +107,9 @@ function YardManager:createYard(name, bounds)
     local yard = UsedEquipmentYard.new(id, name, bounds)
     self.yards[id] = yard
     yard.inventory:spawn()
+    UsedEquipmentYards.addActivatable(yard)
+    -- Notify remote MP clients so they can register the yard client-side.
+    g_server:broadcastEvent(YardCreatedEvent.new(yard))
     print(("[UsedEquipmentYards] Created yard '%s' (id=%d)."):format(name, id))
     return yard
 end
@@ -116,6 +119,9 @@ function YardManager:removeYard(id)
     if yard == nil then
         return ("No yard with id %d found."):format(id)
     end
+    -- Notify remote MP clients before removing.
+    g_server:broadcastEvent(YardRemovedEvent.new(id))
+    UsedEquipmentYards.removeActivatable(id)
     yard:delete()
     self.yards[id] = nil
     return ("Yard '%s' (id=%d) removed."):format(yard.name, id)

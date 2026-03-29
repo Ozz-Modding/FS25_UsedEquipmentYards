@@ -6,12 +6,26 @@ UsedEquipmentYards = {}
 UsedEquipmentYards.dir     = g_currentModDirectory
 UsedEquipmentYards.modName = g_currentModName
 
+-- Activatables registered with the activatable system (one per yard).
+UsedEquipmentYards.activatables = {}
+
+-- Client-side yard registry: populated via YardCreatedEvent on remote MP clients
+-- and via PlaceableUsedEquipmentYard:onReadStream for clients joining mid-game.
+-- The server uses yardManager instead; this table is only non-empty on remote clients.
+UsedEquipmentYards.clientYards = {}
+
 function UsedEquipmentYards:loadMap(filename)
     PriceTagRenderer.load()
+    YardConfigDialog.register()
 
     if g_currentMission:getIsServer() then
         self.yardManager = YardManager.new(self)
         self.yardManager:load()
+
+        -- Create activatables for already-loaded yards.
+        for _, yard in pairs(self.yardManager.yards) do
+            UsedEquipmentYards.addActivatable(yard)
+        end
     end
 
     if g_addCheatCommands then
@@ -21,6 +35,8 @@ end
 
 function UsedEquipmentYards:delete()
     self:unregisterConsoleCommands()
+    UsedEquipmentYards.removeAllActivatables()
+    UsedEquipmentYards.clientYards = {}
     PriceTagRenderer.delete()
     if self.yardManager ~= nil then
         self.yardManager:delete()
@@ -74,6 +90,11 @@ FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, 
     end
 end)
 
+FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState,
+    function(self, connection, user, farm)
+        connection:sendEvent(UEYInitialClientStateEvent.new())
+    end)
+
 -- Patch fence construction brushes so yard fence posts can be placed on any land.
 -- Two checks need bypassing:
 --   1. ConstructionBrush:verifyAccess — checks canFarmAccessLand (runs every frame + on click)
@@ -118,6 +139,51 @@ if ConstructionBrushNewFence ~= nil then
             return superFunc(self, x, z)
         end
     )
+end
+
+-- ---------------------------------------------------------------------------
+-- Activatable management — one per yard, added/removed with yard lifecycle
+-- ---------------------------------------------------------------------------
+
+function UsedEquipmentYards.addActivatable(yard)
+    if UsedEquipmentYards.activatables[yard.id] ~= nil then return end
+    local activatable = YardConfigActivatable.new(yard)
+    UsedEquipmentYards.activatables[yard.id] = activatable
+    g_currentMission.activatableObjectsSystem:addActivatable(activatable)
+end
+
+function UsedEquipmentYards.removeActivatable(yardId)
+    local activatable = UsedEquipmentYards.activatables[yardId]
+    if activatable == nil then return end
+    g_currentMission.activatableObjectsSystem:removeActivatable(activatable)
+    UsedEquipmentYards.activatables[yardId] = nil
+end
+
+function UsedEquipmentYards.removeAllActivatables()
+    for id, activatable in pairs(UsedEquipmentYards.activatables) do
+        g_currentMission.activatableObjectsSystem:removeActivatable(activatable)
+    end
+    UsedEquipmentYards.activatables = {}
+end
+
+-- ---------------------------------------------------------------------------
+-- Client-side yard registry helpers (called from events and onReadStream)
+-- ---------------------------------------------------------------------------
+
+--- Register a yard received from the server. Creates a lightweight UsedEquipmentYard
+--- (no server-side spawning) and adds a YardConfigActivatable for the local player.
+function UsedEquipmentYards.registerClientYard(yardId, yardName, bounds)
+    if UsedEquipmentYards.clientYards[yardId] ~= nil then return end
+    local yard = UsedEquipmentYard.new(yardId, yardName, bounds)
+    UsedEquipmentYards.clientYards[yardId] = yard
+    UsedEquipmentYards.addActivatable(yard)
+end
+
+--- Remove a client-side yard and its activatable.
+function UsedEquipmentYards.unregisterClientYard(yardId)
+    if UsedEquipmentYards.clientYards[yardId] == nil then return end
+    UsedEquipmentYards.clientYards[yardId] = nil
+    UsedEquipmentYards.removeActivatable(yardId)
 end
 
 -- ---------------------------------------------------------------------------

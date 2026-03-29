@@ -43,7 +43,7 @@ function PlaceableUsedEquipmentYard.registerOverwrittenFunctions(placeableType)
 end
 
 function PlaceableUsedEquipmentYard.registerEventListeners(placeableType)
-    SpecializationUtil.registerEventListener(placeableType, "onLoad", PlaceableUsedEquipmentYard)
+    SpecializationUtil.registerEventListener(placeableType, "onLoad",   PlaceableUsedEquipmentYard)
     SpecializationUtil.registerEventListener(placeableType, "onDelete", PlaceableUsedEquipmentYard)
 end
 

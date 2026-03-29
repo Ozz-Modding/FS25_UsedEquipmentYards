@@ -20,6 +20,23 @@
         <text name="uey_hud_hours"            text="Hours"/>
 
 
+        <!-- Vehicle purchase -->
+        <text name="uey_action_buyVehicle"           text="Buy"/>
+        <text name="uey_purchase_title"              text="Purchase Vehicle"/>
+        <text name="uey_purchase_confirm"            text="Purchase %s for %s?"/>
+        <text name="uey_purchase_insufficient_funds" text="Insufficient funds."/>
+
+        <!-- Yard config dialog -->
+        <text name="uey_action_configureYard"    text="Configure Yard"/>
+        <text name="uey_config_title"            text="Yard Configuration"/>
+        <text name="uey_config_quality"          text="Quality"/>
+        <text name="uey_config_dirtiness"        text="Dirtiness"/>
+        <text name="uey_config_close"            text="Close"/>
+        <text name="uey_config_apply"            text="Apply"/>
+        <text name="uey_config_quality_LOW"      text="Low"/>
+        <text name="uey_config_quality_MEDIUM"   text="Medium"/>
+        <text name="uey_config_quality_HIGH"     text="High"/>
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>

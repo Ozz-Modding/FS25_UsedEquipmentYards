@@ -1,28 +1,24 @@
--- EquipmentPurchasedEvent
--- Sent from client -> server to request a purchase, then broadcast to all clients.
---
--- Flow:
---   1. Client sends event to server (connection:getIsServer() == false on server side)
---   2. Server validates funds, removes item, transfers vehicle, then broadcasts to all
---   3. All clients receive the event and remove the item node from their display
+EquipmentPurchasedEvent = {}
+local EquipmentPurchasedEvent_mt = Class(EquipmentPurchasedEvent, Event)
 
-EquipmentPurchasedEvent    = {}
-EquipmentPurchasedEvent_mt = Class(EquipmentPurchasedEvent, Event)
 InitEventClass(EquipmentPurchasedEvent, "EquipmentPurchasedEvent")
 
 function EquipmentPurchasedEvent.emptyNew()
-    return Event.new(setmetatable({}, EquipmentPurchasedEvent_mt))
+    return Event.new(EquipmentPurchasedEvent_mt)
 end
 
--- yardId    - id of the yard
--- itemIndex - 1-based index into yard.inventory.items
--- farmId    - purchasing farm's id (for balance deduction)
 function EquipmentPurchasedEvent.new(yardId, itemIndex, farmId)
-    local self     = EquipmentPurchasedEvent.emptyNew()
+    local self = EquipmentPurchasedEvent.emptyNew()
     self.yardId    = yardId
     self.itemIndex = itemIndex
     self.farmId    = farmId
     return self
+end
+
+function EquipmentPurchasedEvent:writeStream(streamId, connection)
+    streamWriteInt32(streamId, self.yardId)
+    streamWriteInt32(streamId, self.itemIndex)
+    streamWriteInt32(streamId, self.farmId)
 end
 
 function EquipmentPurchasedEvent:readStream(streamId, connection)
@@ -32,13 +28,51 @@ function EquipmentPurchasedEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
-function EquipmentPurchasedEvent:writeStream(streamId, connection)
-    streamWriteInt32(streamId, self.yardId)
-    streamWriteInt32(streamId, self.itemIndex)
-    streamWriteInt32(streamId, self.farmId)
-end
-
 function EquipmentPurchasedEvent:run(connection)
+    if not connection:getIsServer() then
+        -- -----------------------------------------------------------------
+        -- SERVER: validate, deduct, transfer ownership, apply local cleanup,
+        -- then broadcast to any remote clients.
+        -- Doing cleanup here (not in the client branch) avoids relying on
+        -- the broadcast looping back synchronously in SP.
+        -- -----------------------------------------------------------------
+        local manager = UsedEquipmentYards.yardManager
+        if manager == nil then return end
+
+        local yard = manager.yards[self.yardId]
+        if yard == nil then return end
+
+        local item = yard.inventory.items[self.itemIndex]
+        if item == nil then return end
+
+        local farm = g_farmManager:getFarmById(self.farmId)
+        if farm == nil or farm:getBalance() < item.price then
+            print(("[UsedEquipmentYards] Purchase rejected: insufficient funds (farm %d)"):format(self.farmId))
+            return
+        end
+
+        g_currentMission:addMoneyChange(-item.price, self.farmId, MoneyType.SHOP_VEHICLE_BUY, true)
+
+        local vehicle = item.vehicle
+        if vehicle ~= nil then
+            vehicle:setOwnerFarmId(self.farmId)
+            PriceTagRenderer.removeTag(vehicle)
+            EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
+            EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+        end
+
+        -- Remove from inventory tracking; keepVehicle=true — vehicle stays.
+        yard.inventory:removeItem(item, true)
+
+        -- Broadcast so remote multiplayer clients also clean up their state.
+        g_server:broadcastEvent(EquipmentPurchasedEvent.new(self.yardId, self.itemIndex, self.farmId))
+        return
+    end
+
+    -- -----------------------------------------------------------------
+    -- CLIENT: remote client receiving the broadcast — clean up local state.
+    -- In SP this branch is not needed (server branch handled it above).
+    -- -----------------------------------------------------------------
     local manager = UsedEquipmentYards.yardManager
     if manager == nil then return end
 
@@ -48,16 +82,51 @@ function EquipmentPurchasedEvent:run(connection)
     local item = yard.inventory.items[self.itemIndex]
     if item == nil then return end
 
-    if not connection:getIsServer() then
-        -- Received on server from a client: validate and authorise
-        -- TODO: deduct item.price from the farm and load the vehicle for the buyer.
-        --   Money:   g_currentMission:addMoneyChange(-item.price, self.farmId, MoneyType.SHOP_VEHICLE_BUY, true)
-        --   Vehicle: VehicleLoadingData.new(), :setFilename(), :setOwnerFarmId(), :load(callback)
-        --   See FS25_RedTape/src/instances/Scheme.lua:spawnVehicles() for the full pattern.
-        yard.inventory:removeItem(item)
-        g_server:broadcastEvent(self)
-    else
-        -- Received on a client from the server: remove visual node
-        yard.inventory:removeItem(item)
+    local vehicle = item.vehicle
+    if vehicle ~= nil then
+        PriceTagRenderer.removeTag(vehicle)
+        EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
+        EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+    end
+
+    yard.inventory:removeItem(item, true)
+end
+
+--- Assign a fresh random license plate. Vehicles spawn with ownerFarmId=0 so
+--- spec.licensePlateData is nil at spawn time; there is no original to restore.
+--- Mirrors the shop's approach: get random data, then override placementIndex
+--- with the vehicle's own preferred placement (getLicensePlateDialogSettings),
+--- because the map-level default placement can be NONE on some maps.
+function EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
+    if vehicle.spec_licensePlates == nil then return end
+    if vehicle.setLicensePlatesData == nil then return end
+    if not (vehicle.getHasLicensePlates ~= nil and vehicle:getHasLicensePlates()) then return end
+    if g_licensePlateManager == nil then return end
+
+    local plateData = g_licensePlateManager:getRandomLicensePlateData()
+
+    -- The map-level default placement can be NONE on some maps, which would
+    -- hide all plates. Use the vehicle's own preferred placement instead,
+    -- falling back to BOTH if the vehicle XML doesn't specify one.
+    local vehiclePlacement = nil
+    if vehicle.getLicensePlateDialogSettings ~= nil then
+        vehiclePlacement = vehicle:getLicensePlateDialogSettings()
+    end
+    plateData.placementIndex = vehiclePlacement or LicensePlateManager.PLACEMENT_OPTION.BOTH
+
+    vehicle:setLicensePlatesData(plateData)
+end
+
+--- Re-enable driving and Tab cycling on a vehicle previously blocked for yard display.
+function EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+    -- Driving is blocked via spec_drivable.playerControlAllowedFunctions.
+    -- Clear the whole table so no functions can return false.
+    if vehicle.spec_drivable ~= nil then
+        vehicle.spec_drivable.playerControlAllowedFunctions = {}
+        vehicle.spec_drivable.hasPlayerControlAllowedFunctions = false
+    end
+
+    if vehicle.setIsTabbable ~= nil then
+        vehicle:setIsTabbable(true)
     end
 end

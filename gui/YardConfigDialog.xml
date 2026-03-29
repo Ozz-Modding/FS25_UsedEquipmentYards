@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="700px 620px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="dialogTitle" text="$l10n_uey_config_title" id="dialogTitleElement" position="0px -30px"/>
+
+            <!-- Settings list -->
+            <SmoothList profile="ueyConfigList" id="settingsList" position="50px -80px" size="570px 440px"
+                        focusInit="onOpen" focusChangeTop="nil" focusChangeBottom="nil"
+                        onClick="onListClick" onDoubleClick="onListClick">
+                <ListItem profile="ueyConfigListItem" name="settingRowTemplate" size="555px 50px">
+                    <Text profile="ueyConfigSettingName" position="10px 0px" size="300px 50px" name="settingName"/>
+                    <Text profile="ueyConfigSettingValue" position="320px 0px" size="220px 50px" name="settingValue"/>
+                </ListItem>
+            </SmoothList>
+
+            <!-- Scrollbar -->
+            <ThreePartBitmap profile="fs25_listSliderBox" position="-30px -17px" size="12px 440px" with="anchorTopRight">
+                <Slider profile="fs25_listSlider" size="6px 432px" dataElementId="settingsList" id="listSlider"/>
+            </ThreePartBitmap>
+        </GuiElement>
+
+        <!-- Buttons -->
+        <BoxLayout profile="fs25_dialogButtonBox" size="600px 60px">
+            <Button profile="buttonExtra1" text="$l10n_uey_config_apply" onClick="onClickApply" id="applyButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>
+        </BoxLayout>
+    </GuiElement>
+</GUI>
