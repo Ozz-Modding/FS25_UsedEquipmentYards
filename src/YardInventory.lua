@@ -88,15 +88,15 @@ YardInventory.BOUNDS_INSET = 3
 -- ---------------------------------------------------------------------------
 -- Buffer distance (metres) added around each vehicle's bounding radius.
 -- Ensures vehicles have enough clearance to be driven out.
-YardInventory.VEHICLE_CLEARANCE_BUFFER = 3.0
+YardInventory.VEHICLE_CLEARANCE_BUFFER = 2.0
 -- Maximum random positions to try before giving up on one vehicle.
 YardInventory.MAX_PLACEMENT_ATTEMPTS = 50
 -- After this many consecutive vehicles fail to find a position, declare
 -- the yard full and stop spawning.
 YardInventory.MAX_CONSECUTIVE_FAILURES = 5
--- Yaw jitter range (radians). Vehicles pick a random cardinal direction
--- then add uniform noise within this range. ≈ ±30°.
-YardInventory.YAW_JITTER = math.rad(30)
+-- Yaw jitter range (radians). Vehicles face toward the yard entrance
+-- (anchor point) then add uniform noise within this range. ≈ ±15°.
+YardInventory.YAW_JITTER = math.rad(15)
 -- Terrain offset (metres) when calling setPosition — lifts the vehicle
 -- slightly above the ground to avoid clipping.
 YardInventory.TERRAIN_OFFSET = 0.5
@@ -384,7 +384,7 @@ function YardInventory:findSpawnPosition(candidateRadius)
 
         if self.yard:containsPoint(x, z)
            and not self:isPositionTooClose(x, z, candidateRadius + buffer) then
-            local yaw = self:randomParkingYaw()
+            local yaw = self:parkingYaw(x, z)
             return x, z, yaw
         end
     end
@@ -424,12 +424,18 @@ function YardInventory:isPositionTooClose(x, z, requiredDist)
     return false
 end
 
---- Pick a random yaw that looks like organic parking.
---- Chooses a cardinal direction then adds ± YAW_JITTER.
+--- Compute yaw so the vehicle faces toward the yard entrance (anchor point),
+--- with ± YAW_JITTER for a natural look.
+---@param x number  vehicle world X
+---@param z number  vehicle world Z
 ---@return number yaw in radians
-function YardInventory:randomParkingYaw()
-    local cardinals = { 0, math.pi * 0.5, math.pi, -math.pi * 0.5 }
-    local base = cardinals[math.random(1, 4)]
+function YardInventory:parkingYaw(x, z)
+    local b = self.yard.bounds
+    local ax = b.anchorX or b.cx
+    local az = b.anchorZ or b.cz
+    local dx = ax - x
+    local dz = az - z
+    local base = math.atan2(dx, dz)
     local jitter = (math.random() * 2 - 1) * YardInventory.YAW_JITTER
     return base + jitter
 end

@@ -266,5 +266,9 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
         sizeX = maxX - minX,
         sizeZ = maxZ - minZ,
         polygon = polygon,
+        -- First fence click point — used as the "entrance" so spawned vehicles
+        -- face toward it.
+        anchorX = polygon[1].x,
+        anchorZ = polygon[1].z,
     }
 end

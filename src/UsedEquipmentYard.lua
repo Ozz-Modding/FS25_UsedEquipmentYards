@@ -69,6 +69,10 @@ function UsedEquipmentYard:saveToXML(xmlFile, key)
     setXMLFloat(xmlFile,  key .. ".bounds#cz",   self.bounds.cz)
     setXMLFloat(xmlFile,  key .. ".bounds#sizeX", self.bounds.sizeX)
     setXMLFloat(xmlFile,  key .. ".bounds#sizeZ", self.bounds.sizeZ)
+    if self.bounds.anchorX ~= nil then
+        setXMLFloat(xmlFile, key .. ".bounds#anchorX", self.bounds.anchorX)
+        setXMLFloat(xmlFile, key .. ".bounds#anchorZ", self.bounds.anchorZ)
+    end
 
     -- Persist fence polygon so containsPoint works after load.
     local poly = self.bounds.polygon
@@ -95,6 +99,10 @@ function UsedEquipmentYard.loadFromXML(xmlFile, key)
         sizeX = getXMLFloat(xmlFile, key .. ".bounds#sizeX") or 10,
         sizeZ = getXMLFloat(xmlFile, key .. ".bounds#sizeZ") or 10,
     }
+
+    -- Restore entrance anchor (falls back to yard centre for legacy saves).
+    bounds.anchorX = getXMLFloat(xmlFile, key .. ".bounds#anchorX") or bounds.cx
+    bounds.anchorZ = getXMLFloat(xmlFile, key .. ".bounds#anchorZ") or bounds.cz
 
     -- Restore fence polygon.
     local polygon = {}
