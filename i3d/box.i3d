@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="box.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.11"/>
+  </Asset>
+
+  <Files>
+    <File fileId="7" filename="$data/maps/mapUS/textures/concreteDark_diffuse.png"/>
+    <File fileId="8" filename="$data/maps/mapUS/textures/concreteDark_normal.png"/>
+    <File fileId="9" filename="$data/maps/mapUS/textures/concreteDark_specular.png"/>
+    <File fileId="10" filename="$data/maps/mapUS/textures/props/electricConnetionDecals_diffuse.png"/>
+    <File fileId="1" filename="$data/maps/mapUS/textures/props/electricalBoxSet_diffuse.png"/>
+    <File fileId="2" filename="$data/maps/mapUS/textures/props/electricalBoxSet_normal.png"/>
+    <File fileId="3" filename="$data/maps/mapUS/textures/props/electricalBoxSet_specular.png"/>
+    <File fileId="4" filename="$data/shaders/placeableShader.xml"/>
+    <File fileId="11" filename="$data/shared/default_normal.png"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="concreteDark_mat" materialId="106" customShaderId="4">
+      <Texture fileId="7"/>
+      <Normalmap fileId="8"/>
+      <Glossmap fileId="9"/>
+    </Material>
+    <Material name="electricalBoxSet_mat" materialId="148" customShaderId="4">
+      <Texture fileId="1"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="electricConnetionDecals_mat" materialId="155" specularColor="0.8 1 0">
+      <Texture fileId="10"/>
+      <Normalmap fileId="11"/>
+    </Material>
+    <Material name="lambert1" materialId="386" diffuseColor="0.494118 0.494118 0.494118 1">
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="box.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="electricalBox02" lockedgroup="true" translation="0 0 0" rotation="0 0 0" lodDistance="0 30" clipDistance="300" nodeId="173369">
+      <Shape name="LOD0" shapeId="1" nodeId="173370" castsShadows="true" receiveShadows="true" materialIds="148">
+        <Shape name="concrete" shapeId="2" nodeId="173371" castsShadows="true" receiveShadows="true" materialIds="106"/>
+        <Shape name="decals" shapeId="3" clipDistance="30" nodeId="173372" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="155"/>
+      </Shape>
+      <Shape name="LOD1" shapeId="4" nodeId="173373" castsShadows="true" receiveShadows="true" materialIds="148"/>
+      <Shape name="col" shapeId="5" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="173374" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="386"/>
+    </TransformGroup>
+  </Scene>
+
+</i3D>

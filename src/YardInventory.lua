@@ -93,7 +93,7 @@ YardInventory.VEHICLE_CLEARANCE_BUFFER = 2.0
 YardInventory.MAX_PLACEMENT_ATTEMPTS = 50
 -- After this many consecutive vehicles fail to find a position, declare
 -- the yard full and stop spawning.
-YardInventory.MAX_CONSECUTIVE_FAILURES = 5
+YardInventory.MAX_CONSECUTIVE_FAILURES = 8
 -- Yaw jitter range (radians). Vehicles face toward the yard entrance
 -- (anchor point) then add uniform noise within this range. ≈ ±15°.
 YardInventory.YAW_JITTER = math.rad(15)
@@ -435,7 +435,7 @@ function YardInventory:parkingYaw(x, z)
     local az = b.anchorZ or b.cz
     local dx = ax - x
     local dz = az - z
-    local base = math.atan2(dx, dz)
+    local base = math.atan2(dx, dz) + math.pi
     local jitter = (math.random() * 2 - 1) * YardInventory.YAW_JITTER
     return base + jitter
 end

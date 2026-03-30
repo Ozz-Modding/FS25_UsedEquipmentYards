@@ -63,11 +63,11 @@ function PlaceableUsedEquipmentYard:getIsOnFarmland(superFunc, farmlandId)
 end
 
 function PlaceableUsedEquipmentYard:getOwnerFarmId(superFunc)
-    return AccessHandler.EVERYONE
+    return superFunc(self)
 end
 
 function PlaceableUsedEquipmentYard:setOwnerFarmId(superFunc, farmId)
-    -- Accept but ignore — yard is always accessible to everyone.
+    superFunc(self, farmId)
 end
 
 function PlaceableUsedEquipmentYard:tryFinalizeFence(superFunc)

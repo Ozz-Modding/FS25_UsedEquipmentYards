@@ -7,7 +7,7 @@ YardVehicleActivatable = {}
 local YardVehicleActivatable_mt = Class(YardVehicleActivatable)
 
 -- How close (metres) the player needs to be before the prompt appears.
-YardVehicleActivatable.ACTIVATION_DISTANCE = 6
+YardVehicleActivatable.ACTIVATION_DISTANCE = 4
 
 function YardVehicleActivatable.new(yard, item)
     local self = setmetatable({}, YardVehicleActivatable_mt)
