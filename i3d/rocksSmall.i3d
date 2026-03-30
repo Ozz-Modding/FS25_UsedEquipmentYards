@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<i3D name="rocksSmall.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+    <Asset>
+        <Export program="GIANTS Editor 64bit" version="10.0.11"/>
+    </Asset>
+    <Files>
+        <File fileId="7" filename="$data/maps/textures/shared/props/rocks/rocksSmall_alpha.png"/>
+        <File fileId="1" filename="$data/maps/textures/shared/props/rocks/rocksSmall_diffuse.png"/>
+        <File fileId="8" filename="$data/maps/textures/shared/props/rocks/rocksSmall_height.png"/>
+        <File fileId="2" filename="$data/maps/textures/shared/props/rocks/rocksSmall_normal.png"/>
+        <File fileId="3" filename="$data/maps/textures/shared/props/rocks/rocksSmall_specular.png"/>
+        <File fileId="4" filename="$data/shaders/placeableShader.xml"/>
+    </Files>
+    <Materials>
+        <Material name="rocksSmall_mat" materialId="491" customShaderId="4">
+            <Texture fileId="1"/>
+            <Normalmap fileId="2"/>
+            <Glossmap fileId="3"/>
+        </Material>
+        <Material name="rocksSmallLOD_mat" materialId="492" customShaderId="4" customShaderVariation="customParallax_alphaMap">
+            <Texture fileId="1"/>
+            <Normalmap fileId="2"/>
+            <Glossmap fileId="3"/>
+            <Custommap name="alphaMap" fileId="7"/>
+            <Custommap name="mParallaxMap" fileId="8"/>
+        </Material>
+    </Materials>
+    <Shapes externalShapesFile="rocksSmall.i3d.shapes"/>
+    <Scene>
+        <!-- node 0> : pole (fence post at each vertex) -->
+        <TransformGroup name="pole" nodeId="100">
+            <TransformGroup name="rocksSmall02_lod" lockedgroup="true" scale="2 2 2" lodDistance="0 16" clipDistance="300" nodeId="22866">
+                <Shape name="LOD0" shapeId="1" nodeId="22867" castsShadows="true" receiveShadows="true" materialIds="491"/>
+                <Shape name="LOD1" shapeId="2" nodeId="22868" castsShadows="true" receiveShadows="true" materialIds="492"/>
+            </TransformGroup>
+        </TransformGroup>
+        <!-- node 1> : panel (connecting segment — invisible, we only want posts) -->
+        <TransformGroup name="panel" nodeId="101">
+            <Shape name="visual" shapeId="1" visibility="false" nodeId="102" materialIds="491"/>
+        </TransformGroup>
+    </Scene>
+</i3D>

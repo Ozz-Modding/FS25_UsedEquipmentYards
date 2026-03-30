@@ -25,8 +25,7 @@
     </storeData>
 
     <base>
-        <!-- TODO: replace with a proper yard sign/shed i3d -->
-        <filename>i3d/grass.i3d</filename>
+        <filename>i3d/rocksSmall.i3d</filename>
     </base>
 
     <placement useRandomYRotation="false" useManualYRotation="true">
