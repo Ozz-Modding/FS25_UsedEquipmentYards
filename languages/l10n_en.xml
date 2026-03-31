@@ -31,8 +31,8 @@
         <text name="uey_config_title"            text="Yard Configuration"/>
         <text name="uey_config_quality"          text="Quality"/>
         <text name="uey_config_quality_desc"     text="Controls the overall condition of spawned equipment — higher quality means less wear and damage."/>
-        <text name="uey_config_dirtiness"        text="Max Dirtiness"/>
-        <text name="uey_config_dirtiness_desc"   text="Maximum dirt level on spawned vehicles (randomised between 0 and this value)."/>
+        <text name="uey_config_dirtiness"        text="Dirtiness"/>
+        <text name="uey_config_dirtiness_desc"   text="Base dirt level on spawned vehicles (randomised ± 20% around this value)."/>
         <text name="uey_config_weights_header"   text="Category Weights"/>
         <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
         <text name="uey_config_close"            text="Close"/>

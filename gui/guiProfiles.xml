@@ -35,4 +35,12 @@
         <textColor value="$preset_fs25_colorMainLight"/>
     </Profile>
 
+    <!-- MultiTextOption with top-left anchor for absolute positioning in our dialog -->
+    <Profile name="ueyMultiTextOption" extends="fs25_settingsMultiTextOption" with="anchorTopLeft">
+    </Profile>
+
+    <!-- Weight row container inside ScrollingLayout -->
+    <Profile name="ueyWeightRow" extends="baseReference" with="anchorTopLeft">
+    </Profile>
+
 </GUIProfiles>
