@@ -2,27 +2,139 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
-    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="700px 620px">
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1000px 720px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
         <GuiElement profile="fs25_dialogContentContainer">
-            <Text profile="dialogTitle" text="$l10n_uey_config_title" id="dialogTitleElement" position="0px -30px"/>
+            <Text profile="dialogTitle" text="$l10n_uey_config_title" id="dialogTitleElement" position="0px -25px"/>
 
-            <!-- Settings list -->
-            <SmoothList profile="ueyConfigList" id="settingsList" position="50px -80px" size="570px 440px"
-                        focusInit="onOpen" focusChangeTop="nil" focusChangeBottom="nil"
-                        onClick="onListClick" onDoubleClick="onListClick">
-                <ListItem profile="ueyConfigListItem" name="settingRowTemplate" size="555px 50px">
-                    <Text profile="ueyConfigSettingName" position="10px 0px" size="300px 50px" name="settingName"/>
-                    <Text profile="ueyConfigSettingValue" position="320px 0px" size="220px 50px" name="settingValue"/>
-                </ListItem>
-            </SmoothList>
+            <!-- ======== LEFT COLUMN: Core Settings ======== -->
+            <GuiElement position="40px -80px" size="420px 540px">
 
-            <!-- Scrollbar -->
-            <ThreePartBitmap profile="fs25_listSliderBox" position="-30px -17px" size="12px 440px" with="anchorTopRight">
-                <Slider profile="fs25_listSlider" size="6px 432px" dataElementId="settingsList" id="listSlider"/>
-            </ThreePartBitmap>
+                <!-- Quality -->
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_quality" position="0px 0px" size="400px 28px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_quality_desc" position="0px -28px" size="400px 40px"/>
+                <MultiTextOption profile="fs25_settingsMultiTextOption" id="qualityOption"
+                    position="0px -72px" size="400px 40px" onClick="onQualityChanged"/>
+
+                <!-- Dirtiness -->
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_dirtiness" position="0px -140px" size="400px 28px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -168px" size="400px 40px"/>
+                <MultiTextOption profile="fs25_settingsMultiTextOption" id="dirtinessOption"
+                    position="0px -212px" size="400px 40px" onClick="onDirtinessChanged"/>
+
+            </GuiElement>
+
+            <!-- ======== RIGHT COLUMN: Category Weights ======== -->
+            <GuiElement position="500px -80px" size="460px 580px">
+                <Text profile="ueyColumnHeader" text="$l10n_uey_config_weights_header" position="0px 0px" size="460px 28px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_weights_desc" position="0px -26px" size="460px 20px"/>
+
+                <!-- Weight rows (label + MultiTextOption per category) -->
+                <!-- Each row: 26px tall, starting at -52px below column header -->
+
+                <GuiElement position="0px -52px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_TRACTORSS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightTRACTORSS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -78px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_TRACTORSM" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightTRACTORSM" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -104px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_TRACTORSL" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightTRACTORSL" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -130px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_TELELOADERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightTELELOADERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -156px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_WHEELLOADERSM" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightWHEELLOADERSM" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -182px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_WHEELLOADERSL" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightWHEELLOADERSL" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -208px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_SKIDSTEERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightSKIDSTEERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -234px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_COMBINECUTTERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightCOMBINECUTTERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -260px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_HARVESTERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightHARVESTERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -286px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_FORAGEHARVESTERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightFORAGEHARVESTERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -312px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_SPRAYERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightSPRAYERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -338px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_FERTILIZERSPREAD" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightFERTILIZERSPREAD" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -364px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_SOWINGMACHINES" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightSOWINGMACHINES" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -390px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_PLOWS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightPLOWS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -416px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_CULTIVATORS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightCULTIVATORS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -442px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_MOWERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightMOWERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -468px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_TEDDERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightTEDDERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -494px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_WINDROWERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightWINDROWERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -520px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_BALERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightBALERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+                <GuiElement position="0px -546px" size="460px 26px">
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_cat_TRAILERS" size="230px 26px"/>
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="weightTRAILERS" position="230px 0px" size="220px 26px" onClick="onWeightChanged"/>
+                </GuiElement>
+
+            </GuiElement>
         </GuiElement>
 
         <!-- Buttons -->

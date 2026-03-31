@@ -1,0 +1,45 @@
+<licensePlates xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../shared/xml/schema/mapLicensePlates.xsd">
+    <font name="LICENSE_PLATE_PL" />
+
+    <licensePlate filename="i3d/licensePlates/licensePlatesPL.i3d" node="0" type="ELONGATED" width="0.52" height="0.11">
+        <font size="0.075" scaleX="0.85" scaleY="1"/>
+
+        <variations>
+            <variation>
+                <value node="0|0" posX="-0.090"  numerical="true"  alphabetical="false" />
+                <value node="0|1" posX="-0.040"  numerical="true"  alphabetical="false" />
+                <value node="0|2" posX="0.010"   numerical="true"  alphabetical="false" />
+				<value node="0|3" posX="0.030" character="," locked="true"/>
+                <value node="0|4" posX="0.065"   numerical="true"  alphabetical="false" />
+				<value node="0|5" posX="0.115"   numerical="true"  alphabetical="false" />
+                <value node="0|6" posX="0.165"   numerical="true"  alphabetical="false" />
+			</variation>
+		</variations>
+
+        <frame node="2" widthOffset="0.005" heightOffsetTop="0.005" heightOffsetBot="0.015"/>
+	</licensePlate>
+
+    <licensePlate filename="i3d/licensePlates/licensePlatesPL.i3d" node="1" type="SQUARISH" width="0.255" height="0.130">
+        <font size="0.05" scaleX="0.95" scaleY="1"/>
+
+        <variations>
+            <variation>
+                <value node="0|0" posX="-0.060" posY="-0.01" numerical="true" alphabetical="false" />
+				<value node="0|1" posX="-0.030" posY="-0.01" numerical="true" alphabetical="false" />
+                <value node="0|2" posX="0.000" posY="-0.01" numerical="true" alphabetical="false" />
+				<value node="0|3" posX="0.015" posY="-0.01" character="," locked="true"/>
+                <value node="0|4" posX="0.040"  posY="-0.01" numerical="true"  alphabetical="false" />
+                <value node="0|5" posX="0.070"  posY="-0.01" numerical="true"  alphabetical="false" />
+				<value node="0|6" posX="0.100"  posY="-0.01" numerical="true"  alphabetical="false" />
+			</variation>
+		</variations>
+
+        <frame node="2" widthOffset="0.005" heightOffsetTop="0.005" heightOffsetBot="0.015"/>
+	</licensePlate>
+
+    <colorConfigurations materialName="licensePlateColored_mat" useDefaultColors="true">
+        <colorConfiguration name="$l10n_ui_colorBlack" color="0.0212 0.0212 0.0212"/>
+	</colorConfigurations>
+
+    <placement defaultType="both"/>
+</licensePlates>

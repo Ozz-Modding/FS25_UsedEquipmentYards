@@ -1,11 +1,7 @@
 -- YardConfigDialog
 -- Dialog for configuring a yard's quality, dirtiness, and category weights.
--- Uses a SmoothList with left/right click cycling through option values.
---
--- Row layout:
---   [0] Quality      — cycles LOW / MEDIUM / HIGH
---   [1] Dirtiness    — cycles 0%, 5%, 10%, ... 100%
---   [2+] Categories  — cycles weight 0..10 for each known vehicle category
+-- Two-column layout: core settings (left), category weights (right).
+-- Each setting uses a MultiTextOption for left/right value selection.
 
 YardConfigDialog = {}
 
@@ -16,28 +12,28 @@ YardConfigDialog.DIRTINESS_STEP  = 0.05    -- 5% increments
 YardConfigDialog.MAX_WEIGHT      = 10
 
 -- Ordered list of categories shown in the dialog.
--- Add/remove entries here to control what players can configure.
+-- Each entry must have a matching id="weight<KEY>" MultiTextOption in the XML.
 YardConfigDialog.CATEGORIES = {
-    "TRACTORSS",        -- Small tractors
-    "TRACTORSM",        -- Medium tractors
-    "TRACTORSL",        -- Large tractors
-    "TELELOADERS",      -- Telescopic loaders
-    "WHEELLOADERSM",    -- Medium wheel loaders
-    "WHEELLOADERSL",    -- Large wheel loaders
-    "SKIDSTEERS",       -- Skid steers
-    "COMBINECUTTERS",   -- Combine headers/cutters
-    "HARVESTERS",       -- Combines / harvesters
-    "FORAGEHARVESTERS", -- Forage harvesters
-    "SPRAYERS",         -- Sprayers
-    "FERTILIZERSPREAD", -- Fertiliser spreaders
-    "SOWINGMACHINES",   -- Seeders / drills
-    "PLOWS",            -- Ploughs
-    "CULTIVATORS",      -- Cultivators / tillers
-    "MOWERS",           -- Mowers
-    "TEDDERS",          -- Tedders
-    "WINDROWERS",       -- Windrowers / rakes
-    "BALERS",           -- Balers
-    "TRAILERS",         -- Trailers
+    "TRACTORSS",
+    "TRACTORSM",
+    "TRACTORSL",
+    "TELELOADERS",
+    "WHEELLOADERSM",
+    "WHEELLOADERSL",
+    "SKIDSTEERS",
+    "COMBINECUTTERS",
+    "HARVESTERS",
+    "FORAGEHARVESTERS",
+    "SPRAYERS",
+    "FERTILIZERSPREAD",
+    "SOWINGMACHINES",
+    "PLOWS",
+    "CULTIVATORS",
+    "MOWERS",
+    "TEDDERS",
+    "WINDROWERS",
+    "BALERS",
+    "TRAILERS",
 }
 
 -- ---------------------------------------------------------------------------
@@ -53,8 +49,7 @@ end
 function YardConfigDialog.new()
     local self = MessageDialog.new(nil, YardConfigDialog_mt, g_messageCenter, g_i18n, g_inputBinding)
     self.yard = nil
-    self.config = nil       -- working copy of yard config
-    self.entries = {}       -- ordered list of { type, key, ... }
+    self.config = nil
     return self
 end
 
@@ -77,8 +72,7 @@ end
 
 function YardConfigDialog:onOpen()
     YardConfigDialog:superClass().onOpen(self)
-    self:buildEntries()
-    self.settingsList:reloadData()
+    self:populateOptions()
 end
 
 function YardConfigDialog:onClose()
@@ -91,136 +85,65 @@ function YardConfigDialog:onCreate()
 end
 
 -- ---------------------------------------------------------------------------
--- Entries
+-- Populate all MultiTextOption elements with texts and current state
 -- ---------------------------------------------------------------------------
 
-function YardConfigDialog:buildEntries()
-    self.entries = {}
-
-    -- Quality row.
-    self.entries[#self.entries + 1] = { type = "quality" }
-
-    -- Dirtiness row.
-    self.entries[#self.entries + 1] = { type = "dirtiness" }
-
-    -- Category rows — gather all known vehicle categories from the store.
-    local cats = self:getKnownCategories()
-    for _, catName in ipairs(cats) do
-        self.entries[#self.entries + 1] = { type = "category", key = catName }
+function YardConfigDialog:populateOptions()
+    -- Quality
+    local qualityTexts = {}
+    for _, q in ipairs(YardConfigDialog.QUALITY_OPTIONS) do
+        qualityTexts[#qualityTexts + 1] = g_i18n:getText("uey_config_quality_" .. q)
     end
-end
-
---- Returns the curated list of categories shown in the dialog.
-function YardConfigDialog:getKnownCategories()
-    return YardConfigDialog.CATEGORIES
-end
-
--- ---------------------------------------------------------------------------
--- DataSource for SmoothList
--- ---------------------------------------------------------------------------
-
-function YardConfigDialog:getNumberOfItemsInSection(list, section)
-    return #self.entries
-end
-
-function YardConfigDialog:populateCellForItemInSection(list, section, index, cell)
-    local entry = self.entries[index]
-    if entry == nil then return end
-
-    local nameElem  = cell:getAttribute("settingName")
-    local valueElem = cell:getAttribute("settingValue")
-
-    if entry.type == "quality" then
-        nameElem:setText(g_i18n:getText("uey_config_quality"))
-        local key = "uey_config_quality_" .. (self.config.quality or "MEDIUM")
-        valueElem:setText(g_i18n:getText(key))
-
-    elseif entry.type == "dirtiness" then
-        nameElem:setText(g_i18n:getText("uey_config_dirtiness"))
-        local pct = math.floor((self.config.dirtiness or 0.20) * 100 + 0.5)
-        valueElem:setText(("%d %%"):format(pct))
-
-    elseif entry.type == "category" then
-        nameElem:setText(entry.key)
-        local w = self.config.categories[entry.key] or 0
-        valueElem:setText(tostring(w))
+    self.qualityOption:setTexts(qualityTexts)
+    local qualityState = 1
+    for i, v in ipairs(YardConfigDialog.QUALITY_OPTIONS) do
+        if v == self.config.quality then qualityState = i; break end
     end
-end
+    self.qualityOption:setState(qualityState)
 
--- ---------------------------------------------------------------------------
--- Click handling — left click cycles forward, right click backward (not
--- supported by SmoothList onClick; we just cycle forward on any click).
--- ---------------------------------------------------------------------------
+    -- Dirtiness (0%, 5%, 10%, ... 100%)
+    local dirtTexts = {}
+    for pct = 0, 100, 5 do
+        dirtTexts[#dirtTexts + 1] = ("%d %%"):format(pct)
+    end
+    self.dirtinessOption:setTexts(dirtTexts)
+    local dirtState = math.floor((self.config.dirtiness or 0.20) / YardConfigDialog.DIRTINESS_STEP + 0.5) + 1
+    self.dirtinessOption:setState(math.max(1, math.min(#dirtTexts, dirtState)))
 
-function YardConfigDialog:onListClick(list, section, index, element)
-    local entry = self.entries[index]
-    if entry == nil then return end
-
-    if entry.type == "quality" then
-        self:cycleQuality(1)
-    elseif entry.type == "dirtiness" then
-        self:cycleDirtiness(1)
-    elseif entry.type == "category" then
-        self:cycleCategory(entry.key, 1)
+    -- Category weights (0 .. MAX_WEIGHT)
+    local weightTexts = {}
+    for w = 0, YardConfigDialog.MAX_WEIGHT do
+        weightTexts[#weightTexts + 1] = tostring(w)
     end
 
-    self.settingsList:reloadData()
-end
-
-function YardConfigDialog:cycleQuality(dir)
-    local opts = YardConfigDialog.QUALITY_OPTIONS
-    local cur = 1
-    for i, v in ipairs(opts) do
-        if v == self.config.quality then cur = i; break end
-    end
-    cur = cur + dir
-    if cur > #opts then cur = 1 end
-    if cur < 1 then cur = #opts end
-    self.config.quality = opts[cur]
-end
-
-function YardConfigDialog:cycleDirtiness(dir)
-    local step = YardConfigDialog.DIRTINESS_STEP
-    local val = (self.config.dirtiness or 0.20) + dir * step
-    -- Wrap around.
-    if val > 1.005 then val = 0 end
-    if val < -0.005 then val = 1 end
-    self.config.dirtiness = math.max(0, math.min(1, val))
-end
-
-function YardConfigDialog:cycleCategory(catName, dir)
-    local cur = self.config.categories[catName] or 0
-    cur = cur + dir
-    if cur > YardConfigDialog.MAX_WEIGHT then cur = 0 end
-    if cur < 0 then cur = YardConfigDialog.MAX_WEIGHT end
-    self.config.categories[catName] = cur
-end
-
--- ---------------------------------------------------------------------------
--- Keyboard navigation — left/right arrows cycle value on selected row
--- ---------------------------------------------------------------------------
-
-function YardConfigDialog:onMenuInput(actionName, inputValue)
-    if actionName == InputAction.MENU_AXIS_LEFT_RIGHT then
-        local dir = inputValue > 0 and 1 or -1
-        local index = self.settingsList:getSelectedIndex()
-        if index ~= nil and index > 0 then
-            local entry = self.entries[index]
-            if entry ~= nil then
-                if entry.type == "quality" then
-                    self:cycleQuality(dir)
-                elseif entry.type == "dirtiness" then
-                    self:cycleDirtiness(dir)
-                elseif entry.type == "category" then
-                    self:cycleCategory(entry.key, dir)
-                end
-                self.settingsList:reloadData()
-            end
+    for _, catName in ipairs(YardConfigDialog.CATEGORIES) do
+        local option = self["weight" .. catName]
+        if option ~= nil then
+            option:setTexts(weightTexts)
+            local w = (self.config.categories[catName] or 0) + 1
+            option:setState(math.max(1, math.min(#weightTexts, w)))
+            option.ueyCategory = catName
         end
-        return
     end
+end
 
-    YardConfigDialog:superClass().onMenuInput(self, actionName, inputValue)
+-- ---------------------------------------------------------------------------
+-- Callbacks — one per core setting, one shared for all weight options
+-- ---------------------------------------------------------------------------
+
+function YardConfigDialog:onQualityChanged(state, element)
+    self.config.quality = YardConfigDialog.QUALITY_OPTIONS[state]
+end
+
+function YardConfigDialog:onDirtinessChanged(state, element)
+    self.config.dirtiness = (state - 1) * YardConfigDialog.DIRTINESS_STEP
+end
+
+function YardConfigDialog:onWeightChanged(state, element)
+    local catName = element.ueyCategory
+    if catName ~= nil then
+        self.config.categories[catName] = state - 1
+    end
 end
 
 -- ---------------------------------------------------------------------------

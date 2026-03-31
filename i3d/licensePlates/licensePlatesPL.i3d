@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="licensePlatesPL.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.11"/>
+  </Asset>
+
+  <Files>
+    <File fileId="4" filename="$data/shaders/vehicleShader.xml"/>
+    <File fileId="2" filename="$data/shared/default_normal.png"/>
+    <File fileId="6" filename="$data/shared/detailLibrary/flat_normal.png"/>
+    <File fileId="15" filename="$data/shared/detailLibrary/metallic/silverScratched_diffuse.png"/>
+    <File fileId="14" filename="$data/shared/detailLibrary/metallic/silverScratched_specular.png"/>
+    <File fileId="7" filename="$data/shared/detailLibrary/nonMetallic/metal/metalPainted_diffuse.png"/>
+    <File fileId="5" filename="$data/shared/detailLibrary/nonMetallic/metal/metalPainted_specular.png"/>
+    <File fileId="18" filename="$data/shared/detailLibrary/nonMetallic/plastic/plasticPainted_diffuse.png"/>
+    <File fileId="17" filename="$data/shared/detailLibrary/nonMetallic/plastic/plasticPainted_specular.png"/>
+    <File fileId="1" filename="$data/shared/licensePlates/licensePlates_diffuse.png"/>
+    <File fileId="13" filename="$data/shared/licensePlates/licensePlates_normal.png"/>
+    <File fileId="3" filename="$data/shared/licensePlates/licensePlates_vmask.png"/>
+    <File fileId="12" filename="$data/shared/white_diffuse.png"/>
+    <File fileId="19" filename="licensePlateSquare_diffuse.dds"/>
+    <File fileId="16" filename="licensePlaterRectangle_diffuse.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="licensePlates_metalPainted_mat1" materialId="5" customShaderId="4">
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+    </Material>
+    <Material name="licensePlates_metalPainted_mat1" materialId="6" customShaderId="4">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+    </Material>
+    <Material name="licensePlates_metalPainted_mat1" materialId="7" customShaderId="4">
+      <Texture fileId="16"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+    </Material>
+    <Material name="licensePlates_metalPainted_mat1" materialId="8" customShaderId="4">
+      <Texture fileId="19"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+    </Material>
+    <Material name="licensePlates_metalPainted_mat3" materialId="9" customShaderId="4" customShaderVariation="vmaskUV2">
+      <Texture fileId="1"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="5"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="7"/>
+    </Material>
+    <Material name="licensePlates_metalPaintedBlack_mat" materialId="10" customShaderId="4">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="17"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="18"/>
+      <CustomParameter name="colorScale" value="0.012 0.012 0.012"/>
+    </Material>
+    <Material name="licensePlates_silverScratched_mat" materialId="11" customShaderId="4">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="14"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="15"/>
+      <CustomParameter name="colorScale" value="0 0 1"/>
+    </Material>
+    <Material name="licensePlates_silverScratched_mat" materialId="12" customShaderId="4">
+      <Texture fileId="12"/>
+      <Normalmap fileId="13"/>
+      <Glossmap fileId="3"/>
+      <Custommap name="detailSpecular" fileId="14"/>
+      <Custommap name="detailNormal" fileId="6"/>
+      <Custommap name="detailDiffuse" fileId="15"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="licensePlatesPL.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="rectangle" rotation="-90 0 0" nodeId="21">
+      <TransformGroup name="symbols" rotation="90 0 0" nodeId="22">
+        <TransformGroup name="d1" translation="-0.054 0.002 0.000475" rotation="-90 0 0" nodeId="26"/>
+        <TransformGroup name="d2" translation="0 0.002 0.000475" rotation="-90 0 0" nodeId="27"/>
+        <TransformGroup name="d3" translation="0.054 0.002 0.000475" rotation="-90 0 0" nodeId="28"/>
+        <TransformGroup name="sep" translation="0.065 0.002 0.000475" rotation="-90 0 0" nodeId="29"/>
+        <TransformGroup name="d4" translation="0.108 0.002 0.000475" rotation="-90 0 0" nodeId="30"/>
+        <TransformGroup name="d5" translation="0.162 0.002 0.000475" rotation="-90 0 0" nodeId="31"/>
+        <TransformGroup name="d6" translation="0.216 0.002 0.000475" rotation="-90 0 0" nodeId="34"/>
+      </TransformGroup>
+      <Shape name="rectanglePlate" translation="0 0 0.000862" rotation="90 0 0" shapeId="3" clipDistance="300" nodeId="35" castsShadows="true" receiveShadows="true" materialIds="11,7,7,5"/>
+      <Shape name="rectangleFrame" rotation="90 0 0" shapeId="4" clipDistance="300" nodeId="36" castsShadows="true" receiveShadows="true" materialIds="10"/>
+    </TransformGroup>
+    <TransformGroup name="square" translation="0 0 0.2" rotation="-90 0 0" nodeId="37">
+      <TransformGroup name="symbols" nodeId="38">
+        <TransformGroup name="d1" translation="0 0.014 0.001942" nodeId="40"/>
+        <TransformGroup name="d2" translation="0.03 0.014 0.001942" nodeId="46"/>
+        <TransformGroup name="d3" translation="0.06 0.014 0.001942" nodeId="41"/>
+        <TransformGroup name="sep" translation="-0.05 -0.031 0.001942" nodeId="42"/>
+        <TransformGroup name="d4" translation="0 -0.031 0.001942" nodeId="44"/>
+        <TransformGroup name="d5" translation="0.03 -0.031 0.001942" nodeId="45"/>
+        <TransformGroup name="d6" translation="0.06 -0.031 0.001942" nodeId="47"/>
+      </TransformGroup>
+      <Shape name="squarePlate" translation="0 0.005004 0.000765" rotation="90 0 0" shapeId="6" clipDistance="300" nodeId="51" castsShadows="true" receiveShadows="true" materialIds="6,12,8,8"/>
+      <Shape name="squareFrame" translation="0 0 0.001938" rotation="90 0 0" shapeId="7" clipDistance="300" nodeId="52" castsShadows="true" receiveShadows="true" materialIds="10"/>
+    </TransformGroup>
+  </Scene>
+
+</i3D>

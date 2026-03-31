@@ -30,12 +30,38 @@
         <text name="uey_action_configureYard"    text="Configure Yard"/>
         <text name="uey_config_title"            text="Yard Configuration"/>
         <text name="uey_config_quality"          text="Quality"/>
-        <text name="uey_config_dirtiness"        text="Dirtiness"/>
+        <text name="uey_config_quality_desc"     text="Controls the overall condition of spawned equipment — higher quality means less wear and damage."/>
+        <text name="uey_config_dirtiness"        text="Max Dirtiness"/>
+        <text name="uey_config_dirtiness_desc"   text="Maximum dirt level on spawned vehicles (randomised between 0 and this value)."/>
+        <text name="uey_config_weights_header"   text="Category Weights"/>
+        <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
         <text name="uey_config_close"            text="Close"/>
         <text name="uey_config_apply"            text="Apply"/>
         <text name="uey_config_quality_LOW"      text="Low"/>
         <text name="uey_config_quality_MEDIUM"   text="Medium"/>
         <text name="uey_config_quality_HIGH"     text="High"/>
+
+        <!-- Category names -->
+        <text name="uey_cat_TRACTORSS"        text="Small Tractors"/>
+        <text name="uey_cat_TRACTORSM"        text="Medium Tractors"/>
+        <text name="uey_cat_TRACTORSL"        text="Large Tractors"/>
+        <text name="uey_cat_TELELOADERS"      text="Teleloaders"/>
+        <text name="uey_cat_WHEELLOADERSM"    text="Medium Wheel Loaders"/>
+        <text name="uey_cat_WHEELLOADERSL"    text="Large Wheel Loaders"/>
+        <text name="uey_cat_SKIDSTEERS"       text="Skid Steers"/>
+        <text name="uey_cat_COMBINECUTTERS"   text="Combine Headers"/>
+        <text name="uey_cat_HARVESTERS"       text="Harvesters"/>
+        <text name="uey_cat_FORAGEHARVESTERS" text="Forage Harvesters"/>
+        <text name="uey_cat_SPRAYERS"         text="Sprayers"/>
+        <text name="uey_cat_FERTILIZERSPREAD" text="Fertiliser Spreaders"/>
+        <text name="uey_cat_SOWINGMACHINES"   text="Seeders"/>
+        <text name="uey_cat_PLOWS"            text="Ploughs"/>
+        <text name="uey_cat_CULTIVATORS"      text="Cultivators"/>
+        <text name="uey_cat_MOWERS"           text="Mowers"/>
+        <text name="uey_cat_TEDDERS"          text="Tedders"/>
+        <text name="uey_cat_WINDROWERS"       text="Windrowers"/>
+        <text name="uey_cat_BALERS"           text="Balers"/>
+        <text name="uey_cat_TRAILERS"         text="Trailers"/>
 
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
