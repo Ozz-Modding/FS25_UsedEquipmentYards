@@ -1,7 +1,7 @@
 -- YardConfigDialog
--- Dialog for configuring a yard's quality, dirtiness, and category weights.
--- Two-column layout: core settings (left), category weights (right).
--- Category weights are built dynamically from g_storeManager.categoryByName.
+-- Dialog for configuring a yard's quality, dirtiness, category weights, and brands.
+-- Three-column layout: core settings (left), category weights (middle), brands (right).
+-- Category weights and brands are built dynamically from g_storeManager / g_brandManager.
 
 YardConfigDialog                 = {}
 
@@ -10,6 +10,7 @@ local YardConfigDialog_mt        = Class(YardConfigDialog, MessageDialog)
 YardConfigDialog.QUALITY_OPTIONS = { "LOW", "MEDIUM", "HIGH" }
 YardConfigDialog.DIRTINESS_STEP  = 0.05 -- 5% increments
 YardConfigDialog.MAX_WEIGHT      = 10
+YardConfigDialog.MAX_BRAND_WEIGHT = 3
 
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES      = {
@@ -36,6 +37,11 @@ YardConfigDialog.SKIP_NAMES      = {
     ["FORESTRYMISC"] = true,
 }
 
+-- Brand names to exclude.
+YardConfigDialog.SKIP_BRANDS     = {
+    ["NONE"] = true,
+}
+
 -- ---------------------------------------------------------------------------
 -- Registration (called once at mod load)
 -- ---------------------------------------------------------------------------
@@ -50,8 +56,9 @@ function YardConfigDialog.new()
     local self = MessageDialog.new(nil, YardConfigDialog_mt, g_messageCenter, g_i18n, g_inputBinding)
     self.yard = nil
     self.config = nil
-    self.weightRows = {} -- { catName, option } created dynamically
-    self.categoriesBuilt = false
+    self.weightRows = {}   -- { catName, option }
+    self.brandRows  = {}   -- { brandName, option }
+    self.rowsBuilt  = false
     return self
 end
 
@@ -74,7 +81,7 @@ end
 
 function YardConfigDialog:onOpen()
     YardConfigDialog:superClass().onOpen(self)
-    self:buildCategoryRows()
+    self:buildRows()
     self:populateOptions()
 end
 
@@ -88,11 +95,10 @@ function YardConfigDialog:onCreate()
 end
 
 -- ---------------------------------------------------------------------------
--- Build category weight rows dynamically from g_storeManager
+-- Build dynamic rows (categories + brands) — runs once
 -- ---------------------------------------------------------------------------
 
---- Return an ordered list of { name, title } for all store categories that
---- are not in SKIP_TYPES, sorted by orderId.
+--- Return an ordered list of { name, title } for filtered store categories.
 function YardConfigDialog.getKnownCategories()
     local cats = {}
     for name, info in pairs(g_storeManager.categoryByName) do
@@ -120,35 +126,57 @@ function YardConfigDialog.getKnownCategories()
     return cats
 end
 
---- Clone the hidden template row for each store category and add to the
---- ScrollingLayout. Only runs once; subsequent opens reuse the rows.
-function YardConfigDialog:buildCategoryRows()
-    if self.categoriesBuilt then return end
-    self.categoriesBuilt = true
+--- Return an ordered list of { name, title } for all brands.
+function YardConfigDialog.getKnownBrands()
+    local brands = {}
+    for i = 1, g_brandManager.numOfBrands do
+        local brand = g_brandManager.indexToBrand[i]
+        if brand ~= nil and not YardConfigDialog.SKIP_BRANDS[brand.name] then
+            brands[#brands + 1] = { name = brand.name, title = brand.title }
+        end
+    end
+    table.sort(brands, function(a, b) return a.title < b.title end)
+    return brands
+end
 
-    local layout         = self.weightScrollLayout
-    local template       = self.weightRowTemplate
+--- Clone template rows into the ScrollingLayouts. Only runs once.
+function YardConfigDialog:buildRows()
+    if self.rowsBuilt then return end
+    self.rowsBuilt = true
+
+    -- Category weights
+    self:buildListRows(
+        self.weightScrollLayout, self.weightRowTemplate,
+        YardConfigDialog.getKnownCategories(), self.weightRows, "ueyCategory"
+    )
+
+    -- Brands
+    self:buildListRows(
+        self.brandScrollLayout, self.brandRowTemplate,
+        YardConfigDialog.getKnownBrands(), self.brandRows, "ueyBrand"
+    )
+end
+
+--- Generic: clone a template row per entry into a ScrollingLayout.
+function YardConfigDialog:buildListRows(layout, template, entries, rowTable, tagKey)
     if layout == nil or template == nil then return end
 
-    local categories = YardConfigDialog.getKnownCategories()
-
-    for _, cat in ipairs(categories) do
+    for _, entry in ipairs(entries) do
         local row = template:clone()
         row:setVisible(true)
 
-        -- Children by index: [1] = label, [2] = option.
         local label  = row.elements[1]
         local option = row.elements[2]
 
         if label ~= nil then
-            label:setText(cat.title)
+            label:setText(entry.title)
         end
         if option ~= nil then
-            option.ueyCategory = cat.name
+            option[tagKey] = entry.name
         end
 
         layout:addElement(row)
-        self.weightRows[#self.weightRows + 1] = { catName = cat.name, option = option }
+        rowTable[#rowTable + 1] = { name = entry.name, option = option }
     end
 
     layout:invalidateLayout()
@@ -187,11 +215,23 @@ function YardConfigDialog:populateOptions()
     for w = 0, YardConfigDialog.MAX_WEIGHT do
         weightTexts[#weightTexts + 1] = tostring(w)
     end
-
     for _, row in ipairs(self.weightRows) do
         row.option:setTexts(weightTexts)
-        local w = (self.config.categories[row.catName] or 0) + 1
+        local w = (self.config.categories[row.name] or 0) + 1
         row.option:setState(math.max(1, math.min(#weightTexts, w)))
+    end
+
+    -- Brand weights (0 .. MAX_BRAND_WEIGHT)
+    -- Empty brands config = all brands at weight 1.
+    local hasBrandConfig = next(self.config.brands) ~= nil
+    local brandTexts = {}
+    for w = 0, YardConfigDialog.MAX_BRAND_WEIGHT do
+        brandTexts[#brandTexts + 1] = tostring(w)
+    end
+    for _, row in ipairs(self.brandRows) do
+        row.option:setTexts(brandTexts)
+        local w = hasBrandConfig and (self.config.brands[row.name] or 0) or 1
+        row.option:setState(math.max(1, math.min(#brandTexts, w + 1)))
     end
 end
 
@@ -214,14 +254,35 @@ function YardConfigDialog:onWeightChanged(state, element)
     end
 end
 
+function YardConfigDialog:onBrandChanged(state, element)
+    local brandName = element.ueyBrand
+    if brandName ~= nil then
+        self.config.brands[brandName] = state - 1
+    end
+end
+
 -- ---------------------------------------------------------------------------
 -- Buttons
 -- ---------------------------------------------------------------------------
 
 function YardConfigDialog:onClickClearWeights()
     for _, row in ipairs(self.weightRows) do
+        row.option:setState(1)
+        self.config.categories[row.name] = 0
+    end
+end
+
+function YardConfigDialog:onClickAllBrands()
+    for _, row in ipairs(self.brandRows) do
+        row.option:setState(2)  -- state 2 = weight 1
+        self.config.brands[row.name] = 1
+    end
+end
+
+function YardConfigDialog:onClickClearBrands()
+    for _, row in ipairs(self.brandRows) do
         row.option:setState(1)  -- state 1 = weight 0
-        self.config.categories[row.catName] = 0
+        self.config.brands[row.name] = 0
     end
 end
 

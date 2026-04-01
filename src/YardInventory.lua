@@ -64,9 +64,10 @@ YardInventory.QUALITY                  = {
 }
 
 -- ---------------------------------------------------------------------------
--- Default yard configuration — quality tier, category weights, dirtiness
+-- Default yard configuration — quality tier, category weights, dirtiness, brands
 -- ---------------------------------------------------------------------------
 -- Categories is a map of { CATEGORY_NAME = weight }. Weight 0 = excluded.
+-- Brands is a map of { BRAND_NAME = weight }. Empty table = all brands allowed (weight 1).
 YardInventory.DEFAULT_CONFIG           = {
     quality = "MEDIUM",
     dirtiness = 0.50, -- base dirt level (0–1)
@@ -78,6 +79,7 @@ YardInventory.DEFAULT_CONFIG           = {
         WHEELLOADERVEHICLES = 2,
         SKIDSTEERVEHICLES   = 2,
     },
+    brands = {},  -- empty = all brands with weight 1
 }
 
 -- Dirt jitter range applied ± around the dirtiness base
@@ -132,9 +134,13 @@ function YardInventory.copyConfig(cfg)
         quality    = cfg.quality,
         dirtiness  = cfg.dirtiness,
         categories = {},
+        brands     = {},
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
+    end
+    for k, v in pairs(cfg.brands or {}) do
+        copy.brands[k] = v
     end
     return copy
 end
@@ -319,22 +325,38 @@ function YardInventory:rollItem()
 end
 
 --- Build a weighted pool of { storeItem, weight } entries from the config.
+--- Weight = category weight * brand weight. Brand weight defaults to 1 if
+--- the brands table is empty (no brand filter configured).
 function YardInventory:buildStorePool()
-    local cats = self.config.categories -- map: CATEGORY_NAME = weight
+    local cats   = self.config.categories  -- map: CATEGORY_NAME = weight
+    local brands = self.config.brands      -- map: BRAND_NAME = weight (empty = all)
+    local hasBrandFilter = next(brands) ~= nil
 
-    local pool = {}                     -- { storeItem, weight }
+    local pool = {}        -- { storeItem, weight }
     local totalWeight = 0
 
     for _, si in pairs(g_storeManager:getItems()) do
         if si.showInStore and si.extraContentId == nil
             and si.price >= YardInventory.MIN_VEHICLE_PRICE
             and StoreItemUtil.getIsVehicle(si) then
-            for _, catName in ipairs(si.categoryNames or {}) do
-                local w = cats[catName]
-                if w ~= nil and w > 0 then
-                    pool[#pool + 1] = { storeItem = si, weight = w }
-                    totalWeight = totalWeight + w
-                    break
+
+            -- Brand weight: if no filter configured, all brands get weight 1.
+            local brandWeight = 1
+            if hasBrandFilter then
+                local brand = g_brandManager:getBrandByIndex(si.brandIndex)
+                local brandName = brand ~= nil and brand.name or nil
+                brandWeight = brandName ~= nil and (brands[brandName] or 0) or 0
+            end
+
+            if brandWeight > 0 then
+                for _, catName in ipairs(si.categoryNames or {}) do
+                    local catWeight = cats[catName]
+                    if catWeight ~= nil and catWeight > 0 then
+                        local w = catWeight * brandWeight
+                        pool[#pool + 1] = { storeItem = si, weight = w }
+                        totalWeight = totalWeight + w
+                        break
+                    end
                 end
             end
         end
@@ -723,6 +745,16 @@ function YardInventory:saveToXML(xmlFile, key)
         end
     end
 
+    local bi = 0
+    for brandName, weight in pairs(self.config.brands or {}) do
+        if weight > 0 then
+            local bKey = ("%s.config.brand(%d)"):format(key, bi)
+            setXMLString(xmlFile, bKey .. "#name", brandName)
+            setXMLInt(xmlFile, bKey .. "#weight", weight)
+            bi = bi + 1
+        end
+    end
+
     -- Save items.
     for i, item in ipairs(self.items) do
         local iKey = ("%s.item(%d)"):format(key, i - 1)
@@ -743,6 +775,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             quality    = getXMLString(xmlFile, key .. ".config#quality") or "MEDIUM",
             dirtiness  = getXMLFloat(xmlFile, key .. ".config#dirtiness") or 0.20,
             categories = {},
+            brands     = {},
         }
         local ci = 0
         while true do
@@ -754,6 +787,17 @@ function YardInventory:loadFromXML(xmlFile, key)
                 self.config.categories[catName] = weight
             end
             ci = ci + 1
+        end
+        local bi = 0
+        while true do
+            local bKey = ("%s.config.brand(%d)"):format(key, bi)
+            if not hasXMLProperty(xmlFile, bKey) then break end
+            local brandName = getXMLString(xmlFile, bKey .. "#name")
+            local weight    = getXMLInt(xmlFile, bKey .. "#weight") or 0
+            if brandName ~= nil then
+                self.config.brands[brandName] = weight
+            end
+            bi = bi + 1
         end
     end
 

@@ -2,7 +2,7 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
-    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1000px 720px">
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1400px 720px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -10,42 +10,56 @@
             <Text profile="dialogTitle" text="$l10n_uey_config_title" id="dialogTitleElement" position="0px -15px"/>
 
             <!-- ======== LEFT COLUMN: Core Settings ======== -->
-            <GuiElement position="40px -18px" size="420px 580px">
-                <Text profile="ueyColumnHeader" text="$l10n_uey_config_settings_header" position="0px 0px" size="400px 24px"/>
+            <GuiElement position="40px -18px" size="350px 580px">
+                <Text profile="ueyColumnHeader" text="$l10n_uey_config_settings_header" position="0px 0px" size="350px 24px"/>
 
                 <!-- Quality -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_quality" position="0px -28px" size="400px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_quality_desc" position="0px -52px" size="400px 50px"/>
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_quality" position="0px -28px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_quality_desc" position="0px -52px" size="350px 50px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="qualityOption"
-                    position="0px -106px" size="400px 40px" onClick="onQualityChanged"/>
+                    position="0px -106px" size="350px 40px" onClick="onQualityChanged"/>
 
                 <!-- Dirtiness -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_dirtiness" position="0px -168px" size="400px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -192px" size="400px 50px"/>
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_dirtiness" position="0px -168px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -192px" size="350px 50px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="dirtinessOption"
-                    position="0px -246px" size="400px 40px" onClick="onDirtinessChanged"/>
-
+                    position="0px -246px" size="350px 40px" onClick="onDirtinessChanged"/>
             </GuiElement>
 
-            <!-- ======== RIGHT COLUMN: Category Weights ======== -->
-            <GuiElement position="500px -18px" size="460px 600px">
+            <!-- ======== MIDDLE COLUMN: Category Weights ======== -->
+            <GuiElement position="420px -18px" size="460px 600px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_config_weights_header" position="0px 0px" size="460px 24px"/>
                 <Text profile="ueySettingDesc" text="$l10n_uey_config_weights_desc" position="0px -22px" size="460px 18px"/>
 
-                <!-- Scrollable weight rows — populated dynamically by Lua -->
                 <ScrollingLayout position="0px 46px" size="460px 490px" flowDirection="vertical" id="weightScrollLayout">
-                    <!-- Hidden template — cloned per category in buildCategoryRows() -->
                     <GuiElement profile="ueyWeightRow" size="460px 26px" id="weightRowTemplate" visible="false">
                         <Text profile="ueyWeightLabel" size="230px 26px" id="weightRowLabel"/>
                         <MultiTextOption profile="ueyMultiTextOption" position="230px 0px" size="220px 26px" id="weightRowOption" onClick="onWeightChanged"/>
                     </GuiElement>
                 </ScrollingLayout>
             </GuiElement>
+
+            <!-- ======== RIGHT COLUMN: Brands ======== -->
+            <GuiElement position="910px -18px" size="460px 600px">
+                <Text profile="ueyColumnHeader" text="$l10n_uey_config_brands_header" position="0px 0px" size="460px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_brands_desc" position="0px -22px" size="460px 18px"/>
+
+                <ScrollingLayout position="0px 46px" size="460px 490px" flowDirection="vertical" id="brandScrollLayout">
+                    <GuiElement profile="ueyWeightRow" size="460px 26px" id="brandRowTemplate" visible="false">
+                        <Text profile="ueyWeightLabel" size="230px 26px" id="brandRowLabel"/>
+                        <MultiTextOption profile="ueyMultiTextOption" position="230px 0px" size="220px 26px" id="brandRowOption" onClick="onBrandChanged"/>
+                    </GuiElement>
+                </ScrollingLayout>
+            </GuiElement>
         </GuiElement>
 
         <!-- Buttons -->
-        <BoxLayout profile="fs25_dialogButtonBox" size="800px 60px">
+        <BoxLayout profile="fs25_dialogButtonBox" size="1200px 60px">
             <Button profile="buttonExtra1" text="$l10n_uey_config_clearWeights" onClick="onClickClearWeights"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonActivate" text="$l10n_uey_config_allBrands" onClick="onClickAllBrands"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonCancel" text="$l10n_uey_config_clearBrands" onClick="onClickClearBrands"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonOK" text="$l10n_uey_config_apply" onClick="onClickApply" id="applyButton"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
