@@ -164,19 +164,39 @@ end
 -- ---------------------------------------------------------------------------
 
 --- Called by YardManager each in-game hour (MessageType.HOUR_CHANGED).
---- Ticks down TTL on all live vehicles and rolls for a new spawn.
+--- Ticks down TTL on all live vehicles, checks overdue test drives, and
+--- rolls for a new spawn.
 function YardInventory:onHourChanged()
+    local env = g_currentMission.environment
+
     -- Decrement TTL and expire vehicles whose time is up.
+    -- Skip vehicles currently on test drive (don't expire them).
     local i = #self.items
     while i >= 1 do
         local item = self.items[i]
-        if item.ttlHours ~= nil then
+        if item.testDrive == nil and item.ttlHours ~= nil then
             item.ttlHours = item.ttlHours - 1
             if item.ttlHours <= 0 then
                 self:removeItem(item)
             end
         end
         i = i - 1
+    end
+
+    -- Fine overdue test drives (1% of price per hour, minimum 50).
+    for _, item in ipairs(self.items) do
+        local td = item.testDrive
+        if td ~= nil then
+            local overdue = (env.currentMonotonicDay > td.returnByDay)
+                or (env.currentMonotonicDay == td.returnByDay and env.currentHour >= td.returnByHour)
+            if overdue then
+                local fine = math.max(TestDriveEvent.FINE_MINIMUM,
+                    math.floor(item.price * TestDriveEvent.FINE_PER_HOUR))
+                g_currentMission:addMoneyChange(-fine, td.farmId, MoneyType.OTHER, true)
+                print(("[UsedEquipmentYards] Test drive overdue — fined farm %d: %s"):format(
+                    td.farmId, g_i18n:formatMoney(fine)))
+            end
+        end
     end
 
     -- Roll for a new spawn if not already in a spawn loop and under the cap.
@@ -506,13 +526,20 @@ function YardInventory:removeLastPlacedPosition()
     end
 end
 
---- Rebuild the placedPositions cache from live vehicles.
---- Called before trySpawnOne so the clearance check sees existing vehicles.
+--- Rebuild the placedPositions cache from live vehicles and reserved
+--- test-drive return positions (so new spawns don't occupy those spots).
 function YardInventory:rebuildPlacedPositions()
     self.placedPositions = {}
     for _, v in ipairs(self.vehicles) do
         local vx, _, vz = getWorldTranslation(v.rootNode)
         self.placedPositions[#self.placedPositions + 1] = { x = vx, z = vz, radius = 3.0 }
+    end
+    -- Reserve original positions for vehicles currently on test drive.
+    for _, item in ipairs(self.items) do
+        local td = item.testDrive
+        if td ~= nil then
+            self.placedPositions[#self.placedPositions + 1] = { x = td.origX, z = td.origZ, radius = 3.0 }
+        end
     end
 end
 
@@ -650,12 +677,29 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             item.vehicle = vehicle
             self.vehicles[#self.vehicles + 1] = vehicle
             UsedEquipmentYards.vehicleToItem[vehicle] = item
-            PriceTagRenderer.addTag(vehicle, item)
 
-            -- Register purchase activatable so the player can buy this vehicle.
+            -- If this vehicle has an active test drive (loaded from save),
+            -- keep it unlocked for the borrowing farm. Otherwise lock it.
+            if item.testDrive ~= nil then
+                vehicle:setOwnerFarmId(item.testDrive.farmId)
+                EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+            else
+                PriceTagRenderer.addTag(vehicle, item)
+            end
+
+            -- Register purchase activatable so the player can barter this vehicle.
             local activatable = YardVehicleActivatable.new(self.yard, item)
             item.activatable = activatable
             g_currentMission.activatableObjectsSystem:addActivatable(activatable)
+
+            -- Sync item data to remote MP clients so they can interact too.
+            local itemIndex = nil
+            for idx, itm in ipairs(self.items) do
+                if itm == item then itemIndex = idx; break end
+            end
+            if itemIndex ~= nil then
+                g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, itemIndex, item))
+            end
         end
     end
 
@@ -789,6 +833,30 @@ function YardInventory:saveToXML(xmlFile, key)
         setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.TTL_MIN_HOURS)
         setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
         setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
+
+        -- Test driven history (which farms have already test-driven this item).
+        local tdf = item.testDrivenByFarms
+        if tdf ~= nil then
+            local fi = 0
+            for farmId, _ in pairs(tdf) do
+                setXMLInt(xmlFile, ("%s.testDrivenByFarm(%d)#farmId"):format(iKey, fi), farmId)
+                fi = fi + 1
+            end
+        end
+
+        -- Test drive state.
+        local td = item.testDrive
+        if td ~= nil then
+            setXMLInt(xmlFile, iKey .. ".testDrive#farmId", td.farmId)
+            setXMLInt(xmlFile, iKey .. ".testDrive#returnByDay", td.returnByDay)
+            setXMLInt(xmlFile, iKey .. ".testDrive#returnByHour", td.returnByHour)
+            setXMLFloat(xmlFile, iKey .. ".testDrive#origX", td.origX)
+            setXMLFloat(xmlFile, iKey .. ".testDrive#origY", td.origY)
+            setXMLFloat(xmlFile, iKey .. ".testDrive#origZ", td.origZ)
+            setXMLFloat(xmlFile, iKey .. ".testDrive#origRx", td.origRx)
+            setXMLFloat(xmlFile, iKey .. ".testDrive#origRy", td.origRy)
+            setXMLFloat(xmlFile, iKey .. ".testDrive#origRz", td.origRz)
+        end
     end
 end
 
@@ -846,6 +914,39 @@ function YardInventory:loadFromXML(xmlFile, key)
         if item.minPrice == nil then
             item.minPrice = item.price
         end
+
+        -- Restore test driven history.
+        local tdf = {}
+        local fi = 0
+        while true do
+            local fKey = ("%s.testDrivenByFarm(%d)"):format(iKey, fi)
+            if not hasXMLProperty(xmlFile, fKey) then break end
+            local farmId = getXMLInt(xmlFile, fKey .. "#farmId")
+            if farmId ~= nil then
+                tdf[farmId] = true
+            end
+            fi = fi + 1
+        end
+        if next(tdf) ~= nil then
+            item.testDrivenByFarms = tdf
+        end
+
+        -- Restore test drive state if present.
+        local tdKey = iKey .. ".testDrive"
+        if hasXMLProperty(xmlFile, tdKey) then
+            item.testDrive = {
+                farmId       = getXMLInt(xmlFile, tdKey .. "#farmId") or 0,
+                returnByDay  = getXMLInt(xmlFile, tdKey .. "#returnByDay") or 0,
+                returnByHour = getXMLInt(xmlFile, tdKey .. "#returnByHour") or 0,
+                origX  = getXMLFloat(xmlFile, tdKey .. "#origX") or 0,
+                origY  = getXMLFloat(xmlFile, tdKey .. "#origY") or 0,
+                origZ  = getXMLFloat(xmlFile, tdKey .. "#origZ") or 0,
+                origRx = getXMLFloat(xmlFile, tdKey .. "#origRx") or 0,
+                origRy = getXMLFloat(xmlFile, tdKey .. "#origRy") or 0,
+                origRz = getXMLFloat(xmlFile, tdKey .. "#origRz") or 0,
+            }
+        end
+
         self.items[#self.items + 1] = item
         i = i + 1
     end

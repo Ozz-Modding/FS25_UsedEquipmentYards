@@ -71,25 +71,28 @@ function EquipmentPurchasedEvent:run(connection)
 
     -- -----------------------------------------------------------------
     -- CLIENT: remote client receiving the broadcast — clean up local state.
-    -- In SP this branch is not needed (server branch handled it above).
     -- -----------------------------------------------------------------
+
+    -- Try server-side inventory first (for SP / listen server).
     local manager = UsedEquipmentYards.yardManager
-    if manager == nil then return end
-
-    local yard = manager.yards[self.yardId]
-    if yard == nil then return end
-
-    local item = yard.inventory.items[self.itemIndex]
-    if item == nil then return end
-
-    local vehicle = item.vehicle
-    if vehicle ~= nil then
-        PriceTagRenderer.removeTag(vehicle)
-        EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
-        EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+    if manager ~= nil then
+        local yard = manager.yards[self.yardId]
+        if yard ~= nil then
+            local item = yard.inventory.items[self.itemIndex]
+            if item ~= nil then
+                local vehicle = item.vehicle
+                if vehicle ~= nil then
+                    PriceTagRenderer.removeTag(vehicle)
+                    EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
+                    EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+                end
+                yard.inventory:removeItem(item, true)
+            end
+        end
     end
 
-    yard.inventory:removeItem(item, true)
+    -- Clean up client-side item registry (remote MP clients).
+    UsedEquipmentYards.removeClientItem(self.yardId, self.itemIndex)
 end
 
 --- Assign a fresh random license plate. Vehicles spawn with ownerFarmId=0 so

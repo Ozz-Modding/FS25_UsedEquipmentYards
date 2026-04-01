@@ -67,6 +67,12 @@
         <text name="uey_barter_noFarm"             text="You must belong to a farm to barter."/>
         <text name="uey_barter_invalid"            text="Unable to process this offer."/>
         <text name="uey_barter_purchased"          text="Purchased %s for %s."/>
+        <text name="uey_barter_testDrive"          text="Test Drive"/>
+        <text name="uey_barter_testDriveTitle"     text="Test Drive"/>
+        <text name="uey_barter_testDriveConfirm"   text="Take %s for a 2-hour test drive? Return by %d:00 or incur hourly fines."/>
+        <text name="uey_barter_returnVehicle"      text="Return Vehicle"/>
+        <text name="uey_barter_returnTitle"        text="Return Vehicle"/>
+        <text name="uey_barter_returnConfirm"      text="Return this vehicle to the yard?"/>
 
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>

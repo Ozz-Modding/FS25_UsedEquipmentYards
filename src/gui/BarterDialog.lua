@@ -133,7 +133,7 @@ function BarterDialog:populateDialog()
     self.wearText:setText(("%d %%"):format(math.floor((item.wear or 0) * 100)))
 
     self:populateAttributes()
-    self:updateMakeOfferEnabled()
+    self:updateButtonStates()
 end
 
 function BarterDialog:updateChancesText()
@@ -142,6 +142,36 @@ function BarterDialog:updateChancesText()
     local remaining = BarterState.getRemainingChances(farmId, self.yard.id)
     self.chancesText:setText(string.format(
         g_i18n:getText("uey_barter_chancesRemaining"), remaining))
+end
+
+function BarterDialog:updateButtonStates()
+    local farmId = BarterDialog.getLocalFarmId()
+    local td = self.item ~= nil and self.item.testDrive or nil
+    local isOnTestDrive = td ~= nil
+    local isOurTestDrive = isOnTestDrive and td.farmId == farmId
+    local isOtherTestDrive = isOnTestDrive and not isOurTestDrive
+
+    -- Barter/buy disabled when on test drive.
+    local noChances = farmId == nil or self.yard == nil
+        or BarterState.getRemainingChances(farmId, self.yard.id) <= 0
+    self.makeOfferButton.disabled = noChances or isOnTestDrive
+    self.buyNowButton.disabled = isOnTestDrive
+
+    -- Test drive button: shows "Return" if our test drive, "Test Drive" otherwise.
+    local alreadyDriven = farmId ~= nil
+        and self.item.testDrivenByFarms ~= nil
+        and self.item.testDrivenByFarms[farmId] == true
+
+    if isOurTestDrive then
+        self.testDriveButton:setText(g_i18n:getText("uey_barter_returnVehicle"))
+        self.testDriveButton.disabled = false
+    elseif isOtherTestDrive or alreadyDriven then
+        self.testDriveButton:setText(g_i18n:getText("uey_barter_testDrive"))
+        self.testDriveButton.disabled = true
+    else
+        self.testDriveButton:setText(g_i18n:getText("uey_barter_testDrive"))
+        self.testDriveButton.disabled = false
+    end
 end
 
 function BarterDialog:updateMakeOfferEnabled()
@@ -273,6 +303,54 @@ function BarterDialog:onBuyNowConfirm(confirmed)
 
     g_client:getServerConnection():sendEvent(
         EquipmentPurchasedEvent.new(self.yard.id, self.itemIndex, farmId))
+    BarterDialog:superClass().close(self)
+end
+
+function BarterDialog:onClickTestDrive()
+    if self.item == nil or self.yard == nil then return end
+
+    local farmId = BarterDialog.getLocalFarmId()
+    if farmId == nil then return end
+
+    local td = self.item.testDrive
+    if td ~= nil and td.farmId == farmId then
+        -- Return the vehicle.
+        YesNoDialog.show(BarterDialog.onReturnConfirm, self,
+            g_i18n:getText("uey_barter_returnConfirm"),
+            g_i18n:getText("uey_barter_returnTitle"))
+    else
+        -- Start a test drive.
+        local env = g_currentMission.environment
+        local returnByHour = env.currentHour + TestDriveEvent.DURATION_HOURS + 1
+        if returnByHour >= 24 then returnByHour = returnByHour - 24 end
+        local text = string.format(
+            g_i18n:getText("uey_barter_testDriveConfirm"),
+            self.item.vehicle:getFullName(),
+            returnByHour)
+        YesNoDialog.show(BarterDialog.onTestDriveConfirm, self, text,
+            g_i18n:getText("uey_barter_testDriveTitle"))
+    end
+end
+
+function BarterDialog:onTestDriveConfirm(confirmed)
+    if not confirmed or self.item == nil or self.yard == nil then return end
+
+    local farmId = BarterDialog.getLocalFarmId()
+    if farmId == nil then return end
+
+    g_client:getServerConnection():sendEvent(
+        TestDriveEvent.new(self.yard.id, self.itemIndex, farmId, TestDriveEvent.ACTION_START))
+    BarterDialog:superClass().close(self)
+end
+
+function BarterDialog:onReturnConfirm(confirmed)
+    if not confirmed or self.item == nil or self.yard == nil then return end
+
+    local farmId = BarterDialog.getLocalFarmId()
+    if farmId == nil then return end
+
+    g_client:getServerConnection():sendEvent(
+        TestDriveEvent.new(self.yard.id, self.itemIndex, farmId, TestDriveEvent.ACTION_RETURN))
     BarterDialog:superClass().close(self)
 end
 

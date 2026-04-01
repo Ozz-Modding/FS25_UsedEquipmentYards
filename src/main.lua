@@ -38,6 +38,14 @@ end
 function UsedEquipmentYards:delete()
     self:unregisterConsoleCommands()
     UsedEquipmentYards.removeAllActivatables()
+    -- Clean up client vehicle activatables.
+    for vehicle, activatable in pairs(UsedEquipmentYards.clientVehicleActivatables) do
+        g_currentMission.activatableObjectsSystem:removeActivatable(activatable)
+    end
+    UsedEquipmentYards.clientVehicleActivatables = {}
+    UsedEquipmentYards.clientItems = {}
+    UsedEquipmentYards.pendingClientItems = {}
+    UsedEquipmentYards.vehicleToItem = {}
     UsedEquipmentYards.clientYards = {}
     BarterState.delete()
     PriceTagRenderer.delete()
@@ -190,13 +198,95 @@ function UsedEquipmentYards.unregisterClientYard(yardId)
 end
 
 -- ---------------------------------------------------------------------------
--- Vehicle → yard item lookup (populated by YardInventory on spawn)
+-- Vehicle → yard item lookup (populated by YardInventory on spawn,
+-- and by VehicleItemSyncEvent on remote clients)
 -- ---------------------------------------------------------------------------
 
 UsedEquipmentYards.vehicleToItem = {}
 
+-- Client-side item registry: { [yardId] = { [itemIndex] = item } }
+-- On the server, items live in YardInventory. On remote clients, this
+-- table holds lightweight copies synced via VehicleItemSyncEvent.
+UsedEquipmentYards.clientItems = {}
+
+-- Vehicle activatables created for client-side items (keyed by vehicle).
+UsedEquipmentYards.clientVehicleActivatables = {}
+
+-- Pending items waiting for vehicle network objects to resolve.
+-- { { yardId, itemIndex, vehicleObjectId, item }, ... }
+UsedEquipmentYards.pendingClientItems = {}
+
 function UsedEquipmentYards.findItemForVehicle(vehicle)
     return UsedEquipmentYards.vehicleToItem[vehicle]
+end
+
+--- Called on remote clients when the server syncs a yard vehicle's item data.
+--- Creates the vehicle→item mapping and registers a YardVehicleActivatable.
+function UsedEquipmentYards.registerClientItem(yardId, itemIndex, item)
+    if item.vehicle == nil then return end
+
+    -- Store in client item registry.
+    if UsedEquipmentYards.clientItems[yardId] == nil then
+        UsedEquipmentYards.clientItems[yardId] = {}
+    end
+    UsedEquipmentYards.clientItems[yardId][itemIndex] = item
+
+    -- Map vehicle → item (for HUD and lookups).
+    UsedEquipmentYards.vehicleToItem[item.vehicle] = item
+
+    -- Register activatable if not already present.
+    if UsedEquipmentYards.clientVehicleActivatables[item.vehicle] == nil then
+        local yard = UsedEquipmentYards.clientYards[yardId]
+        if yard == nil then
+            -- Create a minimal yard object if we don't have one yet.
+            yard = { id = yardId, inventory = { items = {} } }
+        end
+        -- Store item in yard inventory items at the right index for BarterDialog.
+        yard.inventory.items[itemIndex] = item
+
+        local activatable = YardVehicleActivatable.new(yard, item)
+        UsedEquipmentYards.clientVehicleActivatables[item.vehicle] = activatable
+        g_currentMission.activatableObjectsSystem:addActivatable(activatable)
+    else
+        -- Update existing item data (e.g. test drive state change).
+        local existingItem = UsedEquipmentYards.clientItems[yardId][itemIndex]
+        if existingItem ~= nil then
+            existingItem.price            = item.price
+            existingItem.minPrice         = item.minPrice
+            existingItem.testDrive        = item.testDrive
+            existingItem.testDrivenByFarms = item.testDrivenByFarms
+        end
+    end
+end
+
+--- Queue an item for deferred resolution when the vehicle object isn't available yet.
+function UsedEquipmentYards.addPendingClientItem(yardId, itemIndex, vehicleObjectId, item)
+    UsedEquipmentYards.pendingClientItems[#UsedEquipmentYards.pendingClientItems + 1] = {
+        yardId          = yardId,
+        itemIndex       = itemIndex,
+        vehicleObjectId = vehicleObjectId,
+        item            = item,
+    }
+end
+
+--- Remove a client-side item (e.g. after purchase).
+function UsedEquipmentYards.removeClientItem(yardId, itemIndex)
+    local yardItems = UsedEquipmentYards.clientItems[yardId]
+    if yardItems == nil then return end
+    local item = yardItems[itemIndex]
+    if item == nil then return end
+
+    -- Remove activatable.
+    if item.vehicle ~= nil then
+        local activatable = UsedEquipmentYards.clientVehicleActivatables[item.vehicle]
+        if activatable ~= nil then
+            g_currentMission.activatableObjectsSystem:removeActivatable(activatable)
+            UsedEquipmentYards.clientVehicleActivatables[item.vehicle] = nil
+        end
+        UsedEquipmentYards.vehicleToItem[item.vehicle] = nil
+    end
+
+    yardItems[itemIndex] = nil
 end
 
 -- ---------------------------------------------------------------------------
@@ -229,6 +319,25 @@ if PlayerHUDUpdater ~= nil then
         box:addLine(g_i18n:getText("uey_hud_hours"),   tostring(hours))
         box:showNextFrame()
     end)
+end
+
+-- ---------------------------------------------------------------------------
+-- Update loop — resolve pending client items whose vehicles are now available
+-- ---------------------------------------------------------------------------
+
+function UsedEquipmentYards:update(dt)
+    local pending = UsedEquipmentYards.pendingClientItems
+    local i = #pending
+    while i >= 1 do
+        local entry = pending[i]
+        local vehicle = NetworkUtil.getObject(entry.vehicleObjectId)
+        if vehicle ~= nil then
+            entry.item.vehicle = vehicle
+            UsedEquipmentYards.registerClientItem(entry.yardId, entry.itemIndex, entry.item)
+            table.remove(pending, i)
+        end
+        i = i - 1
+    end
 end
 
 addModEventListener(UsedEquipmentYards)

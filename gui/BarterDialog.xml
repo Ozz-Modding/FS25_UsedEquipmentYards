@@ -62,6 +62,8 @@
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonOK" text="$l10n_uey_barter_buyNow" onClick="onClickBuyNow" id="buyNowButton"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonExtra1" text="$l10n_uey_barter_testDrive" onClick="onClickTestDrive" id="testDriveButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>
         </BoxLayout>
     </GuiElement>

@@ -46,6 +46,27 @@ function InitialClientStateEvent:writeStream(streamId, connection)
 
     -- Barter state.
     BarterState.writeStream(streamId)
+
+    -- Yard vehicle items — so remote clients can interact with them.
+    local totalItems = 0
+    for _, yard in pairs(yards) do
+        for _, item in ipairs(yard.inventory.items) do
+            if item.vehicle ~= nil then
+                totalItems = totalItems + 1
+            end
+        end
+    end
+    streamWriteInt32(streamId, totalItems)
+
+    for _, yard in pairs(yards) do
+        for idx, item in ipairs(yard.inventory.items) do
+            if item.vehicle ~= nil then
+                -- Reuse VehicleItemSyncEvent's write format.
+                local syncEvent = VehicleItemSyncEvent.new(yard.id, idx, item)
+                syncEvent:writeStream(streamId, connection)
+            end
+        end
+    end
 end
 
 function InitialClientStateEvent:readStream(streamId, connection)
@@ -78,6 +99,14 @@ function InitialClientStateEvent:readStream(streamId, connection)
 
     -- Barter state.
     BarterState.readStream(streamId)
+
+    -- Yard vehicle items.
+    local totalItems = streamReadInt32(streamId)
+    for _ = 1, totalItems do
+        local syncEvent = VehicleItemSyncEvent.emptyNew()
+        syncEvent:readStream(streamId, connection)
+        -- readStream registers immediately or adds to pending for update-loop resolution.
+    end
 
     self:run(connection)
 end
