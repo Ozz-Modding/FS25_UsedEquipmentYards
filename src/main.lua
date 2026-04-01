@@ -17,6 +17,8 @@ UsedEquipmentYards.clientYards = {}
 function UsedEquipmentYards:loadMap(filename)
     PriceTagRenderer.load()
     YardConfigDialog.register()
+    BarterDialog.register()
+    BarterState.init()
 
     if g_currentMission:getIsServer() then
         self.yardManager = YardManager.new(self)
@@ -37,6 +39,7 @@ function UsedEquipmentYards:delete()
     self:unregisterConsoleCommands()
     UsedEquipmentYards.removeAllActivatables()
     UsedEquipmentYards.clientYards = {}
+    BarterState.delete()
     PriceTagRenderer.delete()
     if self.yardManager ~= nil then
         self.yardManager:delete()
@@ -92,7 +95,7 @@ end)
 
 FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState,
     function(self, connection, user, farm)
-        connection:sendEvent(UEYInitialClientStateEvent.new())
+        connection:sendEvent(InitialClientStateEvent.new())
     end)
 
 -- Patch fence construction brushes so yard fence posts can be placed on any land.

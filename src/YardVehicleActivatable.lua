@@ -1,7 +1,7 @@
 -- YardVehicleActivatable
 -- One instance per spawned yard vehicle. Registered with the
--- activatableObjectsSystem so the player gets a "Buy" prompt when nearby.
--- run() shows a YesNo confirmation dialog; on confirm, sends a purchase event.
+-- activatableObjectsSystem so the player gets a "Barter" prompt when nearby.
+-- run() opens the BarterDialog for that vehicle.
 
 YardVehicleActivatable = {}
 local YardVehicleActivatable_mt = Class(YardVehicleActivatable)
@@ -16,8 +16,7 @@ function YardVehicleActivatable.new(yard, item)
     self.isUeyActivatable = true
 
     local name = (item.vehicle ~= nil) and item.vehicle:getFullName() or "?"
-    self.activateText = g_i18n:getText("uey_action_buyVehicle")
-        .. " " .. name .. "  —  " .. g_i18n:formatMoney(item.price)
+    self.activateText = g_i18n:getText("uey_action_barter") .. " " .. name
 
     return self
 end
@@ -41,45 +40,7 @@ end
 
 function YardVehicleActivatable:run()
     if self.item == nil or self.item.vehicle == nil then return end
-
-    local farmId = g_currentMission:getFarmId()
-    if farmId == FarmManager.SPECTATOR_FARM_ID then return end
-
-    -- Client-side fund check (server validates authoritatively too).
-    local farm = g_farmManager:getFarmById(farmId)
-    if farm == nil or farm:getBalance() < self.item.price then
-        InfoDialog.show(g_i18n:getText("uey_purchase_insufficient_funds"))
-        return
-    end
-
-    local text = string.format(
-        g_i18n:getText("uey_purchase_confirm"),
-        self.item.vehicle:getFullName(),
-        g_i18n:formatMoney(self.item.price)
-    )
-
-    YesNoDialog.show(YardVehicleActivatable.onPurchaseAnswer, self, text,
-        g_i18n:getText("uey_purchase_title"))
-end
-
-function YardVehicleActivatable:onPurchaseAnswer(confirmed)
-    if not confirmed then return end
-    if self.item == nil or self.item.vehicle == nil then return end
-
-    -- Find item index so the server can locate it.
-    local itemIndex = nil
-    for i, itm in ipairs(self.yard.inventory.items) do
-        if itm == self.item then
-            itemIndex = i
-            break
-        end
-    end
-    if itemIndex == nil then return end
-
-    local farmId = g_currentMission:getFarmId()
-    g_client:getServerConnection():sendEvent(
-        EquipmentPurchasedEvent.new(self.yard.id, itemIndex, farmId)
-    )
+    BarterDialog.show(self.yard, self.item)
 end
 
 function YardVehicleActivatable:activate()

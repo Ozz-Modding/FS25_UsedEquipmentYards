@@ -49,6 +49,8 @@ function YardManager:load()
         i = i + 1
     end
 
+    BarterState.loadFromXML(xmlFile, "UsedEquipmentYards")
+
     delete(xmlFile)
 
     local count = 0
@@ -78,6 +80,8 @@ function YardManager:save()
         yard:saveToXML(xmlFile, key)
         i = i + 1
     end
+
+    BarterState.saveToXML(xmlFile, "UsedEquipmentYards")
 
     saveXMLFile(xmlFile)
     delete(xmlFile)

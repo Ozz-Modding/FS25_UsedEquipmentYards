@@ -1,21 +1,21 @@
--- UEYInitialClientStateEvent
+-- InitialClientStateEvent
 -- Sent by the server to a client joining mid-game so they receive the full
 -- list of existing yards and can register them locally (activatables, etc.).
 
-UEYInitialClientStateEvent = {}
-local UEYInitialClientStateEvent_mt = Class(UEYInitialClientStateEvent, Event)
+InitialClientStateEvent = {}
+local InitialClientStateEvent_mt = Class(InitialClientStateEvent, Event)
 
-InitEventClass(UEYInitialClientStateEvent, "UEYInitialClientStateEvent")
+InitEventClass(InitialClientStateEvent, "InitialClientStateEvent")
 
-function UEYInitialClientStateEvent.emptyNew()
-    return Event.new(UEYInitialClientStateEvent_mt)
+function InitialClientStateEvent.emptyNew()
+    return Event.new(InitialClientStateEvent_mt)
 end
 
-function UEYInitialClientStateEvent.new()
-    return UEYInitialClientStateEvent.emptyNew()
+function InitialClientStateEvent.new()
+    return InitialClientStateEvent.emptyNew()
 end
 
-function UEYInitialClientStateEvent:writeStream(streamId, connection)
+function InitialClientStateEvent:writeStream(streamId, connection)
     local manager = UsedEquipmentYards.yardManager
     local yards   = (manager ~= nil) and manager.yards or {}
 
@@ -43,9 +43,12 @@ function UEYInitialClientStateEvent:writeStream(streamId, connection)
             end
         end
     end
+
+    -- Barter state.
+    BarterState.writeStream(streamId)
 end
 
-function UEYInitialClientStateEvent:readStream(streamId, connection)
+function InitialClientStateEvent:readStream(streamId, connection)
     local count = streamReadInt32(streamId)
 
     for _ = 1, count do
@@ -73,9 +76,12 @@ function UEYInitialClientStateEvent:readStream(streamId, connection)
         UsedEquipmentYards.registerClientYard(yardId, yardName, bounds)
     end
 
+    -- Barter state.
+    BarterState.readStream(streamId)
+
     self:run(connection)
 end
 
-function UEYInitialClientStateEvent:run(connection)
+function InitialClientStateEvent:run(connection)
     -- Nothing extra needed after registration.
 end

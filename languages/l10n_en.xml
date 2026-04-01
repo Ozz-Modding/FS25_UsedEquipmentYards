@@ -47,6 +47,27 @@
         <text name="uey_config_quality_MEDIUM"   text="Medium"/>
         <text name="uey_config_quality_HIGH"     text="High"/>
 
+        <!-- Barter dialog -->
+        <text name="uey_action_barter"              text="Barter:"/>
+        <text name="uey_barter_header"              text="Barter"/>
+        <text name="uey_barter_askingPrice"         text="Asking Price"/>
+        <text name="uey_barter_yourOffer"           text="Your Offer"/>
+        <text name="uey_barter_makeOffer"           text="Make Offer"/>
+        <text name="uey_barter_buyNow"              text="Buy Now"/>
+        <text name="uey_barter_vehicleInfo"         text="Vehicle Info"/>
+        <text name="uey_barter_specs"               text="Specifications"/>
+        <text name="uey_barter_brand"               text="Brand"/>
+        <text name="uey_barter_owners"              text="Owners"/>
+        <text name="uey_barter_hours"               text="Hours"/>
+        <text name="uey_barter_damage"              text="Damage"/>
+        <text name="uey_barter_wear"                text="Wear"/>
+        <text name="uey_barter_chancesRemaining"    text="Barter chances remaining today: %d"/>
+        <text name="uey_barter_rejected"            text="Offer rejected. Try a higher amount."/>
+        <text name="uey_barter_noChances"           text="No barter chances remaining today."/>
+        <text name="uey_barter_noFarm"             text="You must belong to a farm to barter."/>
+        <text name="uey_barter_invalid"            text="Unable to process this offer."/>
+        <text name="uey_barter_purchased"          text="Purchased %s for %s."/>
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>

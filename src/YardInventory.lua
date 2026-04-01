@@ -312,15 +312,37 @@ function YardInventory:rollItem()
     local jitter = 1 + (math.random() * 2 - 1) * spread
     price = price * jitter
 
+    local finalPrice = math.max(1, math.floor(price))
+
+    -- Number of previous owners: based on hours (1 owner per ~25h), ±1.
+    local numOwners = math.max(1, math.floor(hours / 25) + math.random(-1, 1))
+
+    -- Minimum acceptable barter price: heavily weighted within 10% of asking,
+    -- with a small chance of accepting a larger discount.
+    local discountRoll = math.random()
+    local maxDiscount
+    if discountRoll < 0.70 then
+        maxDiscount = 0.05 + math.random() * 0.05   -- 5–10% off
+    elseif discountRoll < 0.90 then
+        maxDiscount = 0.10 + math.random() * 0.05   -- 10–15% off
+    elseif discountRoll < 0.97 then
+        maxDiscount = 0.15 + math.random() * 0.05   -- 15–20% off
+    else
+        maxDiscount = 0.20 + math.random() * 0.10   -- 20–30% off (rare)
+    end
+    local minAcceptablePrice = math.max(1, math.floor(finalPrice * (1 - maxDiscount)))
+
     return {
-        xmlFilename   = storeItem.xmlFilename,
-        price         = math.max(1, math.floor(price)),
-        age           = age,
-        damage        = damage,
-        wear          = wear,
-        operatingTime = operatingTime,
-        ttlHours      = math.random(YardInventory.TTL_MIN_HOURS, YardInventory.TTL_MAX_HOURS),
-        vehicle       = nil,
+        xmlFilename      = storeItem.xmlFilename,
+        price            = finalPrice,
+        minPrice         = minAcceptablePrice,
+        numOwners        = numOwners,
+        age              = age,
+        damage           = damage,
+        wear             = wear,
+        operatingTime    = operatingTime,
+        ttlHours         = math.random(YardInventory.TTL_MIN_HOURS, YardInventory.TTL_MAX_HOURS),
+        vehicle          = nil,
     }
 end
 
@@ -765,6 +787,8 @@ function YardInventory:saveToXML(xmlFile, key)
         setXMLFloat(xmlFile, iKey .. "#wear", item.wear or 0)
         setXMLFloat(xmlFile, iKey .. "#operatingTime", (item.operatingTime or 0) / 1000)
         setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.TTL_MIN_HOURS)
+        setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
+        setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
     end
 end
 
@@ -814,8 +838,14 @@ function YardInventory:loadFromXML(xmlFile, key)
             wear          = getXMLFloat(xmlFile, iKey .. "#wear") or 0,
             operatingTime = (getXMLFloat(xmlFile, iKey .. "#operatingTime") or 0) * 1000,
             ttlHours      = getXMLInt(xmlFile, iKey .. "#ttlHours") or YardInventory.TTL_MIN_HOURS,
+            numOwners     = getXMLInt(xmlFile, iKey .. "#numOwners") or 1,
+            minPrice      = getXMLInt(xmlFile, iKey .. "#minPrice"),
             vehicle       = nil,
         }
+        -- Legacy saves: default minPrice to asking price (no discount).
+        if item.minPrice == nil then
+            item.minPrice = item.price
+        end
         self.items[#self.items + 1] = item
         i = i + 1
     end

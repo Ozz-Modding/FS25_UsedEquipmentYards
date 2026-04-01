@@ -14,7 +14,7 @@
         <textBold value="false"/>
         <textSize value="13px"/>
         <textAlignment value="left"/>
-        <textColor value="$preset_fs25_colorMainLight_50"/>
+        <textColor value="0.8 0.8 0.8 0.5"/>
         <textWrap value="true"/>
     </Profile>
 
@@ -41,6 +41,10 @@
 
     <!-- Weight row container inside ScrollingLayout -->
     <Profile name="ueyWeightRow" extends="baseReference" with="anchorTopLeft">
+    </Profile>
+
+    <!-- Generic top-left anchored container for absolute positioning -->
+    <Profile name="ueySection" extends="baseReference" with="anchorTopLeft">
     </Profile>
 
 </GUIProfiles>
