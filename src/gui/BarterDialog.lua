@@ -7,7 +7,7 @@ BarterDialog = {}
 
 local BarterDialog_mt = Class(BarterDialog, MessageDialog)
 
-BarterDialog.OFFER_STEPS = { 0, 5, 10, 15, 20, 25, 30 }  -- % below asking
+BarterDialog.OFFER_STEPS = { 30, 25, 20, 15, 10, 5, 0 }  -- % below asking (left=biggest discount, right=full price)
 
 -- ---------------------------------------------------------------------------
 -- Registration
@@ -117,8 +117,8 @@ function BarterDialog:populateDialog()
     end
     self.offerValues = offerValues
     self.offerOption:setTexts(offerTexts)
-    self.offerOption:setState(1)
-    self.currentOffer = offerValues[1]
+    self.offerOption:setState(#offerValues)
+    self.currentOffer = offerValues[#offerValues]
 
     self.resultText:setText("")
     self:updateChancesText()
