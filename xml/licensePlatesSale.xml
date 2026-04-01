@@ -9,7 +9,7 @@
                 <value node="0|0" posX="-0.090"  numerical="true"  alphabetical="false" />
                 <value node="0|1" posX="-0.040"  numerical="true"  alphabetical="false" />
                 <value node="0|2" posX="0.010"   numerical="true"  alphabetical="false" />
-				<value node="0|3" posX="0.030" character="," locked="true"/>
+				<value node="0|3" posX="0.035" character="," locked="true"/>
                 <value node="0|4" posX="0.065"   numerical="true"  alphabetical="false" />
 				<value node="0|5" posX="0.115"   numerical="true"  alphabetical="false" />
                 <value node="0|6" posX="0.165"   numerical="true"  alphabetical="false" />
@@ -24,13 +24,13 @@
 
         <variations>
             <variation>
-                <value node="0|0" posX="-0.060" posY="-0.01" numerical="true" alphabetical="false" />
-				<value node="0|1" posX="-0.030" posY="-0.01" numerical="true" alphabetical="false" />
-                <value node="0|2" posX="0.000" posY="-0.01" numerical="true" alphabetical="false" />
-				<value node="0|3" posX="0.015" posY="-0.01" character="," locked="true"/>
-                <value node="0|4" posX="0.040"  posY="-0.01" numerical="true"  alphabetical="false" />
-                <value node="0|5" posX="0.070"  posY="-0.01" numerical="true"  alphabetical="false" />
-				<value node="0|6" posX="0.100"  posY="-0.01" numerical="true"  alphabetical="false" />
+                <value node="0|0" posX="-0.080" posY="-0.01" numerical="true" alphabetical="false" />
+				<value node="0|1" posX="-0.050" posY="-0.01" numerical="true" alphabetical="false" />
+                <value node="0|2" posX="-0.020" posY="-0.01" numerical="true" alphabetical="false" />
+				<value node="0|3" posX="0.000" posY="-0.01" character="," locked="true"/>
+                <value node="0|4" posX="0.020"  posY="-0.01" numerical="true"  alphabetical="false" />
+                <value node="0|5" posX="0.050"  posY="-0.01" numerical="true"  alphabetical="false" />
+				<value node="0|6" posX="0.080"  posY="-0.01" numerical="true"  alphabetical="false" />
 			</variation>
 		</variations>
 

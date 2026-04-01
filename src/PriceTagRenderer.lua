@@ -182,6 +182,16 @@ function PriceTagRenderer.addTag(vehicle, item)
                 local plateClone = template:clone(true)
                 if plateClone ~= nil then
                     plateClone:updateData(1, LicensePlateManager.PLATE_POSITION.ANY, priceStr)
+                    -- Hide the comma separator for prices ≤ 999.
+                    if item.price <= 999 then
+                        local symbols = getChildAt(plateClone.node, 0)
+                        if symbols ~= nil then
+                            local sep = getChildAt(symbols, 3)  -- d1 d2 d3 [sep] d4 d5 d6
+                            if sep ~= nil then
+                                setVisibility(sep, false)
+                            end
+                        end
+                    end
                     setVisibility(plateClone.node, true)
 
                     link(mountNode, plateClone.node)
