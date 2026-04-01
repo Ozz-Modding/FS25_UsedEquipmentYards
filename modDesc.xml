@@ -37,7 +37,8 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]></en>
                         filename="src/PlaceableUsedEquipmentYard.lua" />
     </placeableSpecializations>
     <placeableTypes>
-        <type name="usedEquipmentYard" parent="simplePlaceable">
+        <type name="usedEquipmentYard" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
+            <specialization name="placement" />
             <specialization name="husbandryFence" />
             <specialization name="usedEquipmentYard" />
         </type>
