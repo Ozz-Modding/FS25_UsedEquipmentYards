@@ -60,26 +60,11 @@ end
 -- ---------------------------------------------------------------------------
 
 function UsedEquipmentYards:registerConsoleCommands()
-    addConsoleCommand("ueyListYards",      "List all defined yards",                       "consoleListYards",      self)
-    addConsoleCommand("ueyRemoveYard",     "Remove a yard by ID: ueyRemoveYard <id>",      "consoleRemoveYard",     self)
     addConsoleCommand("ueyResetInventory", "Reset inventory: ueyResetInventory [id|all]",  "consoleResetInventory", self)
 end
 
 function UsedEquipmentYards:unregisterConsoleCommands()
-    removeConsoleCommand("ueyListYards")
-    removeConsoleCommand("ueyRemoveYard")
     removeConsoleCommand("ueyResetInventory")
-end
-
-function UsedEquipmentYards:consoleListYards()
-    if self.yardManager == nil then return "YardManager not active (server only)." end
-    return self.yardManager:getYardListString()
-end
-
-function UsedEquipmentYards:consoleRemoveYard(id)
-    if self.yardManager == nil then return "YardManager not active (server only)." end
-    if id == nil then return "Usage: ueyRemoveYard <id>" end
-    return self.yardManager:removeYard(tonumber(id))
 end
 
 function UsedEquipmentYards:consoleResetInventory(id)
@@ -98,6 +83,13 @@ end
 FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, function()
     if UsedEquipmentYards.yardManager ~= nil then
         UsedEquipmentYards.yardManager:save()
+    end
+end)
+
+-- Spawn vehicles after the mission is fully loaded (terrain ready).
+FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMission, function()
+    if UsedEquipmentYards.yardManager ~= nil then
+        UsedEquipmentYards.yardManager:spawnAllYards()
     end
 end)
 

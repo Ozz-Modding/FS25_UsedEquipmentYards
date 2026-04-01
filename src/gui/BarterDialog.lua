@@ -48,7 +48,7 @@ function BarterDialog.show(yard, item)
     end
 
     -- DEV: hot-reload XML on every open for faster iteration.
-    BarterDialog.register()
+    -- BarterDialog.register()
 
     local itemIndex = nil
     for i, itm in ipairs(yard.inventory.items) do

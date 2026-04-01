@@ -5,7 +5,6 @@
         <functions>
             <function>$l10n_uey_function</function>
         </functions>
-        <!-- TODO: create a proper store image -->
         <image>store/store_yard.dds</image>
         <price>500</price>
         <dailyUpkeep>0</dailyUpkeep>
@@ -13,14 +12,14 @@
         <rotation>0</rotation>
         <brand>NONE</brand>
         <species>PLACEABLE</species>
-        <category>sheds</category>
+        <category>tools</category>
         <canBeSold>true</canBeSold>
         <showInStore>true</showInStore>
 
         <brush>
             <type>husbandry</type>
             <category>buildings</category>
-            <tab>sheds</tab>
+            <tab>tools</tab>
         </brush>
     </storeData>
 

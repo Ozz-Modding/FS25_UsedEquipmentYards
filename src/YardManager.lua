@@ -57,11 +57,17 @@ function YardManager:load()
     for _ in pairs(self.yards) do count = count + 1 end
     print(("[UsedEquipmentYards] Loaded %d yard(s)."):format(count))
 
+    -- Don't spawn vehicles here — g_terrainNode may not be ready yet.
+    -- Spawning is deferred to spawnAllYards(), called from onMissionStarted.
+
+    g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
+end
+
+--- Called after the mission is fully loaded (terrain, map, etc. are ready).
+function YardManager:spawnAllYards()
     for _, yard in pairs(self.yards) do
         yard.inventory:spawn()
     end
-
-    g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
 end
 
 function YardManager:save()

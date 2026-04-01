@@ -22,12 +22,8 @@ YardInventory._mt                      = Class(YardInventory)
 YardInventory.ABSOLUTE_MAX_ITEMS       = 50
 
 -- Spawn mode constants.
-YardInventory.SPAWN_FILL               = 1 -- fill yard to capacity (used on reset/dev)
+YardInventory.SPAWN_FILL               = 1 -- fill yard to capacity (used on reset)
 YardInventory.SPAWN_SINGLE             = 2 -- spawn one vehicle then stop (used on hourly tick)
-
--- Set to true to fill the yard immediately on creation (dev/testing).
--- Set to false for production: inventory builds up organically via hourly ticks.
-YardInventory.FILL_ON_CREATE           = true
 
 -- ---------------------------------------------------------------------------
 -- Quality presets — control hours, damage, and wear ranges
@@ -200,6 +196,7 @@ function YardInventory:onHourChanged()
     end
 
     -- Roll for a new spawn if not already in a spawn loop and under the cap.
+    -- Skip if we're still restoring saved items.
     if not self.filling
         and #self.items < YardInventory.ABSOLUTE_MAX_ITEMS
         and math.random() < YardInventory.HOURLY_SPAWN_CHANCE then
@@ -207,15 +204,65 @@ function YardInventory:onHourChanged()
     end
 end
 
---- Called on yard creation and load. Respects FILL_ON_CREATE.
+--- Called after mission start. Re-associates saved items with game-restored
+--- vehicles by uniqueId. New yards start empty — inventory builds via hourly ticks.
 function YardInventory:spawn()
-    if YardInventory.FILL_ON_CREATE then
-        self.spawnMode = YardInventory.SPAWN_FILL
-        self.filling = true
-        self.consecutiveFailures = 0
-        self.placedPositions = {}
-        self:spawnNext()
+    if #self.items == 0 then return end
+
+    local associated = 0
+    local orphaned = 0
+    local i = #self.items
+    while i >= 1 do
+        local item = self.items[i]
+        local vehicle = nil
+        if item.vehicleUniqueId ~= nil then
+            vehicle = g_currentMission.vehicleSystem:getVehicleByUniqueId(item.vehicleUniqueId)
+        end
+
+        if vehicle ~= nil then
+            item.vehicle = vehicle
+            item.vehicleUniqueId = nil  -- no longer needed
+            self.vehicles[#self.vehicles + 1] = vehicle
+            UsedEquipmentYards.vehicleToItem[vehicle] = item
+
+            -- Re-apply yard vehicle state.
+            if item.testDrive ~= nil then
+                vehicle:setOwnerFarmId(item.testDrive.farmId)
+                EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+            else
+                -- Lock the vehicle and add price tag.
+                if vehicle.setIsTabbable ~= nil then vehicle:setIsTabbable(false) end
+                if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
+                    vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function() return false, nil end)
+                end
+                PriceTagRenderer.addTag(vehicle, item)
+            end
+
+            -- Register activatable.
+            local activatable = YardVehicleActivatable.new(self.yard, item)
+            item.activatable = activatable
+            g_currentMission.activatableObjectsSystem:addActivatable(activatable)
+
+            -- Sync to remote MP clients.
+            local itemIndex = nil
+            for idx, itm in ipairs(self.items) do
+                if itm == item then itemIndex = idx; break end
+            end
+            if itemIndex ~= nil then
+                g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, itemIndex, item))
+            end
+
+            associated = associated + 1
+        else
+            -- Vehicle not found — remove orphaned item.
+            table.remove(self.items, i)
+            orphaned = orphaned + 1
+        end
+        i = i - 1
     end
+
+    print(("[UsedEquipmentYards] Yard '%s': %d vehicles re-associated, %d orphaned items removed."):format(
+        self.yard.name, associated, orphaned))
 end
 
 --- Attempt to spawn a single vehicle (hourly tick).
@@ -249,8 +296,7 @@ function YardInventory:despawnAll()
     self.placedPositions = {}
 end
 
---- Full reset — despawns everything and fills from scratch.
---- Always fills regardless of FILL_ON_CREATE (explicit dev action).
+--- Full reset — despawns everything and fills from scratch (console command).
 function YardInventory:reset()
     self:despawnAll()
     self.items = {}
@@ -834,6 +880,11 @@ function YardInventory:saveToXML(xmlFile, key)
         setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
         setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
 
+        -- Save vehicle uniqueId so we can re-associate on load.
+        if item.vehicle ~= nil and item.vehicle.uniqueId ~= nil then
+            setXMLString(xmlFile, iKey .. "#vehicleUniqueId", item.vehicle.uniqueId)
+        end
+
         -- Test driven history (which farms have already test-driven this item).
         local tdf = item.testDrivenByFarms
         if tdf ~= nil then
@@ -908,6 +959,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             ttlHours      = getXMLInt(xmlFile, iKey .. "#ttlHours") or YardInventory.TTL_MIN_HOURS,
             numOwners     = getXMLInt(xmlFile, iKey .. "#numOwners") or 1,
             minPrice      = getXMLInt(xmlFile, iKey .. "#minPrice"),
+            vehicleUniqueId = getXMLString(xmlFile, iKey .. "#vehicleUniqueId"),
             vehicle       = nil,
         }
         -- Legacy saves: default minPrice to asking price (no discount).
