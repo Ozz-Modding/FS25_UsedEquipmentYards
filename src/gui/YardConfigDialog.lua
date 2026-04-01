@@ -1,39 +1,39 @@
 -- YardConfigDialog
 -- Dialog for configuring a yard's quality, dirtiness, and category weights.
 -- Two-column layout: core settings (left), category weights (right).
--- Each setting uses a MultiTextOption for left/right value selection.
+-- Category weights are built dynamically from g_storeManager.categoryByName.
 
-YardConfigDialog = {}
+YardConfigDialog                 = {}
 
-local YardConfigDialog_mt = Class(YardConfigDialog, MessageDialog)
+local YardConfigDialog_mt        = Class(YardConfigDialog, MessageDialog)
 
 YardConfigDialog.QUALITY_OPTIONS = { "LOW", "MEDIUM", "HIGH" }
-YardConfigDialog.DIRTINESS_STEP  = 0.05    -- 5% increments
+YardConfigDialog.DIRTINESS_STEP  = 0.05 -- 5% increments
 YardConfigDialog.MAX_WEIGHT      = 10
 
--- Ordered list of categories shown in the dialog.
--- Each entry must have a matching id="weight<KEY>" MultiTextOption in the XML.
-YardConfigDialog.CATEGORIES = {
-    "TRACTORSS",
-    "TRACTORSM",
-    "TRACTORSL",
-    "TELELOADERS",
-    "WHEELLOADERSM",
-    "WHEELLOADERSL",
-    "SKIDSTEERS",
-    "COMBINECUTTERS",
-    "HARVESTERS",
-    "FORAGEHARVESTERS",
-    "SPRAYERS",
-    "FERTILIZERSPREAD",
-    "SOWINGMACHINES",
-    "PLOWS",
-    "CULTIVATORS",
-    "MOWERS",
-    "TEDDERS",
-    "WINDROWERS",
-    "BALERS",
-    "TRAILERS",
+-- Category types to exclude from the weight list.
+YardConfigDialog.SKIP_TYPES      = {
+    ["OBJECTS"]   = true,
+    ["PLACEABLE"] = true,
+    ["HANDTOOLS"] = true,
+    ["MISC"]      = true,
+}
+
+-- Specific category names to exclude.
+YardConfigDialog.SKIP_NAMES      = {
+    ["WHEELLOADERTOOLS"]              = true,
+    ["FRONTLOADERTOOLS"]              = true,
+    ["FORESTRYEXCAVATORTOOLS"]        = true,
+    ["TELELOADERTOOLS"]               = true,
+    ["SKIDSTEERTOOLS"]                = true,
+    ["CUTTERS"]                       = true,
+    ["FORAGEHARVESTERCUTTERS"]        = true,
+    ["LEVELER"]                       = true,
+    ["CUTTERTRAILERS"]                = true,
+    ["FORAGEHARVESTERCUTTERTRAILERS"] = true,
+    ["BALINGMISC"] = true,
+    ["MISCDRIVABLES"] = true,
+    ["FORESTRYMISC"] = true,
 }
 
 -- ---------------------------------------------------------------------------
@@ -50,6 +50,8 @@ function YardConfigDialog.new()
     local self = MessageDialog.new(nil, YardConfigDialog_mt, g_messageCenter, g_i18n, g_inputBinding)
     self.yard = nil
     self.config = nil
+    self.weightRows = {} -- { catName, option } created dynamically
+    self.categoriesBuilt = false
     return self
 end
 
@@ -72,6 +74,7 @@ end
 
 function YardConfigDialog:onOpen()
     YardConfigDialog:superClass().onOpen(self)
+    self:buildCategoryRows()
     self:populateOptions()
 end
 
@@ -85,7 +88,74 @@ function YardConfigDialog:onCreate()
 end
 
 -- ---------------------------------------------------------------------------
--- Populate all MultiTextOption elements with texts and current state
+-- Build category weight rows dynamically from g_storeManager
+-- ---------------------------------------------------------------------------
+
+--- Return an ordered list of { name, title } for all store categories that
+--- are not in SKIP_TYPES, sorted by orderId.
+function YardConfigDialog.getKnownCategories()
+    local cats = {}
+    for name, info in pairs(g_storeManager.categoryByName) do
+        if not YardConfigDialog.SKIP_TYPES[info.type]
+            and not YardConfigDialog.SKIP_NAMES[name]
+            and not name:find("PALLET")
+            and not name:find("HEADER") then
+            cats[#cats + 1] = { name = name, title = info.title, type = info.type }
+            print(("[UEY] Category: %s — %s (type: %s)"):format(name, info.title, info.type))
+        end
+    end
+
+    -- Detect duplicate titles and disambiguate with type in brackets.
+    local titleCount = {}
+    for _, cat in ipairs(cats) do
+        titleCount[cat.title] = (titleCount[cat.title] or 0) + 1
+    end
+    for _, cat in ipairs(cats) do
+        if titleCount[cat.title] > 1 then
+            cat.title = cat.title .. " (" .. cat.type .. ")"
+        end
+    end
+
+    table.sort(cats, function(a, b) return a.title < b.title end)
+    return cats
+end
+
+--- Clone the hidden template row for each store category and add to the
+--- ScrollingLayout. Only runs once; subsequent opens reuse the rows.
+function YardConfigDialog:buildCategoryRows()
+    if self.categoriesBuilt then return end
+    self.categoriesBuilt = true
+
+    local layout         = self.weightScrollLayout
+    local template       = self.weightRowTemplate
+    if layout == nil or template == nil then return end
+
+    local categories = YardConfigDialog.getKnownCategories()
+
+    for _, cat in ipairs(categories) do
+        local row = template:clone()
+        row:setVisible(true)
+
+        -- Children by index: [1] = label, [2] = option.
+        local label  = row.elements[1]
+        local option = row.elements[2]
+
+        if label ~= nil then
+            label:setText(cat.title)
+        end
+        if option ~= nil then
+            option.ueyCategory = cat.name
+        end
+
+        layout:addElement(row)
+        self.weightRows[#self.weightRows + 1] = { catName = cat.name, option = option }
+    end
+
+    layout:invalidateLayout()
+end
+
+-- ---------------------------------------------------------------------------
+-- Populate all options with texts and current state
 -- ---------------------------------------------------------------------------
 
 function YardConfigDialog:populateOptions()
@@ -97,7 +167,9 @@ function YardConfigDialog:populateOptions()
     self.qualityOption:setTexts(qualityTexts)
     local qualityState = 1
     for i, v in ipairs(YardConfigDialog.QUALITY_OPTIONS) do
-        if v == self.config.quality then qualityState = i; break end
+        if v == self.config.quality then
+            qualityState = i; break
+        end
     end
     self.qualityOption:setState(qualityState)
 
@@ -116,19 +188,15 @@ function YardConfigDialog:populateOptions()
         weightTexts[#weightTexts + 1] = tostring(w)
     end
 
-    for _, catName in ipairs(YardConfigDialog.CATEGORIES) do
-        local option = self["weight" .. catName]
-        if option ~= nil then
-            option:setTexts(weightTexts)
-            local w = (self.config.categories[catName] or 0) + 1
-            option:setState(math.max(1, math.min(#weightTexts, w)))
-            option.ueyCategory = catName
-        end
+    for _, row in ipairs(self.weightRows) do
+        row.option:setTexts(weightTexts)
+        local w = (self.config.categories[row.catName] or 0) + 1
+        row.option:setState(math.max(1, math.min(#weightTexts, w)))
     end
 end
 
 -- ---------------------------------------------------------------------------
--- Callbacks — one per core setting, one shared for all weight options
+-- Callbacks
 -- ---------------------------------------------------------------------------
 
 function YardConfigDialog:onQualityChanged(state, element)
