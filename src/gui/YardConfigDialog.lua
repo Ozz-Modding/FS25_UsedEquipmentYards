@@ -218,6 +218,13 @@ end
 -- Buttons
 -- ---------------------------------------------------------------------------
 
+function YardConfigDialog:onClickClearWeights()
+    for _, row in ipairs(self.weightRows) do
+        row.option:setState(1)  -- state 1 = weight 0
+        self.config.categories[row.catName] = 0
+    end
+end
+
 function YardConfigDialog:onClickApply()
     if self.yard ~= nil and self.config ~= nil then
         self.yard.inventory:applyConfig(self.config)

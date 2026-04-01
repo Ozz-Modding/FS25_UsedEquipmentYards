@@ -44,8 +44,10 @@
         </GuiElement>
 
         <!-- Buttons -->
-        <BoxLayout profile="fs25_dialogButtonBox" size="600px 60px">
-            <Button profile="buttonExtra1" text="$l10n_uey_config_apply" onClick="onClickApply" id="applyButton"/>
+        <BoxLayout profile="fs25_dialogButtonBox" size="800px 60px">
+            <Button profile="buttonExtra1" text="$l10n_uey_config_clearWeights" onClick="onClickClearWeights"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonOK" text="$l10n_uey_config_apply" onClick="onClickApply" id="applyButton"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>
         </BoxLayout>
