@@ -31,9 +31,9 @@
         <text name="uey_config_title"            text="Yard Configuration"/>
         <text name="uey_config_settings_header"  text="Configuration"/>
         <text name="uey_config_quality"          text="Quality"/>
-        <text name="uey_config_quality_desc"     text="General condition of equipment"/>
+        <text name="uey_config_quality_desc"     text="Controls the hours, damage and wear of equipment. Lower quality equipment will cost less than higher quality equipment."/>
         <text name="uey_config_dirtiness"        text="Dirtiness"/>
-        <text name="uey_config_dirtiness_desc"   text="Average dirt level of equipment"/>
+        <text name="uey_config_dirtiness_desc"   text="Average dirt level of equipment."/>
         <text name="uey_config_weights_header"   text="Category Weights"/>
         <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
         <text name="uey_config_clearWeights"     text="Clear Weights"/>

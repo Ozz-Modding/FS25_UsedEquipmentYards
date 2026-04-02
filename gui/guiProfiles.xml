@@ -9,6 +9,13 @@
         <textColor value="$preset_fs25_colorMainHighlight"/>
     </Profile>
 
+    <!-- Two-line wrapping description text for settings like quality/dirtiness -->
+    <Profile name="ueySettingDesc2Line" extends="fs25_textGrey" with="anchorTopLeft">
+        <textSize value="13px"/>
+        <textMaxNumLines value="2"/>
+        <textVerticalAlignment value="top"/>
+    </Profile>
+
     <!-- Small description text below a setting -->
     <Profile name="ueySettingDesc" extends="baseReference" with="anchorTopLeft">
         <textBold value="false"/>

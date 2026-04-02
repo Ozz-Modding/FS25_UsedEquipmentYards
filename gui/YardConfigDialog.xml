@@ -10,20 +10,20 @@
             <Text profile="dialogTitle" text="$l10n_uey_config_title" id="dialogTitleElement" position="0px -15px"/>
 
             <!-- ======== LEFT COLUMN: Core Settings ======== -->
-            <GuiElement position="40px -18px" size="350px 580px">
+            <GuiElement position="40px 0px" size="350px 580px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_config_settings_header" position="0px 0px" size="350px 24px"/>
 
                 <!-- Quality -->
                 <Text profile="ueySettingLabel" text="$l10n_uey_config_quality" position="0px -28px" size="350px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_quality_desc" position="0px -52px" size="350px 50px"/>
+                <Text profile="ueySettingDesc2Line" text="$l10n_uey_config_quality_desc" position="0px -52px" size="350px 36px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="qualityOption"
-                    position="0px -106px" size="350px 40px" onClick="onQualityChanged"/>
+                    position="0px -92px" size="350px 40px" onClick="onQualityChanged"/>
 
                 <!-- Dirtiness -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_dirtiness" position="0px -168px" size="350px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -192px" size="350px 50px"/>
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_dirtiness" position="0px -144px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -168px" size="350px 20px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="dirtinessOption"
-                    position="0px -246px" size="350px 40px" onClick="onDirtinessChanged"/>
+                    position="0px -192px" size="350px 40px" onClick="onDirtinessChanged"/>
             </GuiElement>
 
             <!-- ======== MIDDLE COLUMN: Category Weights ======== -->
