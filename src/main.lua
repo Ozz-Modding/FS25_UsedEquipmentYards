@@ -86,8 +86,9 @@ FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, 
     end
 end)
 
--- Spawn vehicles after the mission is fully loaded (terrain ready).
+-- After mission start: start fence patch timer and spawn vehicles.
 FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMission, function()
+    UsedEquipmentYards.fencePatchTimer = UsedEquipmentYards.fencePatchDelay
     if UsedEquipmentYards.yardManager ~= nil then
         UsedEquipmentYards.yardManager:spawnAllYards()
     end
@@ -109,39 +110,67 @@ local function isYardFenceBrush(brush)
        and brush.fenceParentObject[PlaceableUsedEquipmentYard.KEY] ~= nil
 end
 
-if ConstructionBrush ~= nil then
-    ConstructionBrush.verifyAccess = Utils.overwrittenFunction(
-        ConstructionBrush.verifyAccess,
-        function(self, superFunc, x, y, z)
-            if isYardFenceBrush(self) then
-                return nil -- nil = no error, access granted
-            end
-            return superFunc(self, x, y, z)
-        end
-    )
-end
+--- Install fence construction patches. Called with a delay so we wrap
+--- whatever version exists AFTER all other mods have had time to patch.
+UsedEquipmentYards.fencePatchDelay = 5000  -- ms
+UsedEquipmentYards.fencePatchTimer = nil
 
-if ConstructionBrushNewFence ~= nil then
-    ConstructionBrushNewFence.validateCurrentSegment = Utils.overwrittenFunction(
-        ConstructionBrushNewFence.validateCurrentSegment,
-        function(self, superFunc, x, z)
-            if isYardFenceBrush(self) then
-                if self.currentSegment == nil then return false end
-                local sx, _, sz = self.currentSegment:getStartPos()
-                if sx == nil then return false end
-                local price = self.currentSegment:getPrice()
-                if g_currentMission:getMoney(g_localPlayer.farmId) < price then
-                    self.cursor:setErrorMessage(g_i18n:getText(ConstructionBrushNewFence.ERROR_MESSAGES[ConstructionBrushNewFence.ERROR.NOT_ENOUGH_MONEY]))
-                    return false
+function UsedEquipmentYards.installFencePatches()
+    if UsedEquipmentYards.fencePatchesInstalled then return end
+    UsedEquipmentYards.fencePatchesInstalled = true
+
+    if ConstructionBrush ~= nil then
+        ConstructionBrush.verifyAccess = Utils.overwrittenFunction(
+            ConstructionBrush.verifyAccess,
+            function(self, superFunc, x, y, z)
+                if isYardFenceBrush(self) then
+                    return nil
                 end
-                if price > 0 then
-                    self.cursor:setMessage(g_i18n:formatMoney(price))
+                local screen = g_constructionScreen
+                if screen ~= nil and screen.brush ~= nil and isYardFenceBrush(screen.brush) then
+                    return nil
                 end
-                return true
+                return superFunc(self, x, y, z)
             end
-            return superFunc(self, x, z)
-        end
-    )
+        )
+    end
+
+    -- Also patch verifyAccess directly on NewFence in case a mod map's
+    -- subclass overrides it and our ConstructionBrush patch doesn't reach it.
+    if ConstructionBrushNewFence ~= nil and ConstructionBrushNewFence.verifyAccess ~= nil then
+        ConstructionBrushNewFence.verifyAccess = Utils.overwrittenFunction(
+            ConstructionBrushNewFence.verifyAccess,
+            function(self, superFunc, x, y, z)
+                if isYardFenceBrush(self) then
+                    return nil
+                end
+                return superFunc(self, x, y, z)
+            end
+        )
+    end
+
+    if ConstructionBrushNewFence ~= nil then
+        ConstructionBrushNewFence.validateCurrentSegment = Utils.overwrittenFunction(
+            ConstructionBrushNewFence.validateCurrentSegment,
+            function(self, superFunc, x, z)
+                if isYardFenceBrush(self) then
+                    if self.currentSegment == nil then return false end
+                    local sx, _, sz = self.currentSegment:getStartPos()
+                    if sx == nil then return false end
+                    local price = self.currentSegment:getPrice()
+                    if g_currentMission:getMoney(g_localPlayer.farmId) < price then
+                        self.cursor:setErrorMessage(g_i18n:getText(ConstructionBrushNewFence.ERROR_MESSAGES[ConstructionBrushNewFence.ERROR.NOT_ENOUGH_MONEY]))
+                        return false
+                    end
+                    if price > 0 then
+                        self.cursor:setMessage(g_i18n:formatMoney(price))
+                    end
+                    return true
+                end
+                return superFunc(self, x, z)
+            end
+        )
+    end
 end
 
 -- ---------------------------------------------------------------------------
@@ -318,6 +347,15 @@ end
 -- ---------------------------------------------------------------------------
 
 function UsedEquipmentYards:update(dt)
+    -- Delayed fence patch install — ensures we're the last to wrap.
+    if UsedEquipmentYards.fencePatchTimer ~= nil then
+        UsedEquipmentYards.fencePatchTimer = UsedEquipmentYards.fencePatchTimer - dt
+        if UsedEquipmentYards.fencePatchTimer <= 0 then
+            UsedEquipmentYards.fencePatchTimer = nil
+            UsedEquipmentYards.installFencePatches()
+        end
+    end
+
     local pending = UsedEquipmentYards.pendingClientItems
     local i = #pending
     while i >= 1 do

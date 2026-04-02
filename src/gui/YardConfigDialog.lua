@@ -115,7 +115,6 @@ function YardConfigDialog.getKnownCategories()
             and not name:find("PALLET")
             and not name:find("HEADER") then
             cats[#cats + 1] = { name = name, title = info.title, type = info.type }
-            print(("[UEY] Category: %s — %s (type: %s)"):format(name, info.title, info.type))
         end
     end
 

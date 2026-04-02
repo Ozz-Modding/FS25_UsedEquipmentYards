@@ -77,10 +77,6 @@ function PriceTagRenderer.load()
     end
 
     xmlFile:delete()
-
-    local count = 0
-    for _ in pairs(PriceTagRenderer.plateTemplates) do count = count + 1 end
-    print(("[UsedEquipmentYards] Price tag plates loaded (%d types)."):format(count))
 end
 
 function PriceTagRenderer.delete()

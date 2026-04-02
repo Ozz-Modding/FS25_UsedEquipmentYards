@@ -195,8 +195,6 @@ function YardInventory:onHourChanged()
                 local fine = math.max(TestDriveEvent.FINE_MINIMUM,
                     math.floor(item.price * TestDriveEvent.FINE_PER_HOUR))
                 g_currentMission:addMoneyChange(-fine, td.farmId, MoneyType.OTHER, true)
-                print(("[UsedEquipmentYards] Test drive overdue — fined farm %d: %s"):format(
-                    td.farmId, g_i18n:formatMoney(fine)))
             end
         end
     end
@@ -653,8 +651,6 @@ function YardInventory:spawnNext()
 
         if self.consecutiveFailures >= YardInventory.MAX_CONSECUTIVE_FAILURES then
             self.filling = false
-            print(("[UsedEquipmentYards] Yard '%s' full — placed %d vehicles (%d consecutive failures)."):format(
-                self.yard.name, #self.vehicles, self.consecutiveFailures))
             return
         end
 

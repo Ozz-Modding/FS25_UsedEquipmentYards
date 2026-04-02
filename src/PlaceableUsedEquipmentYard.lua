@@ -24,26 +24,37 @@ function PlaceableUsedEquipmentYard.prerequisitesPresent(specializations)
 end
 
 function PlaceableUsedEquipmentYard.registerFunctions(placeableType)
-    SpecializationUtil.registerFunction(placeableType, "deleteNavigationMeshPlacementCollision", PlaceableUsedEquipmentYard.noOp)
-    SpecializationUtil.registerFunction(placeableType, "createNavigationMeshPlacementCollision", PlaceableUsedEquipmentYard.noOp)
-    SpecializationUtil.registerFunction(placeableType, "createNavigationMeshFromContour", PlaceableUsedEquipmentYard.noOpTrue)
+    SpecializationUtil.registerFunction(placeableType, "deleteNavigationMeshPlacementCollision",
+        PlaceableUsedEquipmentYard.noOp)
+    SpecializationUtil.registerFunction(placeableType, "createNavigationMeshPlacementCollision",
+        PlaceableUsedEquipmentYard.noOp)
+    SpecializationUtil.registerFunction(placeableType, "createNavigationMeshFromContour",
+        PlaceableUsedEquipmentYard.noOpTrue)
     -- Called by ConstructionBrushHusbandry after BOTH "Yes" and "No" paths complete.
     -- We use it as the trigger to create the yard at exactly the right moment.
-    SpecializationUtil.registerFunction(placeableType, "getCanCreateMeadow", PlaceableUsedEquipmentYard.getCanCreateMeadow)
+    SpecializationUtil.registerFunction(placeableType, "getCanCreateMeadow",
+        PlaceableUsedEquipmentYard.getCanCreateMeadow)
 end
 
 function PlaceableUsedEquipmentYard.registerOverwrittenFunctions(placeableType)
-    SpecializationUtil.registerOverwrittenFunction(placeableType, "getIsOnOwnedFarmland", PlaceableUsedEquipmentYard.getIsOnOwnedFarmland)
-    SpecializationUtil.registerOverwrittenFunction(placeableType, "getIsOnFarmland", PlaceableUsedEquipmentYard.getIsOnFarmland)
-    SpecializationUtil.registerOverwrittenFunction(placeableType, "getOwnerFarmId", PlaceableUsedEquipmentYard.getOwnerFarmId)
-    SpecializationUtil.registerOverwrittenFunction(placeableType, "setOwnerFarmId", PlaceableUsedEquipmentYard.setOwnerFarmId)
-    SpecializationUtil.registerOverwrittenFunction(placeableType, "tryFinalizeFence", PlaceableUsedEquipmentYard.tryFinalizeFence)
-    SpecializationUtil.registerOverwrittenFunction(placeableType, "createDefaultFence", PlaceableUsedEquipmentYard.createDefaultFence)
-    SpecializationUtil.registerOverwrittenFunction(placeableType, "updateHusbandryFence", PlaceableUsedEquipmentYard.updateHusbandryFence)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "getIsOnOwnedFarmland",
+        PlaceableUsedEquipmentYard.getIsOnOwnedFarmland)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "getIsOnFarmland",
+        PlaceableUsedEquipmentYard.getIsOnFarmland)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "getOwnerFarmId",
+        PlaceableUsedEquipmentYard.getOwnerFarmId)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "setOwnerFarmId",
+        PlaceableUsedEquipmentYard.setOwnerFarmId)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "tryFinalizeFence",
+        PlaceableUsedEquipmentYard.tryFinalizeFence)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "createDefaultFence",
+        PlaceableUsedEquipmentYard.createDefaultFence)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "updateHusbandryFence",
+        PlaceableUsedEquipmentYard.updateHusbandryFence)
 end
 
 function PlaceableUsedEquipmentYard.registerEventListeners(placeableType)
-    SpecializationUtil.registerEventListener(placeableType, "onLoad",   PlaceableUsedEquipmentYard)
+    SpecializationUtil.registerEventListener(placeableType, "onLoad", PlaceableUsedEquipmentYard)
     SpecializationUtil.registerEventListener(placeableType, "onDelete", PlaceableUsedEquipmentYard)
 end
 
@@ -52,6 +63,7 @@ end
 -- ---------------------------------------------------------------------------
 
 function PlaceableUsedEquipmentYard.noOp() end
+
 function PlaceableUsedEquipmentYard.noOpTrue() return true end
 
 function PlaceableUsedEquipmentYard:getIsOnOwnedFarmland(superFunc, x, y, z, rotY)
@@ -81,10 +93,10 @@ end
 function PlaceableUsedEquipmentYard.getYardCorners(rootNode)
     local h = PlaceableUsedEquipmentYard.DEFAULT_HALF_SIZE
     local offsets = {
-        {-h, 0},      -- near-left
-        { h, 0},      -- near-right
-        { h, 2 * h},  -- far-right
-        {-h, 2 * h},  -- far-left
+        { -h, 0 },   -- near-left
+        { h, 0 },    -- near-right
+        { h, 2 * h }, -- far-right
+        { -h, 2 * h }, -- far-left
     }
     local corners = {}
     for _, o in ipairs(offsets) do
@@ -192,9 +204,6 @@ function PlaceableUsedEquipmentYard.createYardFromCurrentFence(placeable)
 
     local yard = manager:createYard("Yard", bounds)
     data.yardId = yard.id
-
-    print(("[UsedEquipmentYards] Yard created (id=%d) — bounds: %.0fx%.0f m"):format(
-        yard.id, bounds.sizeX, bounds.sizeZ))
 end
 
 -- ---------------------------------------------------------------------------
@@ -233,8 +242,8 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
     -- Build an ordered polygon from fence segment endpoints.
     -- Each segment has a start and end; consecutive segments share endpoints.
     local polygon = {}
-    local minX, maxX =  math.huge, -math.huge
-    local minZ, maxZ =  math.huge, -math.huge
+    local minX, maxX = math.huge, -math.huge
+    local minZ, maxZ = math.huge, -math.huge
 
     for _, seg in ipairs(segments) do
         local sx, _, sz = seg:getStartPos()
@@ -242,8 +251,8 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
         if sx ~= nil and ex ~= nil then
             -- Add start point (avoid near-duplicates with previous end)
             if #polygon == 0 or
-               math.abs(polygon[#polygon].x - sx) > 0.01 or
-               math.abs(polygon[#polygon].z - sz) > 0.01 then
+                math.abs(polygon[#polygon].x - sx) > 0.01 or
+                math.abs(polygon[#polygon].z - sz) > 0.01 then
                 polygon[#polygon + 1] = { x = sx, z = sz }
             end
             polygon[#polygon + 1] = { x = ex, z = ez }
@@ -262,7 +271,9 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
     local cy = getTerrainHeightAtWorldPos(g_terrainNode, cx, 0, cz)
 
     return {
-        cx = cx, cy = cy, cz = cz,
+        cx = cx,
+        cy = cy,
+        cz = cz,
         sizeX = maxX - minX,
         sizeZ = maxZ - minZ,
         polygon = polygon,
