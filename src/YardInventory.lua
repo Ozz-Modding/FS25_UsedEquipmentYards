@@ -595,17 +595,18 @@ end
 
 --- Rebuild the placedPositions cache from live vehicles and reserved
 --- test-drive return positions (so new spawns don't occupy those spots).
+--- Uses each item's stored spawnRadius for accurate clearance.
 function YardInventory:rebuildPlacedPositions()
     self.placedPositions = {}
-    for _, v in ipairs(self.vehicles) do
-        local vx, _, vz = getWorldTranslation(v.rootNode)
-        self.placedPositions[#self.placedPositions + 1] = { x = vx, z = vz, radius = 3.0 }
-    end
-    -- Reserve original positions for vehicles currently on test drive.
     for _, item in ipairs(self.items) do
-        local td = item.testDrive
-        if td ~= nil then
-            self.placedPositions[#self.placedPositions + 1] = { x = td.origX, z = td.origZ, radius = 3.0 }
+        local r = item.spawnRadius or 3.0
+        if item.testDrive ~= nil then
+            -- Vehicle is out on test drive — reserve its return position.
+            local td = item.testDrive
+            self.placedPositions[#self.placedPositions + 1] = { x = td.origX, z = td.origZ, radius = r }
+        elseif item.vehicle ~= nil then
+            local vx, _, vz = getWorldTranslation(item.vehicle.rootNode)
+            self.placedPositions[#self.placedPositions + 1] = { x = vx, z = vz, radius = r }
         end
     end
 end
@@ -660,6 +661,9 @@ function YardInventory:spawnNext()
     end
 
     self.consecutiveFailures = 0
+
+    -- Store radius on the item for future clearance checks.
+    item.spawnRadius = radius
 
     -- Record position BEFORE async load so the next spawn sees it.
     self:recordPlacedPosition(x, z, radius)
