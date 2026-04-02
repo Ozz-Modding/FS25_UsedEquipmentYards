@@ -78,6 +78,7 @@ YardInventory.DEFAULT_CONFIG           = {
     brands = {},  -- empty = all brands with weight 1
     minWorkingWidth = 0,   -- 0 = no minimum
     maxWorkingWidth = 0,   -- 0 = no maximum
+    maxPrice        = 0,   -- 0 = no maximum (hard cap MAX_VEHICLE_PRICE still applies)
 }
 
 -- Dirt jitter range applied ± around the dirtiness base
@@ -135,6 +136,7 @@ function YardInventory.copyConfig(cfg)
         brands          = {},
         minWorkingWidth = cfg.minWorkingWidth or 0,
         maxWorkingWidth = cfg.maxWorkingWidth or 0,
+        maxPrice        = cfg.maxPrice or 0,
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
@@ -429,9 +431,13 @@ function YardInventory:buildStorePool()
     local pool = {}        -- { storeItem, weight }
     local totalWeight = 0
 
+    local cfgMaxPrice = self.config.maxPrice or 0
+    local effectiveMaxPrice = cfgMaxPrice > 0 and math.min(cfgMaxPrice, YardInventory.MAX_VEHICLE_PRICE) or YardInventory.MAX_VEHICLE_PRICE
+
     for _, si in pairs(g_storeManager:getItems()) do
         if si.showInStore and si.extraContentId == nil
             and si.price >= YardInventory.MIN_VEHICLE_PRICE
+            and si.price <= effectiveMaxPrice
             and StoreItemUtil.getIsVehicle(si) then
 
             -- Working width filter: only applies to items that HAVE a working width spec.
@@ -865,6 +871,7 @@ function YardInventory:saveToXML(xmlFile, key)
     setXMLFloat(xmlFile, key .. ".config#dirtiness", self.config.dirtiness or 0.20)
     setXMLInt(xmlFile, key .. ".config#minWorkingWidth", self.config.minWorkingWidth or 0)
     setXMLInt(xmlFile, key .. ".config#maxWorkingWidth", self.config.maxWorkingWidth or 0)
+    setXMLInt(xmlFile, key .. ".config#maxPrice", self.config.maxPrice or 0)
 
     local ci = 0
     for catName, weight in pairs(self.config.categories) do
@@ -938,6 +945,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             dirtiness       = getXMLFloat(xmlFile, key .. ".config#dirtiness") or 0.20,
             minWorkingWidth = getXMLInt(xmlFile, key .. ".config#minWorkingWidth") or 0,
             maxWorkingWidth = getXMLInt(xmlFile, key .. ".config#maxWorkingWidth") or 0,
+            maxPrice        = getXMLInt(xmlFile, key .. ".config#maxPrice") or 0,
             categories = {},
             brands     = {},
         }

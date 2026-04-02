@@ -36,6 +36,12 @@
                 <Text profile="ueyWeightLabel" text="$l10n_uey_config_maxWorkingWidth" position="0px -330px" size="130px 26px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="maxWorkingWidthOption"
                     position="130px -326px" size="210px 32px" onClick="onMaxWorkingWidthChanged"/>
+
+                <!-- Max Price -->
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_maxPrice" position="0px -370px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_maxPrice_desc" position="0px -394px" size="350px 20px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="maxPriceOption"
+                    position="0px -418px" size="350px 40px" onClick="onMaxPriceChanged"/>
             </GuiElement>
 
             <!-- ======== MIDDLE COLUMN: Category Weights ======== -->

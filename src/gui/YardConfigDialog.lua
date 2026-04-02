@@ -15,6 +15,7 @@ YardConfigDialog.MAX_BRAND_WEIGHT = 3
 -- Working width options (metres). 0 = no limit.
 YardConfigDialog.MIN_WW_OPTIONS  = { 0, 5, 10, 15, 20 }   -- "No minimum", 5m, 10m, ...
 YardConfigDialog.MAX_WW_OPTIONS  = { 5, 10, 15, 20, 0 }   -- 5m, 10m, ..., "No maximum"
+YardConfigDialog.MAX_PRICE_OPTIONS = { 50000, 100000, 150000, 200000, 250000, 0 }  -- 0 = "No maximum"
 
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES      = {
@@ -264,6 +265,18 @@ function YardConfigDialog:populateOptions()
         if v == (self.config.maxWorkingWidth or 0) then maxWWState = i; break end
     end
     self.maxWorkingWidthOption:setState(maxWWState)
+
+    -- Max price
+    local maxPriceTexts = {}
+    for _, v in ipairs(YardConfigDialog.MAX_PRICE_OPTIONS) do
+        maxPriceTexts[#maxPriceTexts + 1] = v == 0 and g_i18n:getText("uey_config_noMaximum") or g_i18n:formatMoney(v)
+    end
+    self.maxPriceOption:setTexts(maxPriceTexts)
+    local maxPriceState = #YardConfigDialog.MAX_PRICE_OPTIONS  -- default: last = "No maximum"
+    for i, v in ipairs(YardConfigDialog.MAX_PRICE_OPTIONS) do
+        if v == (self.config.maxPrice or 0) then maxPriceState = i; break end
+    end
+    self.maxPriceOption:setState(maxPriceState)
 end
 
 -- ---------------------------------------------------------------------------
@@ -284,6 +297,10 @@ end
 
 function YardConfigDialog:onMaxWorkingWidthChanged(state, element)
     self.config.maxWorkingWidth = YardConfigDialog.MAX_WW_OPTIONS[state] or 0
+end
+
+function YardConfigDialog:onMaxPriceChanged(state, element)
+    self.config.maxPrice = YardConfigDialog.MAX_PRICE_OPTIONS[state] or 0
 end
 
 function YardConfigDialog:onWeightChanged(state, element)

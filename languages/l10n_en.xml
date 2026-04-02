@@ -40,6 +40,8 @@
         <text name="uey_config_maxWorkingWidth"  text="Max Width"/>
         <text name="uey_config_noMinimum"        text="No minimum"/>
         <text name="uey_config_noMaximum"        text="No maximum"/>
+        <text name="uey_config_maxPrice"         text="Max Price"/>
+        <text name="uey_config_maxPrice_desc"    text="Limit yard inventory to a maximum price."/>
         <text name="uey_config_weights_header"   text="Category Weights"/>
         <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
         <text name="uey_config_clearWeights"     text="Clear Weights"/>
