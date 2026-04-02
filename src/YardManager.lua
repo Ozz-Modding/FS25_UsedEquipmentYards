@@ -59,12 +59,13 @@ function YardManager:load()
 
     -- Don't spawn vehicles here — g_terrainNode may not be ready yet.
     -- Spawning is deferred to spawnAllYards(), called from onMissionStarted.
-
-    g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
 end
 
 --- Called after the mission is fully loaded (terrain, map, etc. are ready).
+--- Also subscribes to HOUR_CHANGED here (not in load) so it works even
+--- when no save file existed.
 function YardManager:spawnAllYards()
+    g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
     for _, yard in pairs(self.yards) do
         yard.inventory:spawn()
     end

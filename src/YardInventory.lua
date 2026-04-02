@@ -125,7 +125,7 @@ YardInventory.PRICE_WIDE_SPREAD        = 0.25
 YardInventory.TTL_MIN_HOURS            = 24
 YardInventory.TTL_MAX_HOURS            = 144
 -- Probability each in-game hour that a new vehicle is spawned (if space allows).
-YardInventory.HOURLY_SPAWN_CHANCE      = 0.20
+YardInventory.HOURLY_SPAWN_CHANCE      = 0.35
 
 --- Deep-copy a config table so edits don't affect the original.
 function YardInventory.copyConfig(cfg)
