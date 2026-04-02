@@ -76,6 +76,8 @@ YardInventory.DEFAULT_CONFIG           = {
         SKIDSTEERVEHICLES   = 2,
     },
     brands = {},  -- empty = all brands with weight 1
+    minWorkingWidth = 0,   -- 0 = no minimum
+    maxWorkingWidth = 0,   -- 0 = no maximum
 }
 
 -- Dirt jitter range applied ± around the dirtiness base
@@ -127,10 +129,12 @@ YardInventory.HOURLY_SPAWN_CHANCE      = 0.20
 --- Deep-copy a config table so edits don't affect the original.
 function YardInventory.copyConfig(cfg)
     local copy = {
-        quality    = cfg.quality,
-        dirtiness  = cfg.dirtiness,
-        categories = {},
-        brands     = {},
+        quality         = cfg.quality,
+        dirtiness       = cfg.dirtiness,
+        categories      = {},
+        brands          = {},
+        minWorkingWidth = cfg.minWorkingWidth or 0,
+        maxWorkingWidth = cfg.maxWorkingWidth or 0,
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
@@ -419,6 +423,8 @@ function YardInventory:buildStorePool()
     local cats   = self.config.categories  -- map: CATEGORY_NAME = weight
     local brands = self.config.brands      -- map: BRAND_NAME = weight (empty = all)
     local hasBrandFilter = next(brands) ~= nil
+    local minWW = self.config.minWorkingWidth or 0
+    local maxWW = self.config.maxWorkingWidth or 0
 
     local pool = {}        -- { storeItem, weight }
     local totalWeight = 0
@@ -428,22 +434,33 @@ function YardInventory:buildStorePool()
             and si.price >= YardInventory.MIN_VEHICLE_PRICE
             and StoreItemUtil.getIsVehicle(si) then
 
-            -- Brand weight: if no filter configured, all brands get weight 1.
-            local brandWeight = 1
-            if hasBrandFilter then
-                local brand = g_brandManager:getBrandByIndex(si.brandIndex)
-                local brandName = brand ~= nil and brand.name or nil
-                brandWeight = brandName ~= nil and (brands[brandName] or 0) or 0
+            -- Working width filter: only applies to items that HAVE a working width spec.
+            local passesWW = true
+            pcall(StoreItemUtil.loadSpecsFromXML, si)
+            if si.specs ~= nil and si.specs.workingWidth ~= nil then
+                local ww = si.specs.workingWidth.width or 0
+                if minWW > 0 and ww < minWW then passesWW = false end
+                if maxWW > 0 and ww > maxWW then passesWW = false end
             end
 
-            if brandWeight > 0 then
-                for _, catName in ipairs(si.categoryNames or {}) do
-                    local catWeight = cats[catName]
-                    if catWeight ~= nil and catWeight > 0 then
-                        local w = catWeight * brandWeight
-                        pool[#pool + 1] = { storeItem = si, weight = w }
-                        totalWeight = totalWeight + w
-                        break
+            if passesWW then
+                -- Brand weight: if no filter configured, all brands get weight 1.
+                local brandWeight = 1
+                if hasBrandFilter then
+                    local brand = g_brandManager:getBrandByIndex(si.brandIndex)
+                    local brandName = brand ~= nil and brand.name or nil
+                    brandWeight = brandName ~= nil and (brands[brandName] or 0) or 0
+                end
+
+                if brandWeight > 0 then
+                    for _, catName in ipairs(si.categoryNames or {}) do
+                        local catWeight = cats[catName]
+                        if catWeight ~= nil and catWeight > 0 then
+                            local w = catWeight * brandWeight
+                            pool[#pool + 1] = { storeItem = si, weight = w }
+                            totalWeight = totalWeight + w
+                            break
+                        end
                     end
                 end
             end
@@ -846,6 +863,8 @@ function YardInventory:saveToXML(xmlFile, key)
     -- Save config.
     setXMLString(xmlFile, key .. ".config#quality", self.config.quality or "MEDIUM")
     setXMLFloat(xmlFile, key .. ".config#dirtiness", self.config.dirtiness or 0.20)
+    setXMLInt(xmlFile, key .. ".config#minWorkingWidth", self.config.minWorkingWidth or 0)
+    setXMLInt(xmlFile, key .. ".config#maxWorkingWidth", self.config.maxWorkingWidth or 0)
 
     local ci = 0
     for catName, weight in pairs(self.config.categories) do
@@ -916,7 +935,9 @@ function YardInventory:loadFromXML(xmlFile, key)
     if hasXMLProperty(xmlFile, key .. ".config") then
         self.config = {
             quality    = getXMLString(xmlFile, key .. ".config#quality") or "MEDIUM",
-            dirtiness  = getXMLFloat(xmlFile, key .. ".config#dirtiness") or 0.20,
+            dirtiness       = getXMLFloat(xmlFile, key .. ".config#dirtiness") or 0.20,
+            minWorkingWidth = getXMLInt(xmlFile, key .. ".config#minWorkingWidth") or 0,
+            maxWorkingWidth = getXMLInt(xmlFile, key .. ".config#maxWorkingWidth") or 0,
             categories = {},
             brands     = {},
         }

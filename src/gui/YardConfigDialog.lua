@@ -12,6 +12,10 @@ YardConfigDialog.DIRTINESS_STEP  = 0.05 -- 5% increments
 YardConfigDialog.MAX_WEIGHT      = 10
 YardConfigDialog.MAX_BRAND_WEIGHT = 3
 
+-- Working width options (metres). 0 = no limit.
+YardConfigDialog.MIN_WW_OPTIONS  = { 0, 5, 10, 15, 20 }   -- "No minimum", 5m, 10m, ...
+YardConfigDialog.MAX_WW_OPTIONS  = { 5, 10, 15, 20, 0 }   -- 5m, 10m, ..., "No maximum"
+
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES      = {
     ["OBJECTS"]   = true,
@@ -236,6 +240,30 @@ function YardConfigDialog:populateOptions()
         local w = hasBrandConfig and (self.config.brands[row.name] or 0) or 1
         row.option:setState(math.max(1, math.min(#brandTexts, w + 1)))
     end
+
+    -- Min working width
+    local minWWTexts = {}
+    for _, v in ipairs(YardConfigDialog.MIN_WW_OPTIONS) do
+        minWWTexts[#minWWTexts + 1] = v == 0 and g_i18n:getText("uey_config_noMinimum") or (tostring(v) .. " m")
+    end
+    self.minWorkingWidthOption:setTexts(minWWTexts)
+    local minWWState = 1
+    for i, v in ipairs(YardConfigDialog.MIN_WW_OPTIONS) do
+        if v == (self.config.minWorkingWidth or 0) then minWWState = i; break end
+    end
+    self.minWorkingWidthOption:setState(minWWState)
+
+    -- Max working width
+    local maxWWTexts = {}
+    for _, v in ipairs(YardConfigDialog.MAX_WW_OPTIONS) do
+        maxWWTexts[#maxWWTexts + 1] = v == 0 and g_i18n:getText("uey_config_noMaximum") or (tostring(v) .. " m")
+    end
+    self.maxWorkingWidthOption:setTexts(maxWWTexts)
+    local maxWWState = #YardConfigDialog.MAX_WW_OPTIONS  -- default: last = "No maximum"
+    for i, v in ipairs(YardConfigDialog.MAX_WW_OPTIONS) do
+        if v == (self.config.maxWorkingWidth or 0) then maxWWState = i; break end
+    end
+    self.maxWorkingWidthOption:setState(maxWWState)
 end
 
 -- ---------------------------------------------------------------------------
@@ -248,6 +276,14 @@ end
 
 function YardConfigDialog:onDirtinessChanged(state, element)
     self.config.dirtiness = (state - 1) * YardConfigDialog.DIRTINESS_STEP
+end
+
+function YardConfigDialog:onMinWorkingWidthChanged(state, element)
+    self.config.minWorkingWidth = YardConfigDialog.MIN_WW_OPTIONS[state] or 0
+end
+
+function YardConfigDialog:onMaxWorkingWidthChanged(state, element)
+    self.config.maxWorkingWidth = YardConfigDialog.MAX_WW_OPTIONS[state] or 0
 end
 
 function YardConfigDialog:onWeightChanged(state, element)

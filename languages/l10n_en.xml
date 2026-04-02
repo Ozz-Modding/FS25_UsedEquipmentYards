@@ -34,6 +34,12 @@
         <text name="uey_config_quality_desc"     text="Controls the hours, damage and wear of equipment. Lower quality equipment will cost less than higher quality equipment."/>
         <text name="uey_config_dirtiness"        text="Dirtiness"/>
         <text name="uey_config_dirtiness_desc"   text="Average dirt level of equipment."/>
+        <text name="uey_config_workingWidth"      text="Working Width"/>
+        <text name="uey_config_workingWidth_desc" text="Filter equipment by working width."/>
+        <text name="uey_config_minWorkingWidth"  text="Min Width"/>
+        <text name="uey_config_maxWorkingWidth"  text="Max Width"/>
+        <text name="uey_config_noMinimum"        text="No minimum"/>
+        <text name="uey_config_noMaximum"        text="No maximum"/>
         <text name="uey_config_weights_header"   text="Category Weights"/>
         <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
         <text name="uey_config_clearWeights"     text="Clear Weights"/>

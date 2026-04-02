@@ -24,6 +24,18 @@
                 <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -168px" size="350px 20px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="dirtinessOption"
                     position="0px -192px" size="350px 40px" onClick="onDirtinessChanged"/>
+
+                <!-- Working Width -->
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_workingWidth" position="0px -244px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_workingWidth_desc" position="0px -268px" size="350px 20px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_config_minWorkingWidth" position="0px -296px" size="130px 26px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="minWorkingWidthOption"
+                    position="130px -292px" size="210px 32px" onClick="onMinWorkingWidthChanged"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_config_maxWorkingWidth" position="0px -330px" size="130px 26px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="maxWorkingWidthOption"
+                    position="130px -326px" size="210px 32px" onClick="onMaxWorkingWidthChanged"/>
             </GuiElement>
 
             <!-- ======== MIDDLE COLUMN: Category Weights ======== -->
