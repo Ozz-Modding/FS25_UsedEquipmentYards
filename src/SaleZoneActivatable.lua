@@ -26,7 +26,8 @@ end
 function SaleZoneActivatable:run()
     local vehicles = self.saleZone:determineCurrentVehicles()
     if #vehicles == 0 then return end
-    SaleZoneDialog.show(vehicles)
+    local yardId = PlaceableSaleZone.getLinkedYardId(self.saleZone)
+    SaleZoneDialog.show(vehicles, yardId)
 end
 
 function SaleZoneActivatable:getDistance(x, y, z)

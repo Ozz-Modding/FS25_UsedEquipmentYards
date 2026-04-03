@@ -50,6 +50,8 @@ function YardManager:load()
     end
 
     BarterState.loadFromXML(xmlFile, "UsedEquipmentYards")
+    YardCredit.loadFromXML(xmlFile, "UsedEquipmentYards")
+    SellBarterDialog.loadOffersFromXML(xmlFile, "UsedEquipmentYards")
 
     delete(xmlFile)
 
@@ -99,6 +101,8 @@ function YardManager:save()
     end
 
     BarterState.saveToXML(xmlFile, "UsedEquipmentYards")
+    YardCredit.saveToXML(xmlFile, "UsedEquipmentYards")
+    SellBarterDialog.saveOffersToXML(xmlFile, "UsedEquipmentYards")
 
     saveXMLFile(xmlFile)
     delete(xmlFile)

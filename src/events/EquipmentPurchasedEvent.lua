@@ -7,11 +7,12 @@ function EquipmentPurchasedEvent.emptyNew()
     return Event.new(EquipmentPurchasedEvent_mt)
 end
 
-function EquipmentPurchasedEvent.new(yardId, itemIndex, farmId)
+function EquipmentPurchasedEvent.new(yardId, itemIndex, farmId, creditUsed)
     local self = EquipmentPurchasedEvent.emptyNew()
-    self.yardId    = yardId
-    self.itemIndex = itemIndex
-    self.farmId    = farmId
+    self.yardId     = yardId
+    self.itemIndex  = itemIndex
+    self.farmId     = farmId
+    self.creditUsed = creditUsed or 0
     return self
 end
 
@@ -19,12 +20,14 @@ function EquipmentPurchasedEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, self.yardId)
     streamWriteInt32(streamId, self.itemIndex)
     streamWriteInt32(streamId, self.farmId)
+    streamWriteInt32(streamId, self.creditUsed)
 end
 
 function EquipmentPurchasedEvent:readStream(streamId, connection)
-    self.yardId    = streamReadInt32(streamId)
-    self.itemIndex = streamReadInt32(streamId)
-    self.farmId    = streamReadInt32(streamId)
+    self.yardId     = streamReadInt32(streamId)
+    self.itemIndex  = streamReadInt32(streamId)
+    self.farmId     = streamReadInt32(streamId)
+    self.creditUsed = streamReadInt32(streamId)
     self:run(connection)
 end
 
@@ -46,12 +49,18 @@ function EquipmentPurchasedEvent:run(connection)
         if item == nil then return end
 
         local farm = g_farmManager:getFarmById(self.farmId)
-        if farm == nil or farm:getBalance() < item.price then
+        local creditAvailable = YardCredit.getBalance(self.farmId, self.yardId)
+        if farm == nil or (farm:getBalance() + creditAvailable) < item.price then
             print(("[UsedEquipmentYards] Purchase rejected: insufficient funds (farm %d)"):format(self.farmId))
             return
         end
 
-        g_currentMission:addMoneyChange(-item.price, self.farmId, MoneyType.SHOP_VEHICLE_BUY, true)
+        -- Deduct credit first, remainder from cash.
+        local creditUsed = YardCredit.deductCredit(self.farmId, self.yardId, item.price)
+        local cashCost = item.price - creditUsed
+        if cashCost > 0 then
+            g_currentMission:addMoneyChange(-cashCost, self.farmId, MoneyType.SHOP_VEHICLE_BUY, true)
+        end
 
         local vehicle = item.vehicle
         if vehicle ~= nil then
@@ -65,7 +74,7 @@ function EquipmentPurchasedEvent:run(connection)
         yard.inventory:removeItem(item, true)
 
         -- Broadcast so remote multiplayer clients also clean up their state.
-        g_server:broadcastEvent(EquipmentPurchasedEvent.new(self.yardId, self.itemIndex, self.farmId))
+        g_server:broadcastEvent(EquipmentPurchasedEvent.new(self.yardId, self.itemIndex, self.farmId, creditUsed))
         return
     end
 
@@ -89,6 +98,11 @@ function EquipmentPurchasedEvent:run(connection)
                 yard.inventory:removeItem(item, true)
             end
         end
+    end
+
+    -- Sync credit deduction on this client.
+    if self.creditUsed > 0 then
+        YardCredit.deductCredit(self.farmId, self.yardId, self.creditUsed)
     end
 
     -- Clean up client-side item registry (remote MP clients).

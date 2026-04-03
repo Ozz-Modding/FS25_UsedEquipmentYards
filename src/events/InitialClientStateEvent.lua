@@ -47,6 +47,12 @@ function InitialClientStateEvent:writeStream(streamId, connection)
     -- Barter state.
     BarterState.writeStream(streamId)
 
+    -- Yard credit.
+    YardCredit.writeStream(streamId)
+
+    -- Sell offer cache.
+    SellBarterDialog.writeOfferCacheStream(streamId)
+
     -- Yard vehicle items — so remote clients can interact with them.
     local totalItems = 0
     for _, yard in pairs(yards) do
@@ -99,6 +105,12 @@ function InitialClientStateEvent:readStream(streamId, connection)
 
     -- Barter state.
     BarterState.readStream(streamId)
+
+    -- Yard credit.
+    YardCredit.readStream(streamId)
+
+    -- Sell offer cache.
+    SellBarterDialog.readOfferCacheStream(streamId)
 
     -- Yard vehicle items.
     local totalItems = streamReadInt32(streamId)

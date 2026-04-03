@@ -103,6 +103,13 @@ function BarterDialog:populateDialog()
 
     self.askingPriceText:setText(g_i18n:formatMoney(item.price))
 
+    -- Credit balance.
+    local farmId = BarterDialog.getLocalFarmId()
+    local creditBal = (farmId ~= nil and self.yard ~= nil) and YardCredit.getBalance(farmId, self.yard.id) or 0
+    if self.creditBalanceText ~= nil then
+        self.creditBalanceText:setText(creditBal > 0 and g_i18n:formatMoney(creditBal) or g_i18n:getText("uey_credit_none"))
+    end
+
     -- Offer spinner
     local offerTexts = {}
     local offerValues = {}
@@ -250,7 +257,8 @@ function BarterDialog:onClickMakeOffer()
     end
 
     local farm = g_farmManager:getFarmById(farmId)
-    if farm == nil or farm:getBalance() < self.currentOffer then
+    local credit = YardCredit.getBalance(farmId, self.yard.id)
+    if farm == nil or (farm:getBalance() + credit) < self.currentOffer then
         self.resultText:setText(g_i18n:getText("uey_purchase_insufficient_funds"))
         return
     end
@@ -282,7 +290,8 @@ function BarterDialog:onClickBuyNow()
     if farmId == nil then return end
 
     local farm = g_farmManager:getFarmById(farmId)
-    if farm == nil or farm:getBalance() < self.item.price then
+    local credit = YardCredit.getBalance(farmId, self.yard.id)
+    if farm == nil or (farm:getBalance() + credit) < self.item.price then
         self.resultText:setText(g_i18n:getText("uey_purchase_insufficient_funds"))
         return
     end

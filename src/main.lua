@@ -19,7 +19,9 @@ function UsedEquipmentYards:loadMap(filename)
     YardConfigDialog.register()
     BarterDialog.register()
     SaleZoneDialog.register()
+    SellBarterDialog.register()
     BarterState.init()
+    YardCredit.init()
 
     if g_currentMission:getIsServer() then
         self.yardManager = YardManager.new(self)
@@ -49,6 +51,7 @@ function UsedEquipmentYards:delete()
     UsedEquipmentYards.vehicleToItem = {}
     UsedEquipmentYards.clientYards = {}
     BarterState.delete()
+    YardCredit.delete()
     PriceTagRenderer.delete()
     if self.yardManager ~= nil then
         self.yardManager:delete()
@@ -363,6 +366,9 @@ function UsedEquipmentYards:update(dt)
             yard.inventory:update(dt)
         end
     end
+
+    -- Resolve pending offer cache entries from network.
+    SellBarterDialog.resolvePendingOfferCache()
 
     local pending = UsedEquipmentYards.pendingClientItems
     local i = #pending

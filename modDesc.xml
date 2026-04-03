@@ -23,12 +23,16 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]></en>
         <sourceFile filename="src/events/TestDriveEvent.lua"/>
         <sourceFile filename="src/events/VehicleItemSyncEvent.lua"/>
         <sourceFile filename="src/BarterState.lua"/>
+        <sourceFile filename="src/YardCredit.lua"/>
         <sourceFile filename="src/PriceTagRenderer.lua"/>
         <sourceFile filename="src/UsedEquipmentYard.lua"/>
         <sourceFile filename="src/YardInventory.lua"/>
         <sourceFile filename="src/YardManager.lua"/>
         <sourceFile filename="src/gui/YardConfigDialog.lua"/>
         <sourceFile filename="src/gui/BarterDialog.lua"/>
+        <sourceFile filename="src/gui/SellBarterDialog.lua"/>
+        <sourceFile filename="src/events/VehicleSoldEvent.lua"/>
+        <sourceFile filename="src/events/OfferCacheSyncEvent.lua"/>
         <sourceFile filename="src/YardNameGenerator.lua"/>
         <sourceFile filename="src/YardConfigActivatable.lua"/>
         <sourceFile filename="src/YardVehicleActivatable.lua"/>

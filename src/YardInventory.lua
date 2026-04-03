@@ -159,6 +159,7 @@ function YardInventory.new(yard)
     self.filling             = false -- true while the fill loop is running
     self.spawnMode           = YardInventory.SPAWN_FILL
     self.fillDelayMs         = nil   -- ms to wait before starting fill (physics cleanup)
+    self.pendingSoldItems    = {}  -- items from player sales waiting for yard space
     return self
 end
 
@@ -270,8 +271,11 @@ function YardInventory:spawn()
     self:buildSpawnGrid()
     self:rebuildGridOccupancy()
 
-    print(("[UsedEquipmentYards] Yard '%s': %d vehicles re-associated, %d orphaned items removed, %d grid points."):format(
-        self.yard.name, associated, orphaned, #self.spawnGrid))
+    -- Try to place any pending sold items that were queued before the save.
+    self:trySpawnPendingSoldItem()
+
+    print(("[UsedEquipmentYards] Yard '%s': %d vehicles re-associated, %d orphaned items removed, %d grid points, %d pending sold."):format(
+        self.yard.name, associated, orphaned, #self.spawnGrid, #self.pendingSoldItems))
 end
 
 --- Attempt to spawn a single vehicle (hourly tick).
@@ -305,12 +309,13 @@ function YardInventory:despawnAll()
     end
 end
 
---- Full reset — despawns everything and fills from scratch (console command).
---- Spawning starts after a short delay so deleted vehicles' physics are cleaned up
---- before the overlapBox checks run.
+--- Full reset — despawns everything (including pending sold items) and fills
+--- from scratch. Spawning starts after a short delay so deleted vehicles'
+--- physics are cleaned up before the overlapBox checks run.
 function YardInventory:reset()
     self:despawnAll()
     self.items = {}
+    self.pendingSoldItems = {}
     self.storePool = nil
     self:buildSpawnGrid()
     self.spawnMode = YardInventory.SPAWN_FILL
@@ -382,17 +387,17 @@ function YardInventory:rollItem()
     -- Pick a random configuration set (like VehicleSaleSystem does).
     local configs       = YardInventory.randomConfiguration(storeItem)
 
-    -- Use the game's own pricing: sell-price based on age, hours, repair & repaint.
-    local defaultPrice  = StoreItemUtil.getDefaultPrice(storeItem, {})
-    local repairPrice   = 0
-    local repaintPrice  = 0
+    -- Use the game's own pricing with the chosen configuration's price.
+    local configuredPrice = StoreItemUtil.getDefaultPrice(storeItem, configs)
+    local repairPrice     = 0
+    local repaintPrice    = 0
     if Wearable ~= nil then
-        repairPrice  = Wearable.calculateRepairPrice(defaultPrice, damage)
-        repaintPrice = Wearable.calculateRepaintPrice(defaultPrice, wear)
+        repairPrice  = Wearable.calculateRepairPrice(configuredPrice, damage)
+        repaintPrice = Wearable.calculateRepaintPrice(configuredPrice, wear)
     end
-    local price = defaultPrice
+    local price = configuredPrice
     if Vehicle ~= nil and Vehicle.calculateSellPrice ~= nil then
-        price = Vehicle.calculateSellPrice(storeItem, age, operatingTime, defaultPrice, repairPrice, repaintPrice)
+        price = Vehicle.calculateSellPrice(storeItem, age, operatingTime, configuredPrice, repairPrice, repaintPrice)
     end
 
     -- Add price variety around the base sell-price formula.
@@ -424,6 +429,7 @@ function YardInventory:rollItem()
 
     return {
         xmlFilename      = storeItem.xmlFilename,
+        configurations   = configs,
         price            = finalPrice,
         minPrice         = minAcceptablePrice,
         numOwners        = numOwners,
@@ -760,8 +766,8 @@ function YardInventory:spawnNext()
         return
     end
 
-    -- Get vehicle dimensions for grid placement.
-    local config = YardInventory.randomConfiguration(storeItem)
+    -- Use the configuration chosen during rollItem (or a fresh one for pending sold items).
+    local config = item.configurations or YardInventory.randomConfiguration(storeItem)
     local rotation = storeItem.rotation or 0
     local sizeValues = StoreItemUtil.getSizeValues(storeItem.xmlFilename, "vehicle", rotation, config)
     local width  = sizeValues.width  or 3
@@ -942,6 +948,272 @@ function YardInventory.randomConfiguration(storeItem)
 end
 
 -- ---------------------------------------------------------------------------
+-- Eligibility — would this yard buy a given vehicle?
+-- ---------------------------------------------------------------------------
+
+--- Check if this yard's config would accept a live vehicle for purchase.
+--- Mirrors the filtering logic from buildStorePool but for a single vehicle.
+---@param vehicle table  FS25 Vehicle object
+---@return boolean
+function YardInventory:wouldBuyVehicle(vehicle)
+    local si = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+    if si == nil then return false end
+    if not si.showInStore or si.extraContentId ~= nil then return false end
+    if si.price < YardInventory.MIN_VEHICLE_PRICE then return false end
+    if not StoreItemUtil.getIsVehicle(si) then return false end
+
+    -- Price check with 15% allowance above maxPrice.
+    local cfgMaxPrice = self.config.maxPrice or 0
+    if cfgMaxPrice > 0 then
+        local allowedMax = cfgMaxPrice * 1.15
+        if si.price > allowedMax then return false end
+    end
+
+    -- Working width filter.
+    local minWW = self.config.minWorkingWidth or 0
+    local maxWW = self.config.maxWorkingWidth or 0
+    if minWW > 0 or maxWW > 0 then
+        pcall(StoreItemUtil.loadSpecsFromXML, si)
+        if si.specs ~= nil and si.specs.workingWidth ~= nil then
+            local ww = si.specs.workingWidth.width or 0
+            if minWW > 0 and ww < minWW then return false end
+            if maxWW > 0 and ww > maxWW then return false end
+        end
+    end
+
+    -- Brand filter.
+    local hasBrandFilter = next(self.config.brands) ~= nil
+    if hasBrandFilter then
+        local brand = g_brandManager:getBrandByIndex(si.brandIndex)
+        local brandName = brand ~= nil and brand.name or nil
+        if brandName == nil or (self.config.brands[brandName] or 0) == 0 then
+            return false
+        end
+    end
+
+    -- Category filter: at least one category with weight > 0.
+    for _, catName in ipairs(si.categoryNames or {}) do
+        local catWeight = self.config.categories[catName]
+        if catWeight ~= nil and catWeight > 0 then
+            return true
+        end
+    end
+
+    return false
+end
+
+--- Check all yards (server or client) and return the first that would buy the vehicle.
+--- Excludes the yard with the given excludeId.
+---@return table|nil yard
+function YardInventory.wouldAnyYardBuy(vehicle, excludeId)
+    -- Server: check via YardManager.
+    if UsedEquipmentYards.yardManager ~= nil then
+        for _, yard in pairs(UsedEquipmentYards.yardManager.yards) do
+            if yard.id ~= excludeId and yard.inventory:wouldBuyVehicle(vehicle) then
+                return yard
+            end
+        end
+    end
+    return nil
+end
+
+-- ---------------------------------------------------------------------------
+-- Accepting sold vehicles from players
+-- ---------------------------------------------------------------------------
+
+--- Create an inventory item from a live vehicle's current state.
+--- Prices the vehicle using the same formula as rollItem.
+--- If purchasePrice is provided, ensures the listing price is at least 1-2% above it.
+function YardInventory:createItemFromVehicle(vehicle, purchasePrice)
+    local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
+    if storeItem == nil then return nil end
+
+    local operatingTime = vehicle.operatingTime or 0
+    local damage = vehicle.getDamageAmount ~= nil and vehicle:getDamageAmount() or 0
+    local wear = vehicle.getWearTotalAmount ~= nil and vehicle:getWearTotalAmount() or 0
+    local age = vehicle.age or 1
+
+    -- Price using the vehicle's actual configured price and the game's formula.
+    local configuredPrice = vehicle:getPrice()
+    local repairPrice = vehicle.getRepairPrice ~= nil and vehicle:getRepairPrice() or 0
+    local repaintPrice = vehicle.getRepaintPrice ~= nil and vehicle:getRepaintPrice() or 0
+    local basePrice = configuredPrice
+    if Vehicle ~= nil and Vehicle.calculateSellPrice ~= nil then
+        basePrice = Vehicle.calculateSellPrice(storeItem, age, operatingTime, configuredPrice, repairPrice, repaintPrice)
+    end
+
+    -- Apply the yard's standard price jitter.
+    local roll = math.random()
+    local spread = roll < YardInventory.PRICE_NORMAL_CHANCE and YardInventory.PRICE_NORMAL_SPREAD or YardInventory.PRICE_WIDE_SPREAD
+    local jitter = 1 + (math.random() * 2 - 1) * spread
+    local finalPrice = math.max(1, math.floor(basePrice * jitter))
+
+    -- Ensure the yard lists it for at least 1-2% above what it paid the player.
+    if purchasePrice ~= nil and purchasePrice > 0 then
+        local minMarkup = 1.01 + math.random() * 0.01  -- 1-2% above purchase price
+        local priceFloor = math.floor(purchasePrice * minMarkup)
+        if finalPrice < priceFloor then
+            finalPrice = priceFloor
+        end
+    end
+
+    -- Min acceptable barter price (same distribution as rollItem).
+    local discountRoll = math.random()
+    local maxDiscount
+    if discountRoll < 0.70 then
+        maxDiscount = 0.05 + math.random() * 0.05
+    elseif discountRoll < 0.90 then
+        maxDiscount = 0.10 + math.random() * 0.05
+    elseif discountRoll < 0.97 then
+        maxDiscount = 0.15 + math.random() * 0.05
+    else
+        maxDiscount = 0.20 + math.random() * 0.10
+    end
+    local minPrice = math.max(1, math.floor(finalPrice * (1 - maxDiscount)))
+
+    local hours = operatingTime / 3600000
+    local numOwners = math.max(1, math.floor(hours / 25) + math.random(-1, 1))
+
+    -- Get vehicle dimensions for grid placement.
+    local rotation = storeItem.rotation or 0
+    local sizeValues = StoreItemUtil.getSizeValues(storeItem.xmlFilename, "vehicle", rotation, vehicle.configurations or {})
+
+    return {
+        xmlFilename   = storeItem.xmlFilename,
+        price         = finalPrice,
+        minPrice      = minPrice,
+        numOwners     = numOwners,
+        age           = age,
+        damage        = damage,
+        wear          = wear,
+        operatingTime = operatingTime,
+        ttlHours      = math.random(YardInventory.TTL_MIN_HOURS, YardInventory.TTL_MAX_HOURS),
+        vehicle       = nil,
+        spawnWidth    = sizeValues.width or 3,
+        spawnLength   = sizeValues.length or 6,
+        spawnYaw      = 0,
+    }
+end
+
+--- Accept a vehicle sold by a player. Tries to place it in the yard immediately.
+--- If no room, queues the item for later spawning.
+--- purchasePrice = total the yard paid (cash + credit), used as a price floor.
+--- Returns the created item (or nil on failure).
+function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
+    local item = self:createItemFromVehicle(vehicle, purchasePrice)
+    if item == nil then return nil end
+
+    if #self.spawnGrid == 0 then
+        self:buildSpawnGrid()
+    end
+
+    local halfW = item.spawnWidth * 0.5
+    local halfL = item.spawnLength * 0.5
+
+    local x, z, yaw = self:findSpawnPoint(item.spawnWidth, item.spawnLength)
+    if x ~= nil then
+        -- Space available — teleport the vehicle into the yard.
+        item.spawnYaw = yaw
+        self:markGridOccupied(item, x, z, halfW, halfL, yaw)
+        self.items[#self.items + 1] = item
+
+        local terrainY = getTerrainHeightAtWorldPos(g_terrainNode, x, 0, z)
+        vehicle:removeFromPhysics()
+        vehicle:setAbsolutePosition(x, terrainY + YardInventory.TERRAIN_OFFSET, z, 0, yaw, 0)
+        vehicle:addToPhysics()
+
+        self:applyYardRestrictions(vehicle, item)
+        return item
+    end
+
+    -- No room — queue for later and delete the physical vehicle.
+    -- Store the uniqueId so we can log what's queued.
+    item.vehicleUniqueId = vehicle.uniqueId
+    self.pendingSoldItems[#self.pendingSoldItems + 1] = item
+    vehicle:delete()
+    print(("[UsedEquipmentYards] Yard '%s': no room for sold vehicle, queued for later."):format(self.yard.name))
+    return nil
+end
+
+--- Apply yard display restrictions to a vehicle (lock, price tag, activatable).
+--- Extracted from onVehicleLoaded so it can be reused for sold vehicles.
+function YardInventory:applyYardRestrictions(vehicle, item)
+    vehicle:setOwnerFarmId(0)
+
+    if vehicle.setIsTabbable ~= nil then
+        vehicle:setIsTabbable(false)
+    end
+    if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
+        vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function()
+            return false, nil
+        end)
+    end
+
+    item.vehicle = vehicle
+    self.vehicles[#self.vehicles + 1] = vehicle
+    UsedEquipmentYards.vehicleToItem[vehicle] = item
+
+    PriceTagRenderer.addTag(vehicle, item)
+
+    local activatable = YardVehicleActivatable.new(self.yard, item)
+    item.activatable = activatable
+    g_currentMission.activatableObjectsSystem:addActivatable(activatable)
+
+    -- Sync to MP clients.
+    local itemIndex = nil
+    for idx, itm in ipairs(self.items) do
+        if itm == item then itemIndex = idx; break end
+    end
+    if itemIndex ~= nil then
+        g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, itemIndex, item))
+    end
+end
+
+--- Try to spawn the next pending sold item. Called when space frees up.
+function YardInventory:trySpawnPendingSoldItem()
+    if #self.pendingSoldItems == 0 then return end
+    if #self.spawnGrid == 0 then self:buildSpawnGrid() end
+
+    local i = 1
+    while i <= #self.pendingSoldItems do
+        local item = self.pendingSoldItems[i]
+        local x, z, yaw = self:findSpawnPoint(item.spawnWidth, item.spawnLength)
+
+        if x ~= nil then
+            -- Found room — spawn via VehicleLoadingData (same as spawnNext).
+            table.remove(self.pendingSoldItems, i)
+
+            item.spawnYaw = yaw
+            local halfW = item.spawnWidth * 0.5
+            local halfL = item.spawnLength * 0.5
+            self:markGridOccupied(item, x, z, halfW, halfL, yaw)
+            self.items[#self.items + 1] = item
+
+            local storeItem = g_storeManager:getItemByXMLFilename(item.xmlFilename)
+            if storeItem == nil then
+                self:freeGridPoints(item)
+                self:removeItemByRef(item)
+            else
+                local data = VehicleLoadingData.new()
+                data:setStoreItem(storeItem)
+                data:setConfigurations(YardInventory.randomConfiguration(storeItem))
+                data:setPosition(x, nil, z, YardInventory.TERRAIN_OFFSET)
+                data:setRotation(0, yaw, 0)
+                data:setIgnoreShopOffset(true)
+                data:setPropertyState(VehiclePropertyState.OWNED)
+                data:setOwnerFarmId(0)
+
+                self.pendingLoads[#self.pendingLoads + 1] = data
+                data:load(self.onVehicleLoaded, self, { item = item, loadingData = data })
+            end
+            return -- one at a time (async load chains)
+        end
+
+        i = i + 1
+    end
+end
+
+-- ---------------------------------------------------------------------------
 -- Purchase
 -- ---------------------------------------------------------------------------
 
@@ -976,9 +1248,12 @@ function YardInventory:removeItem(item, keepVehicle)
     for i, v in ipairs(self.items) do
         if v == item then
             table.remove(self.items, i)
-            return
+            break
         end
     end
+
+    -- Space freed up — try to place a pending sold vehicle.
+    self:trySpawnPendingSoldItem()
 end
 
 function YardInventory:getItemCount()
@@ -1061,6 +1336,22 @@ function YardInventory:saveToXML(xmlFile, key)
             setXMLFloat(xmlFile, iKey .. ".testDrive#origRy", td.origRy)
             setXMLFloat(xmlFile, iKey .. ".testDrive#origRz", td.origRz)
         end
+    end
+
+    -- Save pending sold items (vehicles waiting for yard space).
+    for pi, pItem in ipairs(self.pendingSoldItems) do
+        local pKey = ("%s.pendingSold(%d)"):format(key, pi - 1)
+        setXMLString(xmlFile, pKey .. "#xmlFilename", pItem.xmlFilename or "")
+        setXMLInt(xmlFile, pKey .. "#price", pItem.price or 0)
+        setXMLInt(xmlFile, pKey .. "#minPrice", pItem.minPrice or pItem.price)
+        setXMLInt(xmlFile, pKey .. "#age", pItem.age or 0)
+        setXMLFloat(xmlFile, pKey .. "#damage", pItem.damage or 0)
+        setXMLFloat(xmlFile, pKey .. "#wear", pItem.wear or 0)
+        setXMLFloat(xmlFile, pKey .. "#operatingTime", (pItem.operatingTime or 0) / 1000)
+        setXMLInt(xmlFile, pKey .. "#ttlHours", pItem.ttlHours or YardInventory.TTL_MIN_HOURS)
+        setXMLInt(xmlFile, pKey .. "#numOwners", pItem.numOwners or 1)
+        setXMLFloat(xmlFile, pKey .. "#spawnWidth", pItem.spawnWidth or 0)
+        setXMLFloat(xmlFile, pKey .. "#spawnLength", pItem.spawnLength or 0)
     end
 end
 
@@ -1160,5 +1451,28 @@ function YardInventory:loadFromXML(xmlFile, key)
 
         self.items[#self.items + 1] = item
         i = i + 1
+    end
+
+    -- Load pending sold items.
+    self.pendingSoldItems = {}
+    local pi = 0
+    while true do
+        local pKey = ("%s.pendingSold(%d)"):format(key, pi)
+        if not hasXMLProperty(xmlFile, pKey) then break end
+        self.pendingSoldItems[#self.pendingSoldItems + 1] = {
+            xmlFilename   = getXMLString(xmlFile, pKey .. "#xmlFilename") or "",
+            price         = getXMLInt(xmlFile, pKey .. "#price") or 0,
+            minPrice      = getXMLInt(xmlFile, pKey .. "#minPrice") or 0,
+            age           = getXMLInt(xmlFile, pKey .. "#age") or 0,
+            damage        = getXMLFloat(xmlFile, pKey .. "#damage") or 0,
+            wear          = getXMLFloat(xmlFile, pKey .. "#wear") or 0,
+            operatingTime = (getXMLFloat(xmlFile, pKey .. "#operatingTime") or 0) * 1000,
+            ttlHours      = getXMLInt(xmlFile, pKey .. "#ttlHours") or YardInventory.TTL_MIN_HOURS,
+            numOwners     = getXMLInt(xmlFile, pKey .. "#numOwners") or 1,
+            spawnWidth    = getXMLFloat(xmlFile, pKey .. "#spawnWidth") or 4,
+            spawnLength   = getXMLFloat(xmlFile, pKey .. "#spawnLength") or 6,
+            vehicle       = nil,
+        }
+        pi = pi + 1
     end
 end

@@ -90,6 +90,24 @@
         <text name="uey_saleZone_dialogTitle"       text="Pick a vehicle to sell"/>
         <text name="uey_saleZone_notNearYard"       text="Must be placed near a Used Equipment Yard."/>
 
+        <!-- Sell flow -->
+        <text name="uey_sell_tryOtherYard"       text="We're not interested in buying this, but I think %s would be."/>
+        <text name="uey_sell_nobodyInterested"   text="Nobody is interested in buying this vehicle."/>
+        <text name="uey_sell_noFarm"             text="You must belong to a farm to sell vehicles."/>
+        <text name="uey_sell_offersHeader"       text="Sell Offers"/>
+        <text name="uey_sell_cashOffer"          text="Cash Offer"/>
+        <text name="uey_sell_creditOffer"        text="Credit Offer"/>
+        <text name="uey_sell_hybridOffer"        text="Mixed Offer"/>
+        <text name="uey_sell_cashLabel"          text="Cash"/>
+        <text name="uey_sell_creditLabel"        text="Credit"/>
+        <text name="uey_sell_totalLabel"         text="Total"/>
+        <text name="uey_sell_selectOffer"        text="Accept"/>
+        <text name="uey_sell_success"            text="Sold %s. Cash: %s, Credit: %s."/>
+
+        <!-- Yard Credit -->
+        <text name="uey_credit_label"            text="Yard Credit"/>
+        <text name="uey_credit_none"             text="None"/>
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>
