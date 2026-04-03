@@ -1,6 +1,6 @@
 -- SaleZoneDialog
--- Simple dialog showing vehicles currently in the sale zone.
--- For now, displays vehicle titles. Will be expanded with sell logic later.
+-- Dialog showing vehicles currently in the sale zone as a selectable list.
+-- Player picks a vehicle from the list to see its details.
 
 SaleZoneDialog = {}
 
@@ -45,28 +45,41 @@ function SaleZoneDialog:populateDialog()
         self.dialogTitleElement:setText(g_i18n:getText("uey_saleZone_dialogTitle"))
     end
 
-    -- Populate vehicle list.
-    if self.vehicleListLayout ~= nil and self.vehicleTemplate ~= nil then
-        -- Clear existing clones.
-        if self.clonedRows ~= nil then
-            for _, row in ipairs(self.clonedRows) do
-                row:delete()
-            end
-        end
-        self.clonedRows = {}
-
-        for _, vehicle in ipairs(self.vehicles) do
-            local row = self.vehicleTemplate:clone(self.vehicleListLayout)
-            row:setVisible(true)
-            -- Row has a text child for the vehicle name.
-            local nameElement = row.elements[1]
-            if nameElement ~= nil then
-                nameElement:setText(vehicle:getFullName())
-            end
-            table.insert(self.clonedRows, row)
-        end
-        self.vehicleListLayout:invalidateLayout()
+    if self.vehicleList ~= nil then
+        self.vehicleList:reloadData()
     end
+end
+
+-- ---------------------------------------------------------------------------
+-- SmoothList data source callbacks
+-- ---------------------------------------------------------------------------
+
+function SaleZoneDialog:getNumberOfItemsInSection(list, section)
+    return #self.vehicles
+end
+
+function SaleZoneDialog:populateCellForItemInSection(list, section, index, cell)
+    local vehicle = self.vehicles[index]
+    if vehicle == nil then return end
+    cell:getAttribute("vehicleName"):setText(vehicle:getFullName())
+end
+
+-- ---------------------------------------------------------------------------
+-- Actions
+-- ---------------------------------------------------------------------------
+
+function SaleZoneDialog:onClickSelect()
+    if self.vehicleList == nil then return end
+
+    local index = self.vehicleList.selectedIndex
+    if index == nil or index < 1 or index > #self.vehicles then return end
+
+    local vehicle = self.vehicles[index]
+    if vehicle == nil then return end
+
+    -- For now, just log the selection. Sell logic will be added later.
+    Logging.info("[UsedEquipmentYards] Selected vehicle: %s", vehicle:getFullName())
+    self:close()
 end
 
 function SaleZoneDialog:onClickClose()
@@ -75,12 +88,5 @@ end
 
 function SaleZoneDialog:onClose()
     SaleZoneDialog:superClass().onClose(self)
-    -- Clean up cloned rows.
-    if self.clonedRows ~= nil then
-        for _, row in ipairs(self.clonedRows) do
-            row:delete()
-        end
-        self.clonedRows = nil
-    end
     self.vehicles = {}
 end

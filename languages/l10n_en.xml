@@ -85,8 +85,8 @@
         <!-- Sale Zone -->
         <text name="uey_saleZoneLabel"             text="Yard Sale Zone"/>
         <text name="uey_saleZone_function"          text="Drive-in sale zone for a used equipment yard"/>
-        <text name="uey_saleZone_action"            text="Sell Vehicle"/>
-        <text name="uey_saleZone_dialogTitle"       text="Vehicles in Sale Zone"/>
+        <text name="uey_saleZone_action"            text="Sell Vehicles"/>
+        <text name="uey_saleZone_dialogTitle"       text="Pick a vehicle to sell"/>
         <text name="uey_saleZone_notNearYard"       text="Must be placed near a Used Equipment Yard."/>
 
         <!-- Console / status messages -->

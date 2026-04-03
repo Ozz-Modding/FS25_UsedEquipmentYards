@@ -54,4 +54,22 @@
     <Profile name="ueySection" extends="baseReference" with="anchorTopLeft">
     </Profile>
 
+    <!-- SmoothList profiles for sale zone dialog -->
+    <Profile name="ueyListTable" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft" />
+    <Profile name="ueyListItem" extends="baseReference" with="anchorTopStretchingX alternating">
+        <height value="32px"/>
+        <imageColor value="$preset_fs25_colorGrey" />
+        <imageSelectedColor value="$preset_fs25_colorMainHighlight" />
+        <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50" />
+    </Profile>
+    <Profile name="ueyListRowCell" extends="baseReference" with="anchorStretchingYLeft">
+        <textBold value="false" />
+        <textSize value="15px" />
+        <textAlignment value="left" />
+        <textColor value="$preset_fs25_colorMainLight" />
+        <textSelectedColor value="$preset_fs25_colorMainDark" />
+        <textDisabledColor value="$preset_colorDisabled" />
+    </Profile>
+    <Profile name="ueySliderBox" extends="fs25_listSliderBox" with="anchorTopLeft" />
+
 </GUIProfiles>

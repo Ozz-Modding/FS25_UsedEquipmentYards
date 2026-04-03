@@ -19,8 +19,7 @@ function SaleZoneActivatable:getIsActivatable()
     local vehicles = self.saleZone:determineCurrentVehicles()
     if #vehicles == 0 then return false end
 
-    -- Update text with first vehicle name.
-    self.activateText = g_i18n:getText("uey_saleZone_action") .. " " .. vehicles[1]:getFullName()
+    self.activateText = g_i18n:getText("uey_saleZone_action")
     return true
 end
 
