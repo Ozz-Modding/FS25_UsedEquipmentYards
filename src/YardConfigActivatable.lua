@@ -25,20 +25,6 @@ function YardConfigActivatable:getIsActivatable()
     local px, _, pz = getWorldTranslation(g_localPlayer.rootNode)
     if not self.yard:containsPoint(px, pz) then return false end
 
-    -- Yield to other non-UEY activatables (fuel stations, animal triggers, etc.)
-    local system = g_currentMission and g_currentMission.activatableObjectsSystem
-    if system ~= nil then
-        for _, other in pairs(system.objects) do
-            if other ~= self and not other.isUeyActivatable then
-                local otherActive = other.getIsActivatable == nil or
-                    other:getIsActivatable(system.dirX, system.dirY, system.dirZ)
-                if otherActive then
-                    return false
-                end
-            end
-        end
-    end
-
     return true
 end
 

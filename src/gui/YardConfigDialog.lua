@@ -73,7 +73,7 @@ end
 
 function YardConfigDialog.show(yard)
     -- DEV: hot-reload XML on every open for faster iteration.
-    YardConfigDialog.register()
+    -- YardConfigDialog.register()
 
     local dialog = g_gui.guis["YardConfigDialog"]
     if dialog == nil then return end
