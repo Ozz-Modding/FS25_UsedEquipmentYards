@@ -13,35 +13,45 @@
             <GuiElement position="40px 0px" size="350px 580px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_config_settings_header" position="0px 0px" size="350px 24px"/>
 
+                <!-- Yard Name -->
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_yardName" position="0px -28px" size="350px 24px"/>
+                <TextInput profile="ueyTextInput" id="yardNameInput" position="0px -52px" size="310px 32px"
+                    onEnterPressed="onNameEnterPressed" onEscPressed="onNameEscPressed" enterWhenClickOutside="true"
+                    applyProfanityFilter="false" imeTitle="" imeDescription="" imePlaceholder="">
+                    <Bitmap profile="fs25_dialogTextInputIconBox">
+                        <Bitmap profile="fs25_dialogTextInputIcon"/>
+                    </Bitmap>
+                </TextInput>
+
                 <!-- Quality -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_quality" position="0px -28px" size="350px 24px"/>
-                <Text profile="ueySettingDesc2Line" text="$l10n_uey_config_quality_desc" position="0px -52px" size="350px 36px"/>
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_quality" position="0px -92px" size="350px 24px"/>
+                <Text profile="ueySettingDesc2Line" text="$l10n_uey_config_quality_desc" position="0px -116px" size="350px 36px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="qualityOption"
-                    position="0px -92px" size="350px 40px" onClick="onQualityChanged"/>
+                    position="0px -156px" size="350px 40px" onClick="onQualityChanged"/>
 
                 <!-- Dirtiness -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_dirtiness" position="0px -144px" size="350px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -168px" size="350px 20px"/>
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_dirtiness" position="0px -208px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_dirtiness_desc" position="0px -232px" size="350px 20px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="dirtinessOption"
-                    position="0px -192px" size="350px 40px" onClick="onDirtinessChanged"/>
+                    position="0px -256px" size="350px 40px" onClick="onDirtinessChanged"/>
 
                 <!-- Working Width -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_workingWidth" position="0px -244px" size="350px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_workingWidth_desc" position="0px -268px" size="350px 20px"/>
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_workingWidth" position="0px -308px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_workingWidth_desc" position="0px -332px" size="350px 20px"/>
 
-                <Text profile="ueyWeightLabel" text="$l10n_uey_config_minWorkingWidth" position="0px -296px" size="130px 26px"/>
+                <Text profile="ueyWeightLabel" text="$l10n_uey_config_minWorkingWidth" position="0px -360px" size="130px 26px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="minWorkingWidthOption"
-                    position="130px -292px" size="210px 32px" onClick="onMinWorkingWidthChanged"/>
+                    position="130px -356px" size="210px 32px" onClick="onMinWorkingWidthChanged"/>
 
-                <Text profile="ueyWeightLabel" text="$l10n_uey_config_maxWorkingWidth" position="0px -330px" size="130px 26px"/>
+                <Text profile="ueyWeightLabel" text="$l10n_uey_config_maxWorkingWidth" position="0px -394px" size="130px 26px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="maxWorkingWidthOption"
-                    position="130px -326px" size="210px 32px" onClick="onMaxWorkingWidthChanged"/>
+                    position="130px -390px" size="210px 32px" onClick="onMaxWorkingWidthChanged"/>
 
                 <!-- Max Price -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_maxPrice" position="0px -370px" size="350px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_maxPrice_desc" position="0px -394px" size="350px 20px"/>
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_maxPrice" position="0px -434px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_maxPrice_desc" position="0px -458px" size="350px 20px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="maxPriceOption"
-                    position="0px -418px" size="350px 40px" onClick="onMaxPriceChanged"/>
+                    position="0px -482px" size="350px 40px" onClick="onMaxPriceChanged"/>
             </GuiElement>
 
             <!-- ======== MIDDLE COLUMN: Category Weights ======== -->

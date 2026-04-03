@@ -53,6 +53,16 @@ function YardManager:load()
 
     delete(xmlFile)
 
+    -- Initialise the name generator with loaded yard names so they are reserved.
+    YardNameGenerator.init(self.yards)
+
+    -- Assign names to any yards that were saved without one (legacy saves).
+    for _, yard in pairs(self.yards) do
+        if yard.name == nil or yard.name == "" or yard.name == "Yard" then
+            yard.name = YardNameGenerator.generateName()
+        end
+    end
+
     local count = 0
     for _ in pairs(self.yards) do count = count + 1 end
     print(("[UsedEquipmentYards] Loaded %d yard(s)."):format(count))
@@ -112,9 +122,10 @@ end
 -- Yard management
 -- ---------------------------------------------------------------------------
 
-function YardManager:createYard(name, bounds)
+function YardManager:createYard(_, bounds)
     local id = self.nextYardId
     self.nextYardId = self.nextYardId + 1
+    local name = YardNameGenerator.generateName()
     local yard = UsedEquipmentYard.new(id, name, bounds)
     self.yards[id] = yard
     yard.inventory:spawn()
@@ -133,6 +144,7 @@ function YardManager:removeYard(id)
     -- Notify remote MP clients before removing.
     g_server:broadcastEvent(YardRemovedEvent.new(id))
     UsedEquipmentYards.removeActivatable(id)
+    YardNameGenerator.release(yard.name)
     yard:delete()
     self.yards[id] = nil
     return ("Yard '%s' (id=%d) removed."):format(yard.name, id)

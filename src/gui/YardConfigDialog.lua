@@ -85,6 +85,7 @@ end
 function YardConfigDialog:setYard(yard)
     self.yard = yard
     self.config = YardInventory.copyConfig(yard.inventory.config)
+    self.yardName = yard.name or ""
 end
 
 function YardConfigDialog:onOpen()
@@ -194,6 +195,11 @@ end
 -- ---------------------------------------------------------------------------
 
 function YardConfigDialog:populateOptions()
+    -- Yard name
+    if self.yardNameInput ~= nil then
+        self.yardNameInput:setText(self.yardName)
+    end
+
     -- Quality
     local qualityTexts = {}
     for _, q in ipairs(YardConfigDialog.QUALITY_OPTIONS) do
@@ -341,10 +347,31 @@ function YardConfigDialog:onClickClearBrands()
     end
 end
 
+function YardConfigDialog:onNameEnterPressed()
+    -- Accept the current text — nothing extra needed.
+end
+
+function YardConfigDialog:onNameEscPressed()
+    -- Revert to original name.
+    if self.yardNameInput ~= nil then
+        self.yardNameInput:setText(self.yardName)
+    end
+end
+
 function YardConfigDialog:onClickApply()
     if self.yard ~= nil and self.config ~= nil then
         self.yard.inventory:applyConfig(self.config)
     end
+
+    -- Apply name change.
+    if self.yard ~= nil and self.yardNameInput ~= nil then
+        local newName = self.yardNameInput:getText()
+        if newName ~= nil and newName ~= "" and newName ~= self.yard.name then
+            YardNameGenerator.rename(self.yard.name, newName)
+            self.yard.name = newName
+        end
+    end
+
     YardConfigDialog:superClass().close(self)
 end
 

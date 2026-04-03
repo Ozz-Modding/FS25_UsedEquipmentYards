@@ -30,6 +30,7 @@
         <text name="uey_action_configureYard"    text="Configure Yard"/>
         <text name="uey_config_title"            text="Yard Configuration"/>
         <text name="uey_config_settings_header"  text="Configuration"/>
+        <text name="uey_config_yardName"          text="Yard Name"/>
         <text name="uey_config_quality"          text="Quality"/>
         <text name="uey_config_quality_desc"     text="Controls the hours, damage and wear of equipment. Lower quality equipment will cost less than higher quality equipment."/>
         <text name="uey_config_dirtiness"        text="Dirtiness"/>

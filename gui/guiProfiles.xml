@@ -46,6 +46,10 @@
     <Profile name="ueyMultiTextOption" extends="fs25_settingsMultiTextOption" with="anchorTopLeft">
     </Profile>
 
+    <!-- TextInput with top-left anchor for absolute positioning -->
+    <Profile name="ueyTextInput" extends="fs25_dialogTextInput" with="anchorTopLeft">
+    </Profile>
+
     <!-- Weight row container inside ScrollingLayout -->
     <Profile name="ueyWeightRow" extends="baseReference" with="anchorTopLeft">
     </Profile>
