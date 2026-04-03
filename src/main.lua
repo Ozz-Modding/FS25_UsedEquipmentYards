@@ -357,6 +357,13 @@ function UsedEquipmentYards:update(dt)
         end
     end
 
+    -- Tick yard inventory timers (e.g. delayed fill after reset).
+    if UsedEquipmentYards.yardManager ~= nil then
+        for _, yard in pairs(UsedEquipmentYards.yardManager.yards) do
+            yard.inventory:update(dt)
+        end
+    end
+
     local pending = UsedEquipmentYards.pendingClientItems
     local i = #pending
     while i >= 1 do

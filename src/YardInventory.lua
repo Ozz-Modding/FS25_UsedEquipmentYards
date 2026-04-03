@@ -93,22 +93,23 @@ YardInventory.MAX_VEHICLE_PRICE        = 999999
 YardInventory.BOUNDS_INSET             = 3
 
 -- ---------------------------------------------------------------------------
--- Scatter placement constants
+-- Grid placement constants
 -- ---------------------------------------------------------------------------
--- Buffer distance (metres) added around each vehicle's bounding radius.
--- Ensures vehicles have enough clearance to be driven out.
-YardInventory.VEHICLE_CLEARANCE_BUFFER = 2.0
--- Maximum random positions to try before giving up on one vehicle.
-YardInventory.MAX_PLACEMENT_ATTEMPTS   = 50
--- After this many consecutive vehicles fail to find a position, declare
--- the yard full and stop spawning.
-YardInventory.MAX_CONSECUTIVE_FAILURES = 8
+-- Spacing (metres) between spawn grid points within the yard polygon.
+YardInventory.GRID_SPACING             = 8
+-- Buffer distance (metres) added around each vehicle's footprint when
+-- checking grid occupancy. Ensures clearance to drive out.
+YardInventory.VEHICLE_CLEARANCE_BUFFER = 1.0
 -- Yaw jitter range (radians). Vehicles face toward the yard entrance
 -- (anchor point) then add uniform noise within this range. ≈ ±15°.
 YardInventory.YAW_JITTER               = math.rad(15)
 -- Terrain offset (metres) when calling setPosition — lifts the vehicle
 -- slightly above the ground to avoid clipping.
 YardInventory.TERRAIN_OFFSET           = 0.5
+-- Collision mask for overlapBox spawn checks. Detects vehicles and
+-- static objects (buildings, fences) but not triggers or terrain.
+-- DEFAULT(0x1) | DYNAMIC_OBJECT(0x20) | BUILDING(0x40) | VEHICLE(0x10000)
+YardInventory.OVERLAP_COLLISION_MASK   = 0x10061
 
 -- Price jitter — adds variety around the base sell-price formula.
 -- PRICE_NORMAL_CHANCE: probability of the narrow band (0–1).
@@ -154,10 +155,10 @@ function YardInventory.new(yard)
     self.items               = {}
     self.vehicles            = {}  -- spawned Vehicle objects
     self.pendingLoads        = {}  -- in-flight VehicleLoadingData
-    self.placedPositions     = {}  -- { x, z, radius } for clearance checks
-    self.consecutiveFailures = 0
+    self.spawnGrid           = {}  -- grid points: { x, z, occupied }
     self.filling             = false -- true while the fill loop is running
     self.spawnMode           = YardInventory.SPAWN_FILL
+    self.fillDelayMs         = nil   -- ms to wait before starting fill (physics cleanup)
     return self
 end
 
@@ -265,16 +266,21 @@ function YardInventory:spawn()
         i = i - 1
     end
 
-    print(("[UsedEquipmentYards] Yard '%s': %d vehicles re-associated, %d orphaned items removed."):format(
-        self.yard.name, associated, orphaned))
+    -- Build the spawn grid and mark occupied points from loaded vehicles.
+    self:buildSpawnGrid()
+    self:rebuildGridOccupancy()
+
+    print(("[UsedEquipmentYards] Yard '%s': %d vehicles re-associated, %d orphaned items removed, %d grid points."):format(
+        self.yard.name, associated, orphaned, #self.spawnGrid))
 end
 
 --- Attempt to spawn a single vehicle (hourly tick).
 function YardInventory:trySpawnOne()
     self.spawnMode = YardInventory.SPAWN_SINGLE
     self.filling = true
-    self.consecutiveFailures = 0
-    self:rebuildPlacedPositions()
+    if #self.spawnGrid == 0 then
+        self:buildSpawnGrid()
+    end
     self:spawnNext()
 end
 
@@ -294,22 +300,36 @@ function YardInventory:despawnAll()
     self.vehicles = {}
 
     for _, item in ipairs(self.items) do
+        self:freeGridPoints(item)
         item.vehicle = nil
     end
-
-    self.placedPositions = {}
 end
 
 --- Full reset — despawns everything and fills from scratch (console command).
+--- Spawning starts after a short delay so deleted vehicles' physics are cleaned up
+--- before the overlapBox checks run.
 function YardInventory:reset()
     self:despawnAll()
     self.items = {}
     self.storePool = nil
-    self.placedPositions = {}
+    self:buildSpawnGrid()
     self.spawnMode = YardInventory.SPAWN_FILL
     self.filling = true
-    self.consecutiveFailures = 0
-    self:spawnNext()
+    self.fillDelayMs = 500  -- wait for physics engine to clean up deleted vehicles
+end
+
+--- Tick down the fill delay and start spawning when ready.
+--- Called from the main update loop via YardManager.
+function YardInventory:update(dt)
+    if self.fillDelayMs ~= nil then
+        self.fillDelayMs = self.fillDelayMs - dt
+        if self.fillDelayMs <= 0 then
+            self.fillDelayMs = nil
+            if self.filling then
+                self:spawnNext()
+            end
+        end
+    end
 end
 
 --- Apply a new config. Does NOT respawn — inventory updates organically via TTL.
@@ -492,83 +512,190 @@ function YardInventory:pickWeightedItem()
 end
 
 -- ---------------------------------------------------------------------------
--- Scatter placement — random positions within the fence polygon
+-- Grid-based placement — pre-computed points within the fence polygon
 -- ---------------------------------------------------------------------------
 
---- Find a random (x, z, yaw) within the yard polygon that has sufficient
---- clearance from all existing vehicles.
----@param candidateRadius number  half the diagonal of the vehicle's footprint
+--- Build a grid of candidate spawn points within the yard polygon.
+--- Called once on yard creation and after reset.
+function YardInventory:buildSpawnGrid()
+    local b = self.yard.bounds
+    local inset = YardInventory.BOUNDS_INSET
+    local spacing = YardInventory.GRID_SPACING
+
+    local halfW = b.sizeX * 0.5 - inset
+    local halfD = b.sizeZ * 0.5 - inset
+
+    self.spawnGrid = {}
+    if halfW < 2 or halfD < 2 then return end
+
+    local minX = b.cx - halfW
+    local maxX = b.cx + halfW
+    local minZ = b.cz - halfD
+    local maxZ = b.cz + halfD
+
+    local x = minX
+    while x <= maxX do
+        local z = minZ
+        while z <= maxZ do
+            if self.yard:containsPoint(x, z) then
+                self.spawnGrid[#self.spawnGrid + 1] = { x = x, z = z, occupied = false }
+            end
+            z = z + spacing
+        end
+        x = x + spacing
+    end
+end
+
+--- Return the indices of all grid points that fall within a rotated
+--- rectangle centred at (cx, cz). Pure geometry — no buffer added.
+function YardInventory:getGridPointsInRect(cx, cz, halfW, halfL, yaw)
+    local cosY = math.cos(-yaw)
+    local sinY = math.sin(-yaw)
+    local indices = {}
+
+    for i, pt in ipairs(self.spawnGrid) do
+        local dx = pt.x - cx
+        local dz = pt.z - cz
+        local localX = dx * cosY - dz * sinY
+        local localZ = dx * sinY + dz * cosY
+        if math.abs(localX) <= halfW and math.abs(localZ) <= halfL then
+            indices[#indices + 1] = i
+        end
+    end
+
+    return indices
+end
+
+--- Check whether every grid point in a list of indices is unoccupied.
+function YardInventory:areGridPointsAvailable(indices)
+    for _, idx in ipairs(indices) do
+        if self.spawnGrid[idx].occupied then
+            return false
+        end
+    end
+    return true
+end
+
+--- Mark grid points occupied by a vehicle using its actual dimensions.
+--- Any grid point that falls within the vehicle's width × length footprint
+--- is invalidated.
+function YardInventory:markGridOccupied(item, cx, cz, halfW, halfL, yaw)
+    local indices = self:getGridPointsInRect(cx, cz, halfW, halfL, yaw)
+    item.gridIndices = indices
+    for _, idx in ipairs(indices) do
+        self.spawnGrid[idx].occupied = true
+    end
+end
+
+--- Free the grid points owned by an item.
+function YardInventory:freeGridPoints(item)
+    if item.gridIndices == nil then return end
+    for _, idx in ipairs(item.gridIndices) do
+        if self.spawnGrid[idx] ~= nil then
+            self.spawnGrid[idx].occupied = false
+        end
+    end
+    item.gridIndices = nil
+end
+
+--- Rebuild grid occupancy from live vehicles and test-drive reservations.
+--- Called after loading a save or re-associating vehicles.
+function YardInventory:rebuildGridOccupancy()
+    -- Reset all points.
+    for _, pt in ipairs(self.spawnGrid) do
+        pt.occupied = false
+    end
+
+    for _, item in ipairs(self.items) do
+        local cx, cz, halfW, halfL, yaw
+
+        if item.testDrive ~= nil then
+            local td = item.testDrive
+            cx, cz = td.origX, td.origZ
+            halfW = (item.spawnWidth or 4) * 0.5
+            halfL = (item.spawnLength or 4) * 0.5
+            yaw   = item.spawnYaw or td.origRy or 0
+        elseif item.vehicle ~= nil then
+            cx, _, cz = getWorldTranslation(item.vehicle.rootNode)
+            halfW = (item.spawnWidth or 4) * 0.5
+            halfL = (item.spawnLength or 4) * 0.5
+            yaw   = item.spawnYaw or 0
+        end
+
+        if cx ~= nil then
+            self:markGridOccupied(item, cx, cz, halfW, halfL, yaw)
+        end
+    end
+end
+
+--- Find an available grid point for a vehicle with the given dimensions.
+--- Shuffles candidates for variety. Checks grid availability then runs an
+--- overlapBox collision test.
+---@param width number  vehicle width (metres)
+---@param length number vehicle length (metres)
 ---@return number|nil x
 ---@return number|nil z
 ---@return number|nil yaw
-function YardInventory:findSpawnPosition(candidateRadius)
-    local b = self.yard.bounds
-    local inset = YardInventory.BOUNDS_INSET
+function YardInventory:findSpawnPoint(width, length)
+    if self.spawnGrid == nil or #self.spawnGrid == 0 then return nil end
 
-    -- Inset AABB for random sampling
-    local halfW = b.sizeX * 0.5 - inset
-    local halfD = b.sizeZ * 0.5 - inset
-    if halfW < 2 or halfD < 2 then
-        return nil, nil, nil
+    -- Collect available point indices and shuffle.
+    local available = {}
+    for i, pt in ipairs(self.spawnGrid) do
+        if not pt.occupied then
+            available[#available + 1] = i
+        end
+    end
+    for i = #available, 2, -1 do
+        local j = math.random(1, i)
+        available[i], available[j] = available[j], available[i]
     end
 
-    local minX = b.cx - halfW
-    local minZ = b.cz - halfD
-    local rangeX = halfW * 2
-    local rangeZ = halfD * 2
-    local buffer = YardInventory.VEHICLE_CLEARANCE_BUFFER
+    local halfW = width * 0.5
+    local halfL = length * 0.5
 
-    for _ = 1, YardInventory.MAX_PLACEMENT_ATTEMPTS do
-        local x = minX + math.random() * rangeX
-        local z = minZ + math.random() * rangeZ
+    for _, idx in ipairs(available) do
+        local pt = self.spawnGrid[idx]
+        local yaw = self:parkingYaw(pt.x, pt.z)
 
-        if self.yard:containsPoint(x, z)
-            and not self:isPositionTooClose(x, z, candidateRadius + buffer) then
-            local yaw = self:parkingYaw(x, z)
-            return x, z, yaw
+        if self:isFootprintInsideYard(pt.x, pt.z, halfW, halfL, yaw) then
+            -- Check availability using vehicle size + clearance buffer.
+            local buf = YardInventory.VEHICLE_CLEARANCE_BUFFER
+            local checkIndices = self:getGridPointsInRect(pt.x, pt.z, halfW + buf, halfL + buf, yaw)
+            if self:areGridPointsAvailable(checkIndices) then
+                if self:isPositionClear(pt.x, pt.z, halfW, halfL, yaw) then
+                    return pt.x, pt.z, yaw
+                end
+            end
         end
     end
 
-    return nil, nil, nil
+    return nil
 end
 
---- Returns true if (x, z) is too close to any existing vehicle.
---- Checks both the pre-spawn position cache and live vehicles.
----@param x number
----@param z number
----@param requiredDist number  minimum distance from candidate centre to any vehicle's edge
----@return boolean
-function YardInventory:isPositionTooClose(x, z, requiredDist)
-    -- Check against cached placed positions (includes the existing vehicle's radius).
-    for _, placed in ipairs(self.placedPositions) do
-        local dx = x - placed.x
-        local dz = z - placed.z
-        local minDist = requiredDist + placed.radius
-        if dx * dx + dz * dz < minDist * minDist then
-            return true
+--- Check that all four corners of the vehicle's rotated footprint are
+--- inside the yard polygon.
+function YardInventory:isFootprintInsideYard(cx, cz, halfW, halfL, yaw)
+    local cosY = math.cos(yaw)
+    local sinY = math.sin(yaw)
+    local corners = {
+        { -halfW, -halfL },
+        {  halfW, -halfL },
+        {  halfW,  halfL },
+        { -halfW,  halfL },
+    }
+    for _, c in ipairs(corners) do
+        local wx = cx + c[1] * cosY - c[2] * sinY
+        local wz = cz + c[1] * sinY + c[2] * cosY
+        if not self.yard:containsPoint(wx, wz) then
+            return false
         end
     end
-
-    -- Fallback: check live vehicles not yet in the cache (e.g. loaded from save
-    -- before the cache was rebuilt).
-    for _, v in ipairs(self.vehicles) do
-        local ex, _, ez = getWorldTranslation(v.rootNode)
-        local dx = x - ex
-        local dz = z - ez
-        local minDist = requiredDist + 3.0 -- conservative default radius
-        if dx * dx + dz * dz < minDist * minDist then
-            return true
-        end
-    end
-
-    return false
+    return true
 end
 
 --- Compute yaw so the vehicle faces toward the yard entrance (anchor point),
 --- with ± YAW_JITTER for a natural look.
----@param x number  vehicle world X
----@param z number  vehicle world Z
----@return number yaw in radians
 function YardInventory:parkingYaw(x, z)
     local b = self.yard.bounds
     local ax = b.anchorX or b.cx
@@ -580,53 +707,49 @@ function YardInventory:parkingYaw(x, z)
     return base + jitter
 end
 
---- Record a vehicle's placement for future clearance checks.
-function YardInventory:recordPlacedPosition(x, z, radius)
-    self.placedPositions[#self.placedPositions + 1] = { x = x, z = z, radius = radius }
+-- ---------------------------------------------------------------------------
+-- Collision check — overlapBox at the candidate position
+-- ---------------------------------------------------------------------------
+
+--- Returns true if the footprint area is free of vehicles and static objects.
+function YardInventory:isPositionClear(cx, cz, halfW, halfL, yaw)
+    local y = getTerrainHeightAtWorldPos(g_terrainNode, cx, 0, cz) + 1.0
+    self._overlapFound = false
+    overlapBox(
+        cx, y, cz,
+        0, yaw, 0,
+        halfW, 1.5, halfL,
+        "onSpawnOverlapCallback", self,
+        YardInventory.OVERLAP_COLLISION_MASK,
+        true, true, true, true
+    )
+    return not self._overlapFound
 end
 
---- Remove the most recently recorded position (used when a post-spawn
---- safety check rejects the vehicle).
-function YardInventory:removeLastPlacedPosition()
-    if #self.placedPositions > 0 then
-        self.placedPositions[#self.placedPositions] = nil
-    end
-end
-
---- Rebuild the placedPositions cache from live vehicles and reserved
---- test-drive return positions (so new spawns don't occupy those spots).
---- Uses each item's stored spawnRadius for accurate clearance.
-function YardInventory:rebuildPlacedPositions()
-    self.placedPositions = {}
-    for _, item in ipairs(self.items) do
-        local r = item.spawnRadius or 3.0
-        if item.testDrive ~= nil then
-            -- Vehicle is out on test drive — reserve its return position.
-            local td = item.testDrive
-            self.placedPositions[#self.placedPositions + 1] = { x = td.origX, z = td.origZ, radius = r }
-        elseif item.vehicle ~= nil then
-            local vx, _, vz = getWorldTranslation(item.vehicle.rootNode)
-            self.placedPositions[#self.placedPositions + 1] = { x = vx, z = vz, radius = r }
-        end
-    end
+--- overlapBox callback — any hit means the position is blocked.
+function YardInventory:onSpawnOverlapCallback(hitObjectId)
+    self._overlapFound = true
+    return false -- stop searching
 end
 
 -- ---------------------------------------------------------------------------
 -- Vehicle spawning (sequential — one at a time via random scatter placement)
 -- ---------------------------------------------------------------------------
 
---- Generate one item, find a random position, and load the vehicle. The
+--- Generate one item, find a grid position, and load the vehicle. The
 --- callback will call spawnNext again in FILL mode.
 function YardInventory:spawnNext()
     if not self.filling then return end
     if #self.items >= YardInventory.ABSOLUTE_MAX_ITEMS then
         self.filling = false
+
         return
     end
 
     local item = self:generateOneItem()
     if item == nil then
         self.filling = false
+
         return
     end
 
@@ -637,36 +760,33 @@ function YardInventory:spawnNext()
         return
     end
 
-    -- Get vehicle dimensions for clearance calculation.
+    -- Get vehicle dimensions for grid placement.
     local config = YardInventory.randomConfiguration(storeItem)
     local rotation = storeItem.rotation or 0
     local sizeValues = StoreItemUtil.getSizeValues(storeItem.xmlFilename, "vehicle", rotation, config)
-    local radius = math.max(sizeValues.width, sizeValues.length) * 0.5
+    local width  = sizeValues.width  or 3
+    local length = sizeValues.length or 6
 
-    -- Find a valid scatter position.
-    local x, z, yaw = self:findSpawnPosition(radius)
+    -- Find a valid grid position.
+    local halfW = width * 0.5
+    local halfL = length * 0.5
+    local x, z, yaw = self:findSpawnPoint(width, length)
     if x == nil then
-        -- Can't place this vehicle — remove and track failure.
+        -- No space — remove item and stop filling (grid is full).
         self:removeItemByRef(item)
-        self.consecutiveFailures = self.consecutiveFailures + 1
+        self.filling = false
 
-        if self.consecutiveFailures >= YardInventory.MAX_CONSECUTIVE_FAILURES then
-            self.filling = false
-            return
-        end
-
-        -- Try again with a different (potentially smaller) vehicle.
-        self:spawnNext()
         return
     end
 
-    self.consecutiveFailures = 0
+    -- Store dimensions on the item for grid rebuild after load.
+    item.spawnWidth  = width
+    item.spawnLength = length
+    item.spawnYaw    = yaw
 
-    -- Store radius on the item for future clearance checks.
-    item.spawnRadius = radius
-
-    -- Record position BEFORE async load so the next spawn sees it.
-    self:recordPlacedPosition(x, z, radius)
+    -- Mark grid points occupied BEFORE async load so the next spawn sees them.
+    -- Uses the vehicle's actual dimensions to invalidate covered points.
+    self:markGridOccupied(item, x, z, halfW, halfL, yaw)
 
     -- Build VehicleLoadingData with direct position.
     local data = VehicleLoadingData.new()
@@ -698,8 +818,8 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
         for _, v in ipairs(loadedVehicles) do
             v:delete()
         end
+        self:freeGridPoints(item)
         self:removeItemByRef(item)
-        self:removeLastPlacedPosition()
         self:spawnNext()
         return
     end
@@ -774,14 +894,15 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
 
     if not vehicleAccepted then
         -- Post-spawn safety check rejected the vehicle — clean up.
+        self:freeGridPoints(item)
         self:removeItemByRef(item)
-        self:removeLastPlacedPosition()
         self:spawnNext()
     elseif self.spawnMode == YardInventory.SPAWN_FILL then
         self:spawnNext()
     else
         -- SPAWN_SINGLE: one vehicle placed successfully — done.
         self.filling = false
+
     end
 end
 
@@ -833,6 +954,9 @@ function YardInventory:removeItem(item, keepVehicle)
         g_currentMission.activatableObjectsSystem:removeActivatable(item.activatable)
         item.activatable = nil
     end
+
+    -- Free grid points so the space can be reused.
+    self:freeGridPoints(item)
 
     if item.vehicle ~= nil then
         for i, v in ipairs(self.vehicles) do
@@ -905,6 +1029,9 @@ function YardInventory:saveToXML(xmlFile, key)
         setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.TTL_MIN_HOURS)
         setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
         setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
+        setXMLFloat(xmlFile, iKey .. "#spawnWidth", item.spawnWidth or 0)
+        setXMLFloat(xmlFile, iKey .. "#spawnLength", item.spawnLength or 0)
+        setXMLFloat(xmlFile, iKey .. "#spawnYaw", item.spawnYaw or 0)
 
         -- Save vehicle uniqueId so we can re-associate on load.
         if item.vehicle ~= nil and item.vehicle.uniqueId ~= nil then
@@ -989,6 +1116,9 @@ function YardInventory:loadFromXML(xmlFile, key)
             numOwners     = getXMLInt(xmlFile, iKey .. "#numOwners") or 1,
             minPrice      = getXMLInt(xmlFile, iKey .. "#minPrice"),
             vehicleUniqueId = getXMLString(xmlFile, iKey .. "#vehicleUniqueId"),
+            spawnWidth    = getXMLFloat(xmlFile, iKey .. "#spawnWidth") or 0,
+            spawnLength   = getXMLFloat(xmlFile, iKey .. "#spawnLength") or 0,
+            spawnYaw      = getXMLFloat(xmlFile, iKey .. "#spawnYaw") or 0,
             vehicle       = nil,
         }
         -- Legacy saves: default minPrice to asking price (no discount).
