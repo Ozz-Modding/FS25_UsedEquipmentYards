@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="600px 400px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="dialogTitle" text="" id="dialogTitleElement" position="0px -10px"/>
+
+            <!-- Vehicle list -->
+            <ScrollingLayout position="30px -50px" size="540px 260px" flowDirection="vertical" id="vehicleListLayout">
+                <GuiElement profile="ueySection" name="vehicleRowTemplate" id="vehicleTemplate" visible="false" size="540px 30px">
+                    <Text profile="ueySettingLabel" text="" position="10px 0px" size="520px 28px"/>
+                </GuiElement>
+            </ScrollingLayout>
+        </GuiElement>
+
+        <!-- Buttons -->
+        <BoxLayout profile="fs25_dialogButtonBox" size="560px 60px">
+            <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>
+        </BoxLayout>
+    </GuiElement>
+</GUI>

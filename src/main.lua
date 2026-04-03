@@ -18,6 +18,7 @@ function UsedEquipmentYards:loadMap(filename)
     PriceTagRenderer.load()
     YardConfigDialog.register()
     BarterDialog.register()
+    SaleZoneDialog.register()
     BarterState.init()
 
     if g_currentMission:getIsServer() then

@@ -82,6 +82,13 @@
         <text name="uey_barter_returnTitle"        text="Return Vehicle"/>
         <text name="uey_barter_returnConfirm"      text="Return this vehicle to the yard?"/>
 
+        <!-- Sale Zone -->
+        <text name="uey_saleZoneLabel"             text="Yard Sale Zone"/>
+        <text name="uey_saleZone_function"          text="Drive-in sale zone for a used equipment yard"/>
+        <text name="uey_saleZone_action"            text="Sell Vehicle"/>
+        <text name="uey_saleZone_dialogTitle"       text="Vehicles in Sale Zone"/>
+        <text name="uey_saleZone_notNearYard"       text="Must be placed near a Used Equipment Yard."/>
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>
