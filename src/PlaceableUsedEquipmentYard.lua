@@ -37,6 +37,8 @@ function PlaceableUsedEquipmentYard.registerFunctions(placeableType)
 end
 
 function PlaceableUsedEquipmentYard.registerOverwrittenFunctions(placeableType)
+    SpecializationUtil.registerOverwrittenFunction(placeableType, "canBeSold",
+        PlaceableUsedEquipmentYard.canBeSold)
     SpecializationUtil.registerOverwrittenFunction(placeableType, "getIsOnOwnedFarmland",
         PlaceableUsedEquipmentYard.getIsOnOwnedFarmland)
     SpecializationUtil.registerOverwrittenFunction(placeableType, "getIsOnFarmland",
@@ -65,6 +67,32 @@ end
 function PlaceableUsedEquipmentYard.noOp() end
 
 function PlaceableUsedEquipmentYard.noOpTrue() return true end
+
+--- Block yard demolition if any sale zones are still linked to this yard.
+function PlaceableUsedEquipmentYard:canBeSold(superFunc)
+    local data = self[PlaceableUsedEquipmentYard.KEY]
+    if data ~= nil and data.yardId ~= nil then
+        local count = PlaceableUsedEquipmentYard.getConnectedSaleZoneCount(data.yardId)
+        if count > 0 then
+            return false
+        end
+    end
+    return superFunc(self)
+end
+
+--- Count how many placed sale zones are linked to the given yard id.
+function PlaceableUsedEquipmentYard.getConnectedSaleZoneCount(yardId)
+    local count = 0
+    if g_currentMission ~= nil and g_currentMission.placeableSystem ~= nil then
+        for _, placeable in pairs(g_currentMission.placeableSystem.placeables) do
+            local szData = placeable[PlaceableSaleZone.KEY]
+            if szData ~= nil and szData.yardId == yardId then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
 
 function PlaceableUsedEquipmentYard:getIsOnOwnedFarmland(superFunc, x, y, z, rotY)
     return true
