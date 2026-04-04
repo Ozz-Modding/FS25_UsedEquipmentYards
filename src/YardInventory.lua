@@ -632,23 +632,25 @@ function YardInventory:rebuildGridOccupancy()
     end
 
     for _, item in ipairs(self.items) do
-        local cx, cz, halfW, halfL, yaw
+        if not self:isItemHidden(item) then
+            local cx, cz, halfW, halfL, yaw
 
-        if item.testDrive ~= nil then
-            local td = item.testDrive
-            cx, cz = td.origX, td.origZ
-            halfW = (item.spawnWidth or 4) * 0.5
-            halfL = (item.spawnLength or 4) * 0.5
-            yaw   = item.spawnYaw or td.origRy or 0
-        elseif item.vehicle ~= nil then
-            cx, _, cz = getWorldTranslation(item.vehicle.rootNode)
-            halfW = (item.spawnWidth or 4) * 0.5
-            halfL = (item.spawnLength or 4) * 0.5
-            yaw   = item.spawnYaw or 0
-        end
+            if item.testDrive ~= nil then
+                local td = item.testDrive
+                cx, cz = td.origX, td.origZ
+                halfW = (item.spawnWidth or 4) * 0.5
+                halfL = (item.spawnLength or 4) * 0.5
+                yaw   = item.spawnYaw or td.origRy or 0
+            elseif item.vehicle ~= nil then
+                cx, _, cz = getWorldTranslation(item.vehicle.rootNode)
+                halfW = (item.spawnWidth or 4) * 0.5
+                halfL = (item.spawnLength or 4) * 0.5
+                yaw   = item.spawnYaw or 0
+            end
 
-        if cx ~= nil then
-            self:markGridOccupied(item, cx, cz, halfW, halfL, yaw)
+            if cx ~= nil then
+                self:markGridOccupied(item, cx, cz, halfW, halfL, yaw)
+            end
         end
     end
 end
@@ -733,6 +735,14 @@ function YardInventory:parkingYaw(x, z)
     return base + jitter
 end
 
+--- Check if an item is in the hidden pending sold list.
+function YardInventory:isItemHidden(item)
+    for _, pItem in ipairs(self.pendingSoldItems) do
+        if pItem == item then return true end
+    end
+    return false
+end
+
 -- ---------------------------------------------------------------------------
 -- Distance check — Lua-based, independent of physics timing
 -- ---------------------------------------------------------------------------
@@ -747,7 +757,7 @@ function YardInventory:isClearOfExistingVehicles(cx, cz, halfW, halfL)
     local candidateRadius = math.sqrt(halfW * halfW + halfL * halfL) + buf
 
     for _, item in ipairs(self.items) do
-        if item.vehicle ~= nil then
+        if item.vehicle ~= nil and not self:isItemHidden(item) then
             local vx, _, vz = getWorldTranslation(item.vehicle.rootNode)
             local eHalfW = (item.spawnWidth or 4) * 0.5
             local eHalfL = (item.spawnLength or 6) * 0.5
@@ -1215,11 +1225,12 @@ function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
     return item
 end
 
---- Hide a vehicle: remove from physics and make invisible.
---- The engine still tracks and saves it.
+--- Hide a vehicle: remove from physics and move far below terrain.
+--- Avoids visibility issues with wheels/components that aren't children
+--- of rootNode. The engine still tracks and saves the vehicle.
 function YardInventory:hideVehicle(vehicle)
     vehicle:removeFromPhysics()
-    setVisibility(vehicle.rootNode, false)
+    vehicle:setAbsolutePosition(0, -200, 0, 0, 0, 0)
 end
 
 --- Reveal and place a hidden vehicle at a yard position.
@@ -1235,7 +1246,6 @@ function YardInventory:placeVehicleInYard(item, x, z, yaw)
     local terrainY = getTerrainHeightAtWorldPos(g_terrainNode, x, 0, z)
     vehicle:removeFromPhysics()
     vehicle:setAbsolutePosition(x, terrainY + YardInventory.TERRAIN_OFFSET, z, 0, yaw, 0)
-    setVisibility(vehicle.rootNode, true)
     vehicle:addToPhysics()
 
     -- Add price tag, activatable, sync to MP.
