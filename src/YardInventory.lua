@@ -174,11 +174,11 @@ function YardInventory:onHourChanged()
     local env = g_currentMission.environment
 
     -- Decrement TTL and expire vehicles whose time is up.
-    -- Skip vehicles currently on test drive (don't expire them).
+    -- Skip vehicles on test drive or hidden (waiting for yard space).
     local i = #self.items
     while i >= 1 do
         local item = self.items[i]
-        if item.testDrive == nil and item.ttlHours ~= nil then
+        if item.testDrive == nil and item.ttlHours ~= nil and not self:isItemHidden(item) then
             item.ttlHours = item.ttlHours - 1
             if item.ttlHours <= 0 then
                 self:removeItem(item)
@@ -1242,6 +1242,9 @@ function YardInventory:placeVehicleInYard(item, x, z, yaw)
     local halfW = item.spawnWidth * 0.5
     local halfL = item.spawnLength * 0.5
     self:markGridOccupied(item, x, z, halfW, halfL, yaw)
+
+    -- Reset TTL — it may have been ticking down while the vehicle was hidden.
+    item.ttlHours = math.random(YardInventory.TTL_MIN_HOURS, YardInventory.TTL_MAX_HOURS)
 
     local terrainY = getTerrainHeightAtWorldPos(g_terrainNode, x, 0, z)
     vehicle:removeFromPhysics()
