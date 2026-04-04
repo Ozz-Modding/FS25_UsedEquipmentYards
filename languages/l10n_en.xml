@@ -92,7 +92,7 @@
 
         <!-- Sell flow -->
         <text name="uey_sell_tryOtherYard"       text="We're not interested in buying this, but I think %s would be."/>
-        <text name="uey_sell_nobodyInterested"   text="Nobody is interested in buying this vehicle."/>
+        <text name="uey_sell_nobodyInterested"   text="This dealer is not interested in this vehicle and does not know another yard that would."/>
         <text name="uey_sell_noFarm"             text="You must belong to a farm to sell vehicles."/>
         <text name="uey_sell_offersHeader"       text="Sell Offers"/>
         <text name="uey_sell_cashOffer"          text="Cash Offer"/>
