@@ -16,6 +16,7 @@ YardConfigDialog.MAX_BRAND_WEIGHT = 3
 YardConfigDialog.MIN_WW_OPTIONS  = { 0, 5, 10, 15, 20 }   -- "No minimum", 5m, 10m, ...
 YardConfigDialog.MAX_WW_OPTIONS  = { 5, 10, 15, 20, 0 }   -- 5m, 10m, ..., "No maximum"
 YardConfigDialog.MAX_PRICE_OPTIONS = { 50000, 100000, 150000, 200000, 250000, 0 }  -- 0 = "No maximum"
+YardConfigDialog.AVG_STOCK_OPTIONS = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120 }
 
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES      = {
@@ -282,6 +283,18 @@ function YardConfigDialog:populateOptions()
         if v == (self.config.maxPrice or 0) then maxPriceState = i; break end
     end
     self.maxPriceOption:setState(maxPriceState)
+
+    -- Avg hours in stock
+    local avgStockTexts = {}
+    for _, v in ipairs(YardConfigDialog.AVG_STOCK_OPTIONS) do
+        avgStockTexts[#avgStockTexts + 1] = tostring(v) .. " h"
+    end
+    self.avgStockHoursOption:setTexts(avgStockTexts)
+    local avgStockState = 8  -- default index for 96
+    for i, v in ipairs(YardConfigDialog.AVG_STOCK_OPTIONS) do
+        if v == (self.config.avgStockHours or 96) then avgStockState = i; break end
+    end
+    self.avgStockHoursOption:setState(avgStockState)
 end
 
 -- ---------------------------------------------------------------------------
@@ -306,6 +319,10 @@ end
 
 function YardConfigDialog:onMaxPriceChanged(state, element)
     self.config.maxPrice = YardConfigDialog.MAX_PRICE_OPTIONS[state] or 0
+end
+
+function YardConfigDialog:onAvgStockHoursChanged(state, element)
+    self.config.avgStockHours = YardConfigDialog.AVG_STOCK_OPTIONS[state] or 96
 end
 
 function YardConfigDialog:onWeightChanged(state, element)

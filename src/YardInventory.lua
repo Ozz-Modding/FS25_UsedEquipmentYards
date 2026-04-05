@@ -78,6 +78,7 @@ YardInventory.DEFAULT_CONFIG           = {
     minWorkingWidth = 0,   -- 0 = no minimum
     maxWorkingWidth = 0,   -- 0 = no maximum
     maxPrice        = 0,   -- 0 = no maximum (hard cap MAX_VEHICLE_PRICE still applies)
+    avgStockHours   = 96,  -- average hours a vehicle stays before TTL expiry
 }
 
 -- Dirt jitter range applied ± around the dirtiness base
@@ -121,9 +122,8 @@ YardInventory.PRICE_WIDE_SPREAD        = 0.25
 -- ---------------------------------------------------------------------------
 -- TTL (time to live) — how long a spawned vehicle stays before expiring.
 -- ---------------------------------------------------------------------------
--- Range in in-game hours; each vehicle gets a random value in [min, max].
-YardInventory.TTL_MIN_HOURS            = 24
-YardInventory.TTL_MAX_HOURS            = 100
+-- Derived from config.avgStockHours: uniform random in [avg*0.5, avg*1.5].
+YardInventory.DEFAULT_AVG_STOCK_HOURS  = 96
 -- Probability each in-game hour that a new vehicle is spawned (if space allows).
 YardInventory.HOURLY_SPAWN_CHANCE      = 0.35
 
@@ -137,6 +137,7 @@ function YardInventory.copyConfig(cfg)
         minWorkingWidth = cfg.minWorkingWidth or 0,
         maxWorkingWidth = cfg.maxWorkingWidth or 0,
         maxPrice        = cfg.maxPrice or 0,
+        avgStockHours   = cfg.avgStockHours or 96,
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
@@ -160,6 +161,15 @@ function YardInventory.new(yard)
     self.fillDelayMs         = nil   -- ms to wait before starting fill (physics cleanup)
     self.pendingSoldItems    = {}  -- items from player sales waiting for yard space
     return self
+end
+
+--- Return a random TTL based on the yard's avgStockHours config.
+--- Uniform random in [avg*0.5, avg*1.5] so the mean equals avg.
+function YardInventory:randomTTL()
+    local avg = self.config.avgStockHours or YardInventory.DEFAULT_AVG_STOCK_HOURS
+    local minH = math.max(1, math.floor(avg * 0.5))
+    local maxH = math.ceil(avg * 1.5)
+    return math.random(minH, maxH)
 end
 
 -- ---------------------------------------------------------------------------
@@ -454,7 +464,7 @@ function YardInventory:rollItem()
         damage           = damage,
         wear             = wear,
         operatingTime    = operatingTime,
-        ttlHours         = math.random(YardInventory.TTL_MIN_HOURS, YardInventory.TTL_MAX_HOURS),
+        ttlHours         = self:randomTTL(),
         vehicle          = nil,
     }
 end
@@ -1236,7 +1246,7 @@ function YardInventory:placeVehicleInYard(item, x, z, yaw)
     self:markGridOccupied(item, x, z, halfW, halfL, yaw)
 
     -- Reset TTL — it may have been ticking down while the vehicle was hidden.
-    item.ttlHours = math.random(YardInventory.TTL_MIN_HOURS, YardInventory.TTL_MAX_HOURS)
+    item.ttlHours = self:randomTTL()
 
     local terrainY = getTerrainHeightAtWorldPos(g_terrainNode, x, 0, z)
     vehicle:removeFromPhysics()
@@ -1346,6 +1356,7 @@ function YardInventory:saveToXML(xmlFile, key)
     setXMLInt(xmlFile, key .. ".config#minWorkingWidth", self.config.minWorkingWidth or 0)
     setXMLInt(xmlFile, key .. ".config#maxWorkingWidth", self.config.maxWorkingWidth or 0)
     setXMLInt(xmlFile, key .. ".config#maxPrice", self.config.maxPrice or 0)
+    setXMLInt(xmlFile, key .. ".config#avgStockHours", self.config.avgStockHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
 
     local ci = 0
     for catName, weight in pairs(self.config.categories) do
@@ -1376,7 +1387,7 @@ function YardInventory:saveToXML(xmlFile, key)
         setXMLFloat(xmlFile, iKey .. "#damage", item.damage or 0)
         setXMLFloat(xmlFile, iKey .. "#wear", item.wear or 0)
         setXMLFloat(xmlFile, iKey .. "#operatingTime", (item.operatingTime or 0) / 1000)
-        setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.TTL_MIN_HOURS)
+        setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
         setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
         setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
         setXMLFloat(xmlFile, iKey .. "#spawnWidth", item.spawnWidth or 0)
@@ -1444,6 +1455,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             minWorkingWidth = getXMLInt(xmlFile, key .. ".config#minWorkingWidth") or 0,
             maxWorkingWidth = getXMLInt(xmlFile, key .. ".config#maxWorkingWidth") or 0,
             maxPrice        = getXMLInt(xmlFile, key .. ".config#maxPrice") or 0,
+            avgStockHours   = getXMLInt(xmlFile, key .. ".config#avgStockHours") or YardInventory.DEFAULT_AVG_STOCK_HOURS,
             categories = {},
             brands     = {},
         }

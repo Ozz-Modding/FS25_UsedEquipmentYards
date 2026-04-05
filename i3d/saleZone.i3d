@@ -2,7 +2,7 @@
 
 <i3D name="saleZone.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
   <Asset>
-    <Export program="GIANTS Editor 64bit" version="10.0.2"/>
+    <Export program="GIANTS Editor 64bit" version="10.0.11"/>
   </Asset>
 
   <Files>
@@ -51,15 +51,13 @@
       <TransformGroup name="collisions" nodeId="24">
         <Shape name="collision" shapeId="1" visibility="false" static="true" collisionFilterGroup="0x8" collisionFilterMask="0x1" density="0.0001" nodeId="25" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="5"/>
       </TransformGroup>
-      <!-- Player trigger: detects player entering the zone -->
-      <Shape name="playerTrigger" translation="0 1 0" scale="3 1 2.5" shapeId="3" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x100000" density="0.0001" nodeId="26" castsShadows="false" receiveShadows="false" nonRenderable="true" materialIds="5"/>
-      <!-- Vehicle trigger: detects vehicles entering the zone -->
-      <Shape name="vehicleTrigger" translation="0 1 0" scale="3 1 2.5" shapeId="3" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x10000" density="0.0001" nodeId="27" castsShadows="false" receiveShadows="false" nonRenderable="true" materialIds="5"/>
+      <Shape name="playerTrigger" translation="0 1 0" scale="3 1 2.5" shapeId="2" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x100000" density="0.0001" nodeId="26" castsShadows="false" receiveShadows="false" nonRenderable="true" materialIds="5"/>
+      <Shape name="vehicleTrigger" translation="0 1 0" scale="3 1 2.5" shapeId="2" static="true" trigger="true" collisionFilterGroup="0x20000000" collisionFilterMask="0x10000" density="0.0001" nodeId="27" castsShadows="false" receiveShadows="false" nonRenderable="true" materialIds="5"/>
       <TransformGroup name="warningStripes" nodeId="28">
-        <Shape name="warningStripesCorner1" translation="-4 0 3" rotation="0 90 0" scale="1 1 1" shapeId="2" clipDistance="100" nodeId="29" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="6"/>
-        <Shape name="warningStripesCorner2" translation="-4 0 -3" scale="1 1 1" shapeId="2" clipDistance="100" nodeId="30" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="6"/>
-        <Shape name="warningStripesCorner3" translation="4 0 -3" rotation="0 -90 0" scale="1 1 1" shapeId="2" clipDistance="100" nodeId="31" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="6"/>
-        <Shape name="warningStripesCorner4" translation="4 0 3" rotation="-180 0 -180" scale="1 1 1" shapeId="2" clipDistance="100" nodeId="32" castsShadows="false" receiveShadows="true" decalLayer="1" materialIds="6"/>
+        <Shape name="warningStripesCorner1" translation="-4 0 3" rotation="0 90 0" shapeId="3" clipDistance="100" nodeId="29" castsShadows="false" receiveShadows="true" terrainDecal="true" renderedInViewports="false" decalLayer="1" materialIds="6"/>
+        <Shape name="warningStripesCorner2" translation="-4 0 -3" shapeId="3" clipDistance="100" nodeId="30" castsShadows="false" receiveShadows="true" terrainDecal="true" renderedInViewports="false" decalLayer="1" materialIds="6"/>
+        <Shape name="warningStripesCorner3" translation="4 0 -3" rotation="0 -90 0" shapeId="3" clipDistance="100" nodeId="31" castsShadows="false" receiveShadows="true" terrainDecal="true" renderedInViewports="false" decalLayer="1" materialIds="6"/>
+        <Shape name="warningStripesCorner4" translation="4 0 3" rotation="-180 0 -180" shapeId="3" clipDistance="100" nodeId="32" castsShadows="false" receiveShadows="true" terrainDecal="true" renderedInViewports="false" decalLayer="1" materialIds="6"/>
       </TransformGroup>
       <TransformGroup name="teleportNode" translation="-5.5 0 0" nodeId="33"/>
     </TransformGroup>

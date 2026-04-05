@@ -2,7 +2,7 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
-    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1400px 720px">
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1400px 790px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -10,7 +10,7 @@
             <Text profile="dialogTitle" text="$l10n_uey_config_title" id="dialogTitleElement" position="0px -15px"/>
 
             <!-- ======== LEFT COLUMN: Core Settings ======== -->
-            <GuiElement position="40px 0px" size="350px 580px">
+            <GuiElement position="40px 0px" size="350px 650px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_config_settings_header" position="0px 0px" size="350px 24px"/>
 
                 <!-- Yard Name -->
@@ -52,14 +52,20 @@
                 <Text profile="ueySettingDesc" text="$l10n_uey_config_maxPrice_desc" position="0px -458px" size="350px 20px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="maxPriceOption"
                     position="0px -482px" size="350px 40px" onClick="onMaxPriceChanged"/>
+
+                <!-- Avg Hours in Stock -->
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_avgStockHours" position="0px -534px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_avgStockHours_desc" position="0px -558px" size="350px 20px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="avgStockHoursOption"
+                    position="0px -582px" size="350px 40px" onClick="onAvgStockHoursChanged"/>
             </GuiElement>
 
             <!-- ======== MIDDLE COLUMN: Category Weights ======== -->
-            <GuiElement position="420px -18px" size="460px 600px">
+            <GuiElement position="420px -18px" size="460px 670px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_config_weights_header" position="0px 0px" size="460px 24px"/>
                 <Text profile="ueySettingDesc" text="$l10n_uey_config_weights_desc" position="0px -22px" size="460px 18px"/>
 
-                <ScrollingLayout position="0px 46px" size="460px 490px" flowDirection="vertical" id="weightScrollLayout">
+                <ScrollingLayout position="0px 46px" size="460px 560px" flowDirection="vertical" id="weightScrollLayout">
                     <GuiElement profile="ueyWeightRow" size="460px 26px" id="weightRowTemplate" visible="false">
                         <Text profile="ueyWeightLabel" size="230px 26px" id="weightRowLabel"/>
                         <MultiTextOption profile="ueyMultiTextOption" position="230px 0px" size="220px 26px" id="weightRowOption" onClick="onWeightChanged"/>
@@ -68,11 +74,11 @@
             </GuiElement>
 
             <!-- ======== RIGHT COLUMN: Brands ======== -->
-            <GuiElement position="910px -18px" size="460px 600px">
+            <GuiElement position="910px -18px" size="460px 670px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_config_brands_header" position="0px 0px" size="460px 24px"/>
                 <Text profile="ueySettingDesc" text="$l10n_uey_config_brands_desc" position="0px -22px" size="460px 18px"/>
 
-                <ScrollingLayout position="0px 46px" size="460px 490px" flowDirection="vertical" id="brandScrollLayout">
+                <ScrollingLayout position="0px 46px" size="460px 560px" flowDirection="vertical" id="brandScrollLayout">
                     <GuiElement profile="ueyWeightRow" size="460px 26px" id="brandRowTemplate" visible="false">
                         <Text profile="ueyWeightLabel" size="230px 26px" id="brandRowLabel"/>
                         <MultiTextOption profile="ueyMultiTextOption" position="230px 0px" size="220px 26px" id="brandRowOption" onClick="onBrandChanged"/>
