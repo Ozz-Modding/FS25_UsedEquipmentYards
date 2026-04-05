@@ -16,7 +16,7 @@ YardConfigDialog.MAX_BRAND_WEIGHT = 3
 YardConfigDialog.MIN_WW_OPTIONS  = { 0, 5, 10, 15, 20 }   -- "No minimum", 5m, 10m, ...
 YardConfigDialog.MAX_WW_OPTIONS  = { 5, 10, 15, 20, 0 }   -- 5m, 10m, ..., "No maximum"
 YardConfigDialog.MAX_PRICE_OPTIONS = { 50000, 100000, 150000, 200000, 250000, 0 }  -- 0 = "No maximum"
-YardConfigDialog.AVG_STOCK_OPTIONS = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120 }
+YardConfigDialog.AVG_STOCK_OPTIONS = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168 }
 
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES      = {
