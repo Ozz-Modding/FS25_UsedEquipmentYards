@@ -9,6 +9,27 @@ local BarterDialog_mt = Class(BarterDialog, MessageDialog)
 
 BarterDialog.OFFER_STEPS = { 30, 25, 20, 15, 10, 5, 0 }  -- % below asking (left=biggest discount, right=full price)
 
+-- Only these store categories are eligible for test drives.
+BarterDialog.TEST_DRIVE_CATEGORIES = {
+    ["TRACTORSS"]           = true,
+    ["TRACTORSM"]           = true,
+    ["TRACTORSL"]           = true,
+    ["TELELOADERVEHICLES"]  = true,
+    ["WHEELLOADERVEHICLES"] = true,
+    ["SKIDSTEERVEHICLES"]   = true,
+    ["BEETHARVESTERS"]      = true,
+    ["CARS"]                = true,
+    ["FORAGEHARVESTERS"]    = true,
+    ["FORESTRYHARVESTERS"]  = true,
+    ["HARVESTERS"]          = true,
+    ["PEAHARVESTERS"]       = true,
+    ["POTATOHARVESTING"]    = true,
+    ["RICEHARVESTERS"]      = true,
+    ["SPINACHHARVESTERS"]   = true,
+    ["SUGARCANEHARVESTERS"] = true,
+    ["VEGETABLEHARVESTERS"] = true,
+}
+
 -- ---------------------------------------------------------------------------
 -- Registration
 -- ---------------------------------------------------------------------------
@@ -165,11 +186,28 @@ function BarterDialog:updateButtonStates()
     self.buyNowButton.disabled = isOnTestDrive
 
     -- Test drive button: shows "Return" if our test drive, "Test Drive" otherwise.
+    -- Only drivable categories (tractors, loaders, skid steers) are eligible.
+    local canTestDrive = false
+    if self.item ~= nil and self.item.vehicle ~= nil then
+        local si = g_storeManager:getItemByXMLFilename(self.item.vehicle.configFileName)
+        if si ~= nil and si.categoryNames ~= nil then
+            for _, catName in ipairs(si.categoryNames) do
+                if BarterDialog.TEST_DRIVE_CATEGORIES[catName] then
+                    canTestDrive = true
+                    break
+                end
+            end
+        end
+    end
+
     local alreadyDriven = farmId ~= nil
         and self.item.testDrivenByFarms ~= nil
         and self.item.testDrivenByFarms[farmId] == true
 
-    if isOurTestDrive then
+    if not canTestDrive then
+        self.testDriveButton:setText(g_i18n:getText("uey_barter_testDrive"))
+        self.testDriveButton.disabled = true
+    elseif isOurTestDrive then
         self.testDriveButton:setText(g_i18n:getText("uey_barter_returnVehicle"))
         self.testDriveButton.disabled = false
     elseif isOtherTestDrive or alreadyDriven then

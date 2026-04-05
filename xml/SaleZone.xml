@@ -5,14 +5,14 @@
         <functions>
             <function>$l10n_uey_saleZone_function</function>
         </functions>
-        <image>store/store_yard.dds</image>
+        <image>store/store_yard_sell.dds</image>
         <price>200</price>
         <dailyUpkeep>0</dailyUpkeep>
         <lifetime>1000</lifetime>
         <rotation>0</rotation>
         <brand>NONE</brand>
         <species>PLACEABLE</species>
-        <category>tools</category>
+        <category>misc</category>
         <canBeSold>true</canBeSold>
         <showInStore>true</showInStore>
 

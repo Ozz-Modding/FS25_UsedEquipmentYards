@@ -28,16 +28,6 @@ YardConfigDialog.SKIP_TYPES      = {
 
 -- Specific category names to exclude.
 YardConfigDialog.SKIP_NAMES      = {
-    -- ["WHEELLOADERTOOLS"]              = true,
-    -- ["FRONTLOADERTOOLS"]              = true,
-    -- ["FORESTRYEXCAVATORTOOLS"]        = true,
-    -- ["TELELOADERTOOLS"]               = true,
-    -- ["SKIDSTEERTOOLS"]                = true,
-    -- ["CUTTERS"]                       = true,
-    -- ["FORAGEHARVESTERCUTTERS"]        = true,
-    -- ["LEVELER"]                       = true,
-    -- ["CUTTERTRAILERS"]                = true,
-    -- ["FORAGEHARVESTERCUTTERTRAILERS"] = true,
     ["BALINGMISC"] = true,
     ["MISCDRIVABLES"] = true,
     ["FORESTRYMISC"] = true,
