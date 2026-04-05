@@ -30,6 +30,7 @@
         <text name="uey_action_configureYard"    text="Configure Yard"/>
         <text name="uey_config_title"            text="Yard Configuration"/>
         <text name="uey_config_settings_header"  text="Configuration"/>
+        <text name="uey_config_yardName"          text="Yard Name"/>
         <text name="uey_config_quality"          text="Quality"/>
         <text name="uey_config_quality_desc"     text="Controls the hours, damage and wear of equipment. Lower quality equipment will cost less than higher quality equipment."/>
         <text name="uey_config_dirtiness"        text="Dirtiness"/>
@@ -44,6 +45,9 @@
         <text name="uey_config_maxPrice_desc"    text="Limit yard inventory to a maximum price."/>
         <text name="uey_config_weights_header"   text="Category Weights"/>
         <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
+        <text name="uey_config_avgStockHours"     text="Average Hours in Stock"/>
+        <text name="uey_config_avgStockHours_desc" text="How long vehicles stay before leaving."/>
+        <text name="uey_config_allWeights"       text="All Weights"/>
         <text name="uey_config_clearWeights"     text="Clear Weights"/>
         <text name="uey_config_brands_header"    text="Brands"/>
         <text name="uey_config_brands_desc"      text="Set spawn likelihood per brand (0 = disabled)."/>
@@ -81,6 +85,31 @@
         <text name="uey_barter_returnVehicle"      text="Return Vehicle"/>
         <text name="uey_barter_returnTitle"        text="Return Vehicle"/>
         <text name="uey_barter_returnConfirm"      text="Return this vehicle to the yard?"/>
+
+        <!-- Sale Zone -->
+        <text name="uey_saleZoneLabel"             text="Yard Sale Zone"/>
+        <text name="uey_saleZone_function"          text="Drive-in sale zone for a used equipment yard"/>
+        <text name="uey_saleZone_action"            text="Sell Vehicles"/>
+        <text name="uey_saleZone_dialogTitle"       text="Pick a vehicle to sell"/>
+        <text name="uey_saleZone_notNearYard"       text="Must be placed near a Used Equipment Yard."/>
+
+        <!-- Sell flow -->
+        <text name="uey_sell_tryOtherYard"       text="We're not interested in buying this, but I think %s would be."/>
+        <text name="uey_sell_nobodyInterested"   text="This dealer is not interested in this vehicle and does not know another yard that would."/>
+        <text name="uey_sell_noFarm"             text="You must belong to a farm to sell vehicles."/>
+        <text name="uey_sell_offersHeader"       text="Sell Offers"/>
+        <text name="uey_sell_cashOffer"          text="Cash Offer"/>
+        <text name="uey_sell_creditOffer"        text="Credit Offer"/>
+        <text name="uey_sell_hybridOffer"        text="Mixed Offer"/>
+        <text name="uey_sell_cashLabel"          text="Cash"/>
+        <text name="uey_sell_creditLabel"        text="Credit"/>
+        <text name="uey_sell_totalLabel"         text="Total"/>
+        <text name="uey_sell_selectOffer"        text="Accept"/>
+        <text name="uey_sell_success"            text="Sold %s. Cash: %s, Credit: %s."/>
+
+        <!-- Yard Credit -->
+        <text name="uey_credit_label"            text="Yard Credit"/>
+        <text name="uey_credit_none"             text="None"/>
 
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>

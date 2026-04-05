@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="700px 440px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="dialogTitle" text="" id="dialogTitleElement" position="0px -10px"/>
+
+            <!-- Vehicle Info -->
+            <GuiElement profile="ueySection" position="40px -50px" size="620px 80px">
+                <Text profile="ueyColumnHeader" text="$l10n_uey_barter_vehicleInfo" position="0px 0px" size="620px 22px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_brand"  position="10px -28px"  size="90px 20px"/>
+                <Text profile="ueySettingLabel" text="" id="brandText"        position="100px -28px" size="200px 20px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_hours"  position="320px -28px" size="90px 20px"/>
+                <Text profile="ueySettingLabel" text="" id="hoursText"        position="410px -28px" size="100px 20px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_damage" position="10px -48px"  size="90px 20px"/>
+                <Text profile="ueySettingLabel" text="" id="damageText"       position="100px -48px" size="100px 20px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_wear"   position="320px -48px" size="90px 20px"/>
+                <Text profile="ueySettingLabel" text="" id="wearText"         position="410px -48px" size="100px 20px"/>
+            </GuiElement>
+
+            <!-- Offer Selection -->
+            <GuiElement profile="ueySection" position="40px -150px" size="620px 180px">
+                <Text profile="ueyColumnHeader" text="$l10n_uey_sell_offersHeader" position="0px 0px" size="620px 22px"/>
+
+                <MultiTextOption profile="ueyMultiTextOption" id="offerSelector"
+                    position="0px -30px" size="400px 36px" onClick="onOfferChanged"/>
+
+                <!-- Detail lines for the selected offer -->
+                <Text profile="ueyWeightLabel" text="$l10n_uey_sell_cashLabel"   position="10px -78px"  size="100px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="detailCashText"      position="120px -78px" size="200px 22px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_sell_creditLabel" position="10px -104px" size="100px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="detailCreditText"    position="120px -104px" size="200px 22px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_sell_totalLabel"  position="10px -134px" size="100px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="detailTotalText"     position="120px -134px" size="200px 22px"/>
+            </GuiElement>
+        </GuiElement>
+
+        <!-- Buttons -->
+        <BoxLayout profile="fs25_dialogButtonBox" size="660px 60px">
+            <Button profile="buttonOK" text="$l10n_uey_sell_selectOffer" onClick="onClickAccept" id="acceptButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>
+        </BoxLayout>
+    </GuiElement>
+</GUI>

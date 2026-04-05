@@ -95,7 +95,8 @@
             "ClassIds",
             "getParent",
             "entityExists",
-            "getHasClassId"
+            "getHasClassId",
+            "Attachable"
         ]
     }
 }

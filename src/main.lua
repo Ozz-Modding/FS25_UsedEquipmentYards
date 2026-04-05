@@ -18,7 +18,10 @@ function UsedEquipmentYards:loadMap(filename)
     PriceTagRenderer.load()
     YardConfigDialog.register()
     BarterDialog.register()
+    SaleZoneDialog.register()
+    SellBarterDialog.register()
     BarterState.init()
+    YardCredit.init()
 
     if g_currentMission:getIsServer() then
         self.yardManager = YardManager.new(self)
@@ -48,6 +51,7 @@ function UsedEquipmentYards:delete()
     UsedEquipmentYards.vehicleToItem = {}
     UsedEquipmentYards.clientYards = {}
     BarterState.delete()
+    YardCredit.delete()
     PriceTagRenderer.delete()
     if self.yardManager ~= nil then
         self.yardManager:delete()
@@ -98,6 +102,29 @@ FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.send
     function(self, connection, user, farm)
         connection:sendEvent(InitialClientStateEvent.new())
     end)
+
+-- Block attaching to/from yard vehicles that are not on a test drive.
+-- A yard vehicle is any vehicle in UsedEquipmentYards.vehicleToItem.
+if Attachable ~= nil then
+    Attachable.isAttachAllowed = Utils.overwrittenFunction(
+        Attachable.isAttachAllowed,
+        function(self, superFunc, farmId, attacherVehicle)
+            -- Check if the attachable (implement) is a yard vehicle not on test drive.
+            local item = UsedEquipmentYards.findItemForVehicle(self)
+            if item ~= nil and item.testDrive == nil then
+                return false
+            end
+
+            -- Check if the attacher (tractor) is a yard vehicle not on test drive.
+            local attacherItem = UsedEquipmentYards.findItemForVehicle(attacherVehicle)
+            if attacherItem ~= nil and attacherItem.testDrive == nil then
+                return false
+            end
+
+            return superFunc(self, farmId, attacherVehicle)
+        end
+    )
+end
 
 -- Patch fence construction brushes so yard fence posts can be placed on any land.
 -- Two checks need bypassing:
@@ -355,6 +382,16 @@ function UsedEquipmentYards:update(dt)
             UsedEquipmentYards.installFencePatches()
         end
     end
+
+    -- Tick yard inventory timers (e.g. delayed fill after reset).
+    if UsedEquipmentYards.yardManager ~= nil then
+        for _, yard in pairs(UsedEquipmentYards.yardManager.yards) do
+            yard.inventory:update(dt)
+        end
+    end
+
+    -- Resolve pending offer cache entries from network.
+    SellBarterDialog.resolvePendingOfferCache()
 
     local pending = UsedEquipmentYards.pendingClientItems
     local i = #pending

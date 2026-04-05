@@ -9,6 +9,27 @@ local BarterDialog_mt = Class(BarterDialog, MessageDialog)
 
 BarterDialog.OFFER_STEPS = { 30, 25, 20, 15, 10, 5, 0 }  -- % below asking (left=biggest discount, right=full price)
 
+-- Only these store categories are eligible for test drives.
+BarterDialog.TEST_DRIVE_CATEGORIES = {
+    ["TRACTORSS"]           = true,
+    ["TRACTORSM"]           = true,
+    ["TRACTORSL"]           = true,
+    ["TELELOADERVEHICLES"]  = true,
+    ["WHEELLOADERVEHICLES"] = true,
+    ["SKIDSTEERVEHICLES"]   = true,
+    ["BEETHARVESTERS"]      = true,
+    ["CARS"]                = true,
+    ["FORAGEHARVESTERS"]    = true,
+    ["FORESTRYHARVESTERS"]  = true,
+    ["HARVESTERS"]          = true,
+    ["PEAHARVESTERS"]       = true,
+    ["POTATOHARVESTING"]    = true,
+    ["RICEHARVESTERS"]      = true,
+    ["SPINACHHARVESTERS"]   = true,
+    ["SUGARCANEHARVESTERS"] = true,
+    ["VEGETABLEHARVESTERS"] = true,
+}
+
 -- ---------------------------------------------------------------------------
 -- Registration
 -- ---------------------------------------------------------------------------
@@ -103,6 +124,13 @@ function BarterDialog:populateDialog()
 
     self.askingPriceText:setText(g_i18n:formatMoney(item.price))
 
+    -- Credit balance.
+    local farmId = BarterDialog.getLocalFarmId()
+    local creditBal = (farmId ~= nil and self.yard ~= nil) and YardCredit.getBalance(farmId, self.yard.id) or 0
+    if self.creditBalanceText ~= nil then
+        self.creditBalanceText:setText(creditBal > 0 and g_i18n:formatMoney(creditBal) or g_i18n:getText("uey_credit_none"))
+    end
+
     -- Offer spinner
     local offerTexts = {}
     local offerValues = {}
@@ -158,11 +186,28 @@ function BarterDialog:updateButtonStates()
     self.buyNowButton.disabled = isOnTestDrive
 
     -- Test drive button: shows "Return" if our test drive, "Test Drive" otherwise.
+    -- Only drivable categories (tractors, loaders, skid steers) are eligible.
+    local canTestDrive = false
+    if self.item ~= nil and self.item.vehicle ~= nil then
+        local si = g_storeManager:getItemByXMLFilename(self.item.vehicle.configFileName)
+        if si ~= nil and si.categoryNames ~= nil then
+            for _, catName in ipairs(si.categoryNames) do
+                if BarterDialog.TEST_DRIVE_CATEGORIES[catName] then
+                    canTestDrive = true
+                    break
+                end
+            end
+        end
+    end
+
     local alreadyDriven = farmId ~= nil
         and self.item.testDrivenByFarms ~= nil
         and self.item.testDrivenByFarms[farmId] == true
 
-    if isOurTestDrive then
+    if not canTestDrive then
+        self.testDriveButton:setText(g_i18n:getText("uey_barter_testDrive"))
+        self.testDriveButton.disabled = true
+    elseif isOurTestDrive then
         self.testDriveButton:setText(g_i18n:getText("uey_barter_returnVehicle"))
         self.testDriveButton.disabled = false
     elseif isOtherTestDrive or alreadyDriven then
@@ -250,7 +295,8 @@ function BarterDialog:onClickMakeOffer()
     end
 
     local farm = g_farmManager:getFarmById(farmId)
-    if farm == nil or farm:getBalance() < self.currentOffer then
+    local credit = YardCredit.getBalance(farmId, self.yard.id)
+    if farm == nil or (farm:getBalance() + credit) < self.currentOffer then
         self.resultText:setText(g_i18n:getText("uey_purchase_insufficient_funds"))
         return
     end
@@ -282,7 +328,8 @@ function BarterDialog:onClickBuyNow()
     if farmId == nil then return end
 
     local farm = g_farmManager:getFarmById(farmId)
-    if farm == nil or farm:getBalance() < self.item.price then
+    local credit = YardCredit.getBalance(farmId, self.yard.id)
+    if farm == nil or (farm:getBalance() + credit) < self.item.price then
         self.resultText:setText(g_i18n:getText("uey_purchase_insufficient_funds"))
         return
     end

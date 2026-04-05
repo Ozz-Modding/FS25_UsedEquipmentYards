@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="600px 420px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="dialogTitle" text="" id="dialogTitleElement" position="0px -10px"/>
+
+            <!-- Vehicle list -->
+            <SmoothList id="vehicleList" profile="ueyListTable" position="30px -50px" size="510px 280px" focusInit="onOpen">
+                <ListItem profile="ueyListItem">
+                    <Text profile="ueyListRowCell" position="20px 0px" size="490px 32px" name="vehicleName"/>
+                </ListItem>
+            </SmoothList>
+            <ThreePartBitmap profile="ueySliderBox" position="545px -50px" size="6px 280px">
+                <Slider profile="fs25_listSlider" dataElementId="vehicleList" />
+            </ThreePartBitmap>
+        </GuiElement>
+
+        <!-- Buttons -->
+        <BoxLayout profile="fs25_dialogButtonBox" size="560px 60px">
+            <Button profile="buttonOK" text="$l10n_button_select" onClick="onClickSelect" id="selectButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>
+        </BoxLayout>
+    </GuiElement>
+</GUI>

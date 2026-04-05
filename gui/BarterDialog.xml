@@ -47,6 +47,9 @@
                 <Text profile="ueyWeightLabel" text="$l10n_uey_barter_askingPrice" position="0px -26px" size="140px 22px"/>
                 <Text profile="ueySettingLabel" text="" id="askingPriceText"        position="140px -26px" size="200px 22px"/>
 
+                <Text profile="ueyWeightLabel" text="$l10n_uey_credit_label"       position="380px -26px" size="120px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="creditBalanceText"      position="500px -26px" size="200px 22px"/>
+
                 <Text profile="ueyWeightLabel" text="$l10n_uey_barter_yourOffer"   position="0px -52px" size="140px 22px"/>
                 <MultiTextOption profile="ueyMultiTextOption" id="offerOption"
                     position="140px -48px" size="300px 32px" onClick="onOfferChanged"/>

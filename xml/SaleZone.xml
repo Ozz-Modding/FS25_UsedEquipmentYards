@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="FS25_UsedEquipmentYards.usedEquipmentYardSaleZone">
+    <storeData>
+        <name>$l10n_uey_saleZoneLabel</name>
+        <functions>
+            <function>$l10n_uey_saleZone_function</function>
+        </functions>
+        <image>store/store_yard_sell.dds</image>
+        <price>200</price>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>NONE</brand>
+        <species>PLACEABLE</species>
+        <category>misc</category>
+        <canBeSold>true</canBeSold>
+        <showInStore>true</showInStore>
+
+        <brush>
+            <type>placeable</type>
+            <category>buildings</category>
+            <tab>tools</tab>
+        </brush>
+    </storeData>
+
+    <base>
+        <filename>i3d/saleZone.i3d</filename>
+        <canBeRenamed>true</canBeRenamed>
+    </base>
+
+    <placement useRandomYRotation="false" useManualYRotation="true">
+        <testAreas>
+            <testArea startNode="testArea1Start" endNode="testArea1End" />
+        </testAreas>
+        <sounds>
+            <place template="smallImp" />
+        </sounds>
+    </placement>
+
+    <clearAreas>
+        <clearArea startNode="clearArea1Start" widthNode="clearArea1Width" heightNode="clearArea1Height"/>
+    </clearAreas>
+
+    <leveling requireLeveling="true" maxSmoothDistance="1" maxSlope="75" maxEdgeAngle="30">
+        <levelAreas>
+            <levelArea startNode="levelAreaStart" widthNode="levelAreaWidth" heightNode="levelAreaHeight" />
+        </levelAreas>
+    </leveling>
+
+    <indoorAreas>
+        <indoorArea startNode="clearArea1Start" widthNode="clearArea1Width" heightNode="clearArea1Height"/>
+    </indoorAreas>
+
+    <ai>
+        <updateAreas>
+            <updateArea startNode="tipOcclusionUpdateArea1Start" endNode="tipOcclusionUpdateArea1End"/>
+        </updateAreas>
+    </ai>
+
+    <tipOcclusionUpdateAreas>
+        <tipOcclusionUpdateArea startNode="tipOcclusionUpdateArea1Start" endNode="tipOcclusionUpdateArea1End" />
+    </tipOcclusionUpdateAreas>
+
+    <triggerMarkers>
+        <triggerMarker node="warningStripesCorner1" adjustToGround="true" groundOffset="0.01" />
+        <triggerMarker node="warningStripesCorner2" adjustToGround="true" groundOffset="0.01" />
+        <triggerMarker node="warningStripesCorner3" adjustToGround="true" groundOffset="0.01" />
+        <triggerMarker node="warningStripesCorner4" adjustToGround="true" groundOffset="0.01" />
+    </triggerMarkers>
+
+    <saleZone playerTriggerNode="playerTrigger" vehicleTriggerNode="vehicleTrigger" nearYardRadius="50" />
+
+    <i3dMappings>
+        <i3dMapping id="saleZone" node="0>" />
+        <i3dMapping id="testArea1Start" node="0>0|0" />
+        <i3dMapping id="testArea1End" node="0>0|0|0" />
+        <i3dMapping id="clearArea1Start" node="0>1" />
+        <i3dMapping id="clearArea1Width" node="0>1|0" />
+        <i3dMapping id="clearArea1Height" node="0>1|1" />
+        <i3dMapping id="levelAreaStart" node="0>2" />
+        <i3dMapping id="levelAreaWidth" node="0>2|0" />
+        <i3dMapping id="levelAreaHeight" node="0>2|1" />
+        <i3dMapping id="tipOcclusionUpdateArea1Start" node="0>3|0" />
+        <i3dMapping id="tipOcclusionUpdateArea1End" node="0>3|0|0" />
+        <i3dMapping id="collision" node="0>4|0" />
+        <i3dMapping id="playerTrigger" node="0>5" />
+        <i3dMapping id="vehicleTrigger" node="0>6" />
+        <i3dMapping id="warningStripes" node="0>7" />
+        <i3dMapping id="warningStripesCorner1" node="0>7|0" />
+        <i3dMapping id="warningStripesCorner2" node="0>7|1" />
+        <i3dMapping id="warningStripesCorner3" node="0>7|2" />
+        <i3dMapping id="warningStripesCorner4" node="0>7|3" />
+        <i3dMapping id="teleportNode" node="0>8" />
+    </i3dMappings>
+</placeable>

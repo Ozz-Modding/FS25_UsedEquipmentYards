@@ -126,11 +126,16 @@ See `~/.claude/skills/fs25-modding/SKILL.md` for the full reference.
 - Both patched via `Utils.overwrittenFunction`, guarded by `isYardFenceBrush()`.
 
 ### Vehicle spawn layout
-- **Random scatter placement**: positions sampled within fence polygon's inset AABB,
-  validated with point-in-polygon and radius-aware clearance checks.
+- **Grid-based placement**: a regular grid of candidate points is built inside the fence
+  polygon at startup (`buildSpawnGrid`). Each point tracks an `occupied` flag.
+- `findSpawnPoint(width, length)` shuffles unoccupied grid points, checks the vehicle's
+  rotated footprint fits inside the yard, verifies surrounding grid points are free
+  (with `VEHICLE_CLEARANCE_BUFFER`), then runs `overlapBox` / `isClearOfExistingVehicles`
+  collision tests. Returns `nil` when no point fits (yard full).
 - `VehicleLoadingData:setPosition(x, nil, z, terrainOffset)` / `setRotation` / `setIgnoreShopOffset(true)`
-- Vehicle yaw: `math.atan2(dx, dz) + math.pi` (faces away from anchor point) ± 15° jitter.
-- Sequential spawning; 50 attempts per vehicle; 8 consecutive failures = yard full.
+- Vehicle yaw: `parkingYaw` — faces away from the anchor point ± jitter.
+- Sequential spawning; yard capacity is bounded only by available grid space (no hard cap).
+- Grid points are marked occupied before async vehicle load so the next spawn sees them.
 - Test-driven vehicles' original positions are reserved in `rebuildPlacedPositions`.
 
 ### Vehicle spawning API

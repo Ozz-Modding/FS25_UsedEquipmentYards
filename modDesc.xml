@@ -23,20 +23,30 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]></en>
         <sourceFile filename="src/events/TestDriveEvent.lua"/>
         <sourceFile filename="src/events/VehicleItemSyncEvent.lua"/>
         <sourceFile filename="src/BarterState.lua"/>
+        <sourceFile filename="src/YardCredit.lua"/>
         <sourceFile filename="src/PriceTagRenderer.lua"/>
         <sourceFile filename="src/UsedEquipmentYard.lua"/>
         <sourceFile filename="src/YardInventory.lua"/>
         <sourceFile filename="src/YardManager.lua"/>
         <sourceFile filename="src/gui/YardConfigDialog.lua"/>
         <sourceFile filename="src/gui/BarterDialog.lua"/>
+        <sourceFile filename="src/gui/SellBarterDialog.lua"/>
+        <sourceFile filename="src/events/VehicleSoldEvent.lua"/>
+        <sourceFile filename="src/events/OfferCacheSyncEvent.lua"/>
+        <sourceFile filename="src/YardNameGenerator.lua"/>
         <sourceFile filename="src/YardConfigActivatable.lua"/>
         <sourceFile filename="src/YardVehicleActivatable.lua"/>
+        <sourceFile filename="src/SaleZoneActivatable.lua"/>
+        <sourceFile filename="src/gui/SaleZoneDialog.lua"/>
         <sourceFile filename="src/main.lua"/>
     </extraSourceFiles>
     <placeableSpecializations>
         <specialization name="usedEquipmentYard"
                         className="PlaceableUsedEquipmentYard"
                         filename="src/PlaceableUsedEquipmentYard.lua" />
+        <specialization name="saleZone"
+                        className="PlaceableSaleZone"
+                        filename="src/PlaceableSaleZone.lua" />
     </placeableSpecializations>
     <placeableTypes>
         <type name="usedEquipmentYard" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
@@ -44,10 +54,15 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]></en>
             <specialization name="husbandryFence" />
             <specialization name="usedEquipmentYard" />
         </type>
+        <type name="usedEquipmentYardSaleZone" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
+            <specialization name="placement" />
+            <specialization name="saleZone" />
+        </type>
     </placeableTypes>
     <storeItems>
         <storeItem xmlFilename="xml/YardFence.xml" />
         <storeItem xmlFilename="xml/UsedEquipmentYard.xml" />
+        <storeItem xmlFilename="xml/SaleZone.xml" />
     </storeItems>
     <multiplayer supported="true"/>
     <l10n filenamePrefix="languages/l10n" />

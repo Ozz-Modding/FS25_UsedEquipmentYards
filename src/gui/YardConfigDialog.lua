@@ -16,6 +16,7 @@ YardConfigDialog.MAX_BRAND_WEIGHT = 3
 YardConfigDialog.MIN_WW_OPTIONS  = { 0, 5, 10, 15, 20 }   -- "No minimum", 5m, 10m, ...
 YardConfigDialog.MAX_WW_OPTIONS  = { 5, 10, 15, 20, 0 }   -- 5m, 10m, ..., "No maximum"
 YardConfigDialog.MAX_PRICE_OPTIONS = { 50000, 100000, 150000, 200000, 250000, 0 }  -- 0 = "No maximum"
+YardConfigDialog.AVG_STOCK_OPTIONS = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168 }
 
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES      = {
@@ -27,16 +28,6 @@ YardConfigDialog.SKIP_TYPES      = {
 
 -- Specific category names to exclude.
 YardConfigDialog.SKIP_NAMES      = {
-    ["WHEELLOADERTOOLS"]              = true,
-    ["FRONTLOADERTOOLS"]              = true,
-    ["FORESTRYEXCAVATORTOOLS"]        = true,
-    ["TELELOADERTOOLS"]               = true,
-    ["SKIDSTEERTOOLS"]                = true,
-    ["CUTTERS"]                       = true,
-    ["FORAGEHARVESTERCUTTERS"]        = true,
-    ["LEVELER"]                       = true,
-    ["CUTTERTRAILERS"]                = true,
-    ["FORAGEHARVESTERCUTTERTRAILERS"] = true,
     ["BALINGMISC"] = true,
     ["MISCDRIVABLES"] = true,
     ["FORESTRYMISC"] = true,
@@ -85,6 +76,7 @@ end
 function YardConfigDialog:setYard(yard)
     self.yard = yard
     self.config = YardInventory.copyConfig(yard.inventory.config)
+    self.yardName = yard.name or ""
 end
 
 function YardConfigDialog:onOpen()
@@ -112,8 +104,8 @@ function YardConfigDialog.getKnownCategories()
     for name, info in pairs(g_storeManager.categoryByName) do
         if not YardConfigDialog.SKIP_TYPES[info.type]
             and not YardConfigDialog.SKIP_NAMES[name]
-            and not name:find("PALLET")
-            and not name:find("HEADER") then
+            -- and not name:find("HEADER")
+            and not name:find("PALLET") then
             cats[#cats + 1] = { name = name, title = info.title, type = info.type }
         end
     end
@@ -194,6 +186,11 @@ end
 -- ---------------------------------------------------------------------------
 
 function YardConfigDialog:populateOptions()
+    -- Yard name
+    if self.yardNameInput ~= nil then
+        self.yardNameInput:setText(self.yardName)
+    end
+
     -- Quality
     local qualityTexts = {}
     for _, q in ipairs(YardConfigDialog.QUALITY_OPTIONS) do
@@ -276,6 +273,18 @@ function YardConfigDialog:populateOptions()
         if v == (self.config.maxPrice or 0) then maxPriceState = i; break end
     end
     self.maxPriceOption:setState(maxPriceState)
+
+    -- Avg hours in stock
+    local avgStockTexts = {}
+    for _, v in ipairs(YardConfigDialog.AVG_STOCK_OPTIONS) do
+        avgStockTexts[#avgStockTexts + 1] = tostring(v) .. " h"
+    end
+    self.avgStockHoursOption:setTexts(avgStockTexts)
+    local avgStockState = 8  -- default index for 96
+    for i, v in ipairs(YardConfigDialog.AVG_STOCK_OPTIONS) do
+        if v == (self.config.avgStockHours or 96) then avgStockState = i; break end
+    end
+    self.avgStockHoursOption:setState(avgStockState)
 end
 
 -- ---------------------------------------------------------------------------
@@ -302,6 +311,10 @@ function YardConfigDialog:onMaxPriceChanged(state, element)
     self.config.maxPrice = YardConfigDialog.MAX_PRICE_OPTIONS[state] or 0
 end
 
+function YardConfigDialog:onAvgStockHoursChanged(state, element)
+    self.config.avgStockHours = YardConfigDialog.AVG_STOCK_OPTIONS[state] or 96
+end
+
 function YardConfigDialog:onWeightChanged(state, element)
     local catName = element.ueyCategory
     if catName ~= nil then
@@ -319,6 +332,13 @@ end
 -- ---------------------------------------------------------------------------
 -- Buttons
 -- ---------------------------------------------------------------------------
+
+function YardConfigDialog:onClickAllWeights()
+    for _, row in ipairs(self.weightRows) do
+        row.option:setState(2)  -- state 2 = weight 1
+        self.config.categories[row.name] = 1
+    end
+end
 
 function YardConfigDialog:onClickClearWeights()
     for _, row in ipairs(self.weightRows) do
@@ -341,10 +361,31 @@ function YardConfigDialog:onClickClearBrands()
     end
 end
 
+function YardConfigDialog:onNameEnterPressed()
+    -- Accept the current text — nothing extra needed.
+end
+
+function YardConfigDialog:onNameEscPressed()
+    -- Revert to original name.
+    if self.yardNameInput ~= nil then
+        self.yardNameInput:setText(self.yardName)
+    end
+end
+
 function YardConfigDialog:onClickApply()
     if self.yard ~= nil and self.config ~= nil then
         self.yard.inventory:applyConfig(self.config)
     end
+
+    -- Apply name change.
+    if self.yard ~= nil and self.yardNameInput ~= nil then
+        local newName = self.yardNameInput:getText()
+        if newName ~= nil and newName ~= "" and newName ~= self.yard.name then
+            YardNameGenerator.rename(self.yard.name, newName)
+            self.yard.name = newName
+        end
+    end
+
     YardConfigDialog:superClass().close(self)
 end
 

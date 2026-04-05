@@ -12,7 +12,7 @@
         <rotation>0</rotation>
         <brand>NONE</brand>
         <species>PLACEABLE</species>
-        <category>tools</category>
+        <category>misc</category>
         <canBeSold>true</canBeSold>
         <showInStore>true</showInStore>
 
