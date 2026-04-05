@@ -19,6 +19,7 @@ YardInventory                          = {}
 YardInventory._mt                      = Class(YardInventory)
 
 -- Safety cap to prevent runaway spawning (e.g. if collision checks fail).
+YardInventory.MAX_PLACEMENT_FAILURES   = 5  -- consecutive placement failures before giving up
 
 -- Spawn mode constants.
 YardInventory.SPAWN_FILL               = 1 -- fill yard to capacity (used on reset)
@@ -79,6 +80,7 @@ YardInventory.DEFAULT_CONFIG           = {
     maxWorkingWidth = 0,   -- 0 = no maximum
     maxPrice        = 0,   -- 0 = no maximum (hard cap MAX_VEHICLE_PRICE still applies)
     avgStockHours   = 96,  -- average hours a vehicle stays before TTL expiry
+    gridSpacing     = 8,   -- metres between spawn grid points
 }
 
 -- Dirt jitter range applied ± around the dirtiness base
@@ -87,7 +89,7 @@ YardInventory.FUEL_BASE                = 0.15  -- target fuel level (25%)
 YardInventory.FUEL_RANGE               = 0.08  -- ± random variation
 
 -- Minimum vehicle new price to be included (filters out tiny items).
-YardInventory.MIN_VEHICLE_PRICE        = 10000
+YardInventory.MIN_VEHICLE_PRICE        = 2000
 -- Maximum used price — vehicles priced above this after jitter are re-rolled.
 YardInventory.MAX_VEHICLE_PRICE        = 999999
 
@@ -140,6 +142,7 @@ function YardInventory.copyConfig(cfg)
         maxWorkingWidth = cfg.maxWorkingWidth or 0,
         maxPrice        = cfg.maxPrice or 0,
         avgStockHours   = cfg.avgStockHours or 96,
+        gridSpacing     = cfg.gridSpacing or 8,
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
@@ -159,6 +162,7 @@ function YardInventory.new(yard)
     self.pendingLoads        = {}  -- in-flight VehicleLoadingData
     self.spawnGrid           = {}  -- grid points: { x, z, occupied }
     self.filling             = false -- true while the fill loop is running
+    self.placementFailures   = 0     -- consecutive placement failures
     self.spawnMode           = YardInventory.SPAWN_FILL
     self.fillDelayMs         = nil   -- ms to wait before starting fill (physics cleanup)
     self.pendingSoldItems    = {}  -- items from player sales waiting for yard space
@@ -368,8 +372,14 @@ end
 
 --- Apply a new config. Does NOT respawn — inventory updates organically via TTL.
 function YardInventory:applyConfig(newConfig)
+    local oldSpacing = self.config.gridSpacing or 8
     self.config = YardInventory.copyConfig(newConfig)
     self.storePool = nil -- force rebuild with new categories on next spawn
+    -- Rebuild spawn grid if spacing changed.
+    if (self.config.gridSpacing or 8) ~= oldSpacing then
+        self:buildSpawnGrid()
+        self:rebuildGridOccupancy()
+    end
 end
 
 -- ---------------------------------------------------------------------------
@@ -555,7 +565,7 @@ end
 function YardInventory:buildSpawnGrid()
     local b = self.yard.bounds
     local inset = YardInventory.BOUNDS_INSET
-    local spacing = YardInventory.GRID_SPACING
+    local spacing = self.config.gridSpacing or YardInventory.GRID_SPACING
 
     local halfW = b.sizeX * 0.5 - inset
     local halfD = b.sizeZ * 0.5 - inset
@@ -849,12 +859,20 @@ function YardInventory:spawnNext()
     local halfL = length * 0.5
     local x, z, yaw = self:findSpawnPoint(width, length)
     if x == nil then
-        -- No space — remove item and stop filling (grid is full).
+        -- No space for this vehicle — remove it and retry with a different item.
         self:removeItemByRef(item)
-        self.filling = false
-
+        self.placementFailures = self.placementFailures + 1
+        if self.placementFailures >= YardInventory.MAX_PLACEMENT_FAILURES then
+            self.filling = false
+            self.placementFailures = 0
+            return
+        end
+        self:spawnNext()
         return
     end
+
+    -- Placed successfully — reset failure counter.
+    self.placementFailures = 0
 
     -- Store dimensions on the item for grid rebuild after load.
     item.spawnWidth  = width
@@ -1207,7 +1225,7 @@ function YardInventory:createItemFromVehicle(vehicle, purchasePrice)
         damage         = damage,
         wear           = wear,
         operatingTime  = operatingTime,
-        ttlHours       = math.random(YardInventory.TTL_MIN_HOURS, YardInventory.TTL_MAX_HOURS),
+        ttlHours       = self:randomTTL(),
         vehicle        = nil,
         spawnWidth     = sizeValues.width or 3,
         spawnLength    = sizeValues.length or 6,
@@ -1383,6 +1401,7 @@ function YardInventory:saveToXML(xmlFile, key)
     setXMLInt(xmlFile, key .. ".config#maxWorkingWidth", self.config.maxWorkingWidth or 0)
     setXMLInt(xmlFile, key .. ".config#maxPrice", self.config.maxPrice or 0)
     setXMLInt(xmlFile, key .. ".config#avgStockHours", self.config.avgStockHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
+    setXMLInt(xmlFile, key .. ".config#gridSpacing", self.config.gridSpacing or 8)
 
     local ci = 0
     for catName, weight in pairs(self.config.categories) do
@@ -1482,6 +1501,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             maxWorkingWidth = getXMLInt(xmlFile, key .. ".config#maxWorkingWidth") or 0,
             maxPrice        = getXMLInt(xmlFile, key .. ".config#maxPrice") or 0,
             avgStockHours   = getXMLInt(xmlFile, key .. ".config#avgStockHours") or YardInventory.DEFAULT_AVG_STOCK_HOURS,
+            gridSpacing     = getXMLInt(xmlFile, key .. ".config#gridSpacing") or 8,
             categories = {},
             brands     = {},
         }
@@ -1521,7 +1541,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             damage        = getXMLFloat(xmlFile, iKey .. "#damage") or 0,
             wear          = getXMLFloat(xmlFile, iKey .. "#wear") or 0,
             operatingTime = (getXMLFloat(xmlFile, iKey .. "#operatingTime") or 0) * 1000,
-            ttlHours      = getXMLInt(xmlFile, iKey .. "#ttlHours") or YardInventory.TTL_MIN_HOURS,
+            ttlHours      = getXMLInt(xmlFile, iKey .. "#ttlHours") or self:randomTTL(),
             numOwners     = getXMLInt(xmlFile, iKey .. "#numOwners") or 1,
             minPrice      = getXMLInt(xmlFile, iKey .. "#minPrice"),
             vehicleUniqueId = getXMLString(xmlFile, iKey .. "#vehicleUniqueId"),

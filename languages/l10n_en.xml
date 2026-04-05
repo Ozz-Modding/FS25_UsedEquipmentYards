@@ -47,6 +47,8 @@
         <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
         <text name="uey_config_avgStockHours"     text="Average Hours in Stock"/>
         <text name="uey_config_avgStockHours_desc" text="How long vehicles stay before leaving."/>
+        <text name="uey_config_gridSpacing"      text="Grid Spacing"/>
+        <text name="uey_config_gridSpacing_desc" text="Distance between spawn points. Smaller = more vehicles."/>
         <text name="uey_config_allWeights"       text="All Weights"/>
         <text name="uey_config_clearWeights"     text="Clear Weights"/>
         <text name="uey_config_brands_header"    text="Brands"/>

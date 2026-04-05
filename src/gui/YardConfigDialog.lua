@@ -17,6 +17,7 @@ YardConfigDialog.MIN_WW_OPTIONS  = { 0, 5, 10, 15, 20 }   -- "No minimum", 5m, 1
 YardConfigDialog.MAX_WW_OPTIONS  = { 5, 10, 15, 20, 0 }   -- 5m, 10m, ..., "No maximum"
 YardConfigDialog.MAX_PRICE_OPTIONS = { 50000, 100000, 150000, 200000, 250000, 0 }  -- 0 = "No maximum"
 YardConfigDialog.AVG_STOCK_OPTIONS = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168 }
+YardConfigDialog.GRID_SPACING_OPTIONS = { 4, 5, 6, 7, 8, 9, 10 }
 
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES      = {
@@ -28,9 +29,9 @@ YardConfigDialog.SKIP_TYPES      = {
 
 -- Specific category names to exclude.
 YardConfigDialog.SKIP_NAMES      = {
-    ["BALINGMISC"] = true,
-    ["MISCDRIVABLES"] = true,
-    ["FORESTRYMISC"] = true,
+    -- ["BALINGMISC"] = true,
+    -- ["MISCDRIVABLES"] = true,
+    -- ["FORESTRYMISC"] = true,
 }
 
 -- Brand names to exclude.
@@ -103,9 +104,9 @@ function YardConfigDialog.getKnownCategories()
     local cats = {}
     for name, info in pairs(g_storeManager.categoryByName) do
         if not YardConfigDialog.SKIP_TYPES[info.type]
-            and not YardConfigDialog.SKIP_NAMES[name]
+            and not YardConfigDialog.SKIP_NAMES[name] then
             -- and not name:find("HEADER")
-            and not name:find("PALLET") then
+            -- and not name:find("PALLET") then
             cats[#cats + 1] = { name = name, title = info.title, type = info.type }
         end
     end
@@ -285,6 +286,18 @@ function YardConfigDialog:populateOptions()
         if v == (self.config.avgStockHours or 96) then avgStockState = i; break end
     end
     self.avgStockHoursOption:setState(avgStockState)
+
+    -- Grid spacing
+    local gridSpacingTexts = {}
+    for _, v in ipairs(YardConfigDialog.GRID_SPACING_OPTIONS) do
+        gridSpacingTexts[#gridSpacingTexts + 1] = tostring(v) .. " m"
+    end
+    self.gridSpacingOption:setTexts(gridSpacingTexts)
+    local gridSpacingState = 5  -- default index for 8
+    for i, v in ipairs(YardConfigDialog.GRID_SPACING_OPTIONS) do
+        if v == (self.config.gridSpacing or 8) then gridSpacingState = i; break end
+    end
+    self.gridSpacingOption:setState(gridSpacingState)
 end
 
 -- ---------------------------------------------------------------------------
@@ -313,6 +326,10 @@ end
 
 function YardConfigDialog:onAvgStockHoursChanged(state, element)
     self.config.avgStockHours = YardConfigDialog.AVG_STOCK_OPTIONS[state] or 96
+end
+
+function YardConfigDialog:onGridSpacingChanged(state, element)
+    self.config.gridSpacing = YardConfigDialog.GRID_SPACING_OPTIONS[state] or 8
 end
 
 function YardConfigDialog:onWeightChanged(state, element)
