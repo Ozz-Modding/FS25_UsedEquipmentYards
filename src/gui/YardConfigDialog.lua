@@ -3,24 +3,24 @@
 -- Three-column layout: core settings (left), category weights (middle), brands (right).
 -- Category weights and brands are built dynamically from g_storeManager / g_brandManager.
 
-YardConfigDialog                 = {}
+YardConfigDialog                      = {}
 
-local YardConfigDialog_mt        = Class(YardConfigDialog, MessageDialog)
+local YardConfigDialog_mt             = Class(YardConfigDialog, MessageDialog)
 
-YardConfigDialog.QUALITY_OPTIONS = { "LOW", "MEDIUM", "HIGH" }
-YardConfigDialog.DIRTINESS_STEP  = 0.05 -- 5% increments
-YardConfigDialog.MAX_WEIGHT      = 10
-YardConfigDialog.MAX_BRAND_WEIGHT = 3
+YardConfigDialog.QUALITY_OPTIONS      = { "LOW", "MEDIUM", "HIGH" }
+YardConfigDialog.DIRTINESS_STEP       = 0.05 -- 5% increments
+YardConfigDialog.MAX_WEIGHT           = 10
+YardConfigDialog.MAX_BRAND_WEIGHT     = 3
 
 -- Working width options (metres). 0 = no limit.
-YardConfigDialog.MIN_WW_OPTIONS  = { 0, 5, 10, 15, 20 }   -- "No minimum", 5m, 10m, ...
-YardConfigDialog.MAX_WW_OPTIONS  = { 5, 10, 15, 20, 0 }   -- 5m, 10m, ..., "No maximum"
-YardConfigDialog.MAX_PRICE_OPTIONS = { 50000, 100000, 150000, 200000, 250000, 0 }  -- 0 = "No maximum"
-YardConfigDialog.AVG_STOCK_OPTIONS = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168 }
+YardConfigDialog.MIN_WW_OPTIONS       = { 0, 5, 10, 15, 20 }                      -- "No minimum", 5m, 10m, ...
+YardConfigDialog.MAX_WW_OPTIONS       = { 5, 10, 15, 20, 0 }                      -- 5m, 10m, ..., "No maximum"
+YardConfigDialog.MAX_PRICE_OPTIONS    = { 50000, 100000, 150000, 200000, 250000, 0 } -- 0 = "No maximum"
+YardConfigDialog.AVG_STOCK_OPTIONS    = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168 }
 YardConfigDialog.GRID_SPACING_OPTIONS = { 4, 5, 6, 7, 8, 9, 10 }
 
 -- Category types to exclude from the weight list.
-YardConfigDialog.SKIP_TYPES      = {
+YardConfigDialog.SKIP_TYPES           = {
     ["OBJECTS"]   = true,
     ["PLACEABLE"] = true,
     ["HANDTOOLS"] = true,
@@ -28,14 +28,19 @@ YardConfigDialog.SKIP_TYPES      = {
 }
 
 -- Specific category names to exclude.
-YardConfigDialog.SKIP_NAMES      = {
-    -- ["BALINGMISC"] = true,
-    -- ["MISCDRIVABLES"] = true,
-    -- ["FORESTRYMISC"] = true,
+YardConfigDialog.SKIP_NAMES           = {
+    ["PALLETFERTILIZERHERBICIDE"] = true,
+    ["PALLETBALING"]              = true,
+    ["PALLETSEEDS"]               = true,
+    ["PALLETVEGETABLES"]          = true,
+    ["PALLETSILAGE"]              = true,
+    ["PALLETGRASSLAND"]           = true,
+    ["PALLETSEEDSROOTCROPS"]      = true,
+    ["SPECIALCROPSPALLETS"]       = true,
 }
 
 -- Brand names to exclude.
-YardConfigDialog.SKIP_BRANDS     = {
+YardConfigDialog.SKIP_BRANDS          = {
     ["NONE"] = true,
 }
 
@@ -50,11 +55,11 @@ function YardConfigDialog.register()
 end
 
 function YardConfigDialog.new()
-    local self = MessageDialog.new(nil, YardConfigDialog_mt, g_messageCenter, g_i18n, g_inputBinding)
-    self.yard = nil
-    self.config = nil
-    self.weightRows = {}   -- { catName, option }
-    self.brandRows  = {}   -- { brandName, option }
+    local self      = MessageDialog.new(nil, YardConfigDialog_mt, g_messageCenter, g_i18n, g_inputBinding)
+    self.yard       = nil
+    self.config     = nil
+    self.weightRows = {} -- { catName, option }
+    self.brandRows  = {} -- { brandName, option }
     self.rowsBuilt  = false
     return self
 end
@@ -103,9 +108,13 @@ end
 function YardConfigDialog.getKnownCategories()
     local cats = {}
     for name, info in pairs(g_storeManager.categoryByName) do
+        -- if info.title == "Consumables" or info.title == "Seeds" then
+        --     print(("UEY: category name=%s  type=%s  title=%s"):format(name, tostring(info.type), info.title))
+        -- end
         if not YardConfigDialog.SKIP_TYPES[info.type]
             and not YardConfigDialog.SKIP_NAMES[name] then
             -- and not name:find("HEADER")
+            -- and not name:find("PALLET") then
             -- and not name:find("PALLET") then
             cats[#cats + 1] = { name = name, title = info.title, type = info.type }
         end
@@ -247,7 +256,9 @@ function YardConfigDialog:populateOptions()
     self.minWorkingWidthOption:setTexts(minWWTexts)
     local minWWState = 1
     for i, v in ipairs(YardConfigDialog.MIN_WW_OPTIONS) do
-        if v == (self.config.minWorkingWidth or 0) then minWWState = i; break end
+        if v == (self.config.minWorkingWidth or 0) then
+            minWWState = i; break
+        end
     end
     self.minWorkingWidthOption:setState(minWWState)
 
@@ -257,9 +268,11 @@ function YardConfigDialog:populateOptions()
         maxWWTexts[#maxWWTexts + 1] = v == 0 and g_i18n:getText("uey_config_noMaximum") or (tostring(v) .. " m")
     end
     self.maxWorkingWidthOption:setTexts(maxWWTexts)
-    local maxWWState = #YardConfigDialog.MAX_WW_OPTIONS  -- default: last = "No maximum"
+    local maxWWState = #YardConfigDialog.MAX_WW_OPTIONS -- default: last = "No maximum"
     for i, v in ipairs(YardConfigDialog.MAX_WW_OPTIONS) do
-        if v == (self.config.maxWorkingWidth or 0) then maxWWState = i; break end
+        if v == (self.config.maxWorkingWidth or 0) then
+            maxWWState = i; break
+        end
     end
     self.maxWorkingWidthOption:setState(maxWWState)
 
@@ -269,9 +282,11 @@ function YardConfigDialog:populateOptions()
         maxPriceTexts[#maxPriceTexts + 1] = v == 0 and g_i18n:getText("uey_config_noMaximum") or g_i18n:formatMoney(v)
     end
     self.maxPriceOption:setTexts(maxPriceTexts)
-    local maxPriceState = #YardConfigDialog.MAX_PRICE_OPTIONS  -- default: last = "No maximum"
+    local maxPriceState = #YardConfigDialog.MAX_PRICE_OPTIONS -- default: last = "No maximum"
     for i, v in ipairs(YardConfigDialog.MAX_PRICE_OPTIONS) do
-        if v == (self.config.maxPrice or 0) then maxPriceState = i; break end
+        if v == (self.config.maxPrice or 0) then
+            maxPriceState = i; break
+        end
     end
     self.maxPriceOption:setState(maxPriceState)
 
@@ -281,9 +296,11 @@ function YardConfigDialog:populateOptions()
         avgStockTexts[#avgStockTexts + 1] = tostring(v) .. " h"
     end
     self.avgStockHoursOption:setTexts(avgStockTexts)
-    local avgStockState = 8  -- default index for 96
+    local avgStockState = 8 -- default index for 96
     for i, v in ipairs(YardConfigDialog.AVG_STOCK_OPTIONS) do
-        if v == (self.config.avgStockHours or 96) then avgStockState = i; break end
+        if v == (self.config.avgStockHours or 96) then
+            avgStockState = i; break
+        end
     end
     self.avgStockHoursOption:setState(avgStockState)
 
@@ -293,9 +310,11 @@ function YardConfigDialog:populateOptions()
         gridSpacingTexts[#gridSpacingTexts + 1] = tostring(v) .. " m"
     end
     self.gridSpacingOption:setTexts(gridSpacingTexts)
-    local gridSpacingState = 5  -- default index for 8
+    local gridSpacingState = 5 -- default index for 8
     for i, v in ipairs(YardConfigDialog.GRID_SPACING_OPTIONS) do
-        if v == (self.config.gridSpacing or 8) then gridSpacingState = i; break end
+        if v == (self.config.gridSpacing or 8) then
+            gridSpacingState = i; break
+        end
     end
     self.gridSpacingOption:setState(gridSpacingState)
 end
@@ -352,7 +371,7 @@ end
 
 function YardConfigDialog:onClickAllWeights()
     for _, row in ipairs(self.weightRows) do
-        row.option:setState(2)  -- state 2 = weight 1
+        row.option:setState(2) -- state 2 = weight 1
         self.config.categories[row.name] = 1
     end
 end
@@ -366,14 +385,14 @@ end
 
 function YardConfigDialog:onClickAllBrands()
     for _, row in ipairs(self.brandRows) do
-        row.option:setState(2)  -- state 2 = weight 1
+        row.option:setState(2) -- state 2 = weight 1
         self.config.brands[row.name] = 1
     end
 end
 
 function YardConfigDialog:onClickClearBrands()
     for _, row in ipairs(self.brandRows) do
-        row.option:setState(1)  -- state 1 = weight 0
+        row.option:setState(1) -- state 1 = weight 0
         self.config.brands[row.name] = 0
     end
 end
