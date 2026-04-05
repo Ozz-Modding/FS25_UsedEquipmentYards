@@ -45,6 +45,7 @@
         <text name="uey_config_maxPrice_desc"    text="Limit yard inventory to a maximum price."/>
         <text name="uey_config_weights_header"   text="Category Weights"/>
         <text name="uey_config_weights_desc"     text="Set spawn likelihood per category (0 = disabled)."/>
+        <text name="uey_config_allWeights"       text="All Weights"/>
         <text name="uey_config_clearWeights"     text="Clear Weights"/>
         <text name="uey_config_brands_header"    text="Brands"/>
         <text name="uey_config_brands_desc"      text="Set spawn likelihood per brand (0 = disabled)."/>

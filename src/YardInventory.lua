@@ -19,7 +19,6 @@ YardInventory                          = {}
 YardInventory._mt                      = Class(YardInventory)
 
 -- Safety cap to prevent runaway spawning (e.g. if collision checks fail).
-YardInventory.ABSOLUTE_MAX_ITEMS       = 50
 
 -- Spawn mode constants.
 YardInventory.SPAWN_FILL               = 1 -- fill yard to capacity (used on reset)
@@ -213,7 +212,6 @@ function YardInventory:onHourChanged()
     -- Skip if we're still restoring saved items.
     if not self.filling
         and self.fillDelayMs == nil
-        and #self.items < YardInventory.ABSOLUTE_MAX_ITEMS
         and math.random() < YardInventory.HOURLY_SPAWN_CHANCE then
         self:trySpawnOne()
     end
@@ -813,12 +811,6 @@ end
 --- callback will call spawnNext again in FILL mode.
 function YardInventory:spawnNext()
     if not self.filling then return end
-    if #self.items >= YardInventory.ABSOLUTE_MAX_ITEMS then
-        self.filling = false
-
-        return
-    end
-
     local item = self:generateOneItem()
     if item == nil then
         self.filling = false

@@ -83,6 +83,8 @@
 
         <!-- Buttons -->
         <BoxLayout profile="fs25_dialogButtonBox" size="1200px 60px">
+            <Button profile="buttonSearch" text="$l10n_uey_config_allWeights" onClick="onClickAllWeights"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonExtra1" text="$l10n_uey_config_clearWeights" onClick="onClickClearWeights"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonActivate" text="$l10n_uey_config_allBrands" onClick="onClickAllBrands"/>

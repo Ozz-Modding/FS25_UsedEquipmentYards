@@ -326,6 +326,13 @@ end
 -- Buttons
 -- ---------------------------------------------------------------------------
 
+function YardConfigDialog:onClickAllWeights()
+    for _, row in ipairs(self.weightRows) do
+        row.option:setState(2)  -- state 2 = weight 1
+        self.config.categories[row.name] = 1
+    end
+end
+
 function YardConfigDialog:onClickClearWeights()
     for _, row in ipairs(self.weightRows) do
         row.option:setState(1)
