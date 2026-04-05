@@ -28,16 +28,16 @@ YardConfigDialog.SKIP_TYPES      = {
 
 -- Specific category names to exclude.
 YardConfigDialog.SKIP_NAMES      = {
-    ["WHEELLOADERTOOLS"]              = true,
-    ["FRONTLOADERTOOLS"]              = true,
-    ["FORESTRYEXCAVATORTOOLS"]        = true,
-    ["TELELOADERTOOLS"]               = true,
-    ["SKIDSTEERTOOLS"]                = true,
-    ["CUTTERS"]                       = true,
-    ["FORAGEHARVESTERCUTTERS"]        = true,
-    ["LEVELER"]                       = true,
-    ["CUTTERTRAILERS"]                = true,
-    ["FORAGEHARVESTERCUTTERTRAILERS"] = true,
+    -- ["WHEELLOADERTOOLS"]              = true,
+    -- ["FRONTLOADERTOOLS"]              = true,
+    -- ["FORESTRYEXCAVATORTOOLS"]        = true,
+    -- ["TELELOADERTOOLS"]               = true,
+    -- ["SKIDSTEERTOOLS"]                = true,
+    -- ["CUTTERS"]                       = true,
+    -- ["FORAGEHARVESTERCUTTERS"]        = true,
+    -- ["LEVELER"]                       = true,
+    -- ["CUTTERTRAILERS"]                = true,
+    -- ["FORAGEHARVESTERCUTTERTRAILERS"] = true,
     ["BALINGMISC"] = true,
     ["MISCDRIVABLES"] = true,
     ["FORESTRYMISC"] = true,
@@ -114,8 +114,8 @@ function YardConfigDialog.getKnownCategories()
     for name, info in pairs(g_storeManager.categoryByName) do
         if not YardConfigDialog.SKIP_TYPES[info.type]
             and not YardConfigDialog.SKIP_NAMES[name]
-            and not name:find("PALLET")
-            and not name:find("HEADER") then
+            -- and not name:find("HEADER")
+            and not name:find("PALLET") then
             cats[#cats + 1] = { name = name, title = info.title, type = info.type }
         end
     end

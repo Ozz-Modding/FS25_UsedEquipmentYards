@@ -83,6 +83,8 @@ YardInventory.DEFAULT_CONFIG           = {
 
 -- Dirt jitter range applied ± around the dirtiness base
 YardInventory.DIRT_RANGE               = 0.20
+YardInventory.FUEL_BASE                = 0.15  -- target fuel level (25%)
+YardInventory.FUEL_RANGE               = 0.08  -- ± random variation
 
 -- Minimum vehicle new price to be included (filters out tiny items).
 YardInventory.MIN_VEHICLE_PRICE        = 10000
@@ -922,6 +924,30 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
                 local range = YardInventory.DIRT_RANGE
                 local dirt = base + (math.random() * 2 - 1) * range
                 vehicle:setDirtAmount(math.max(0, math.min(1, dirt)))
+            end
+
+            -- Limit fuel/energy fill units to ~25% so yard stock isn't full-tank.
+            if vehicle.getConsumerFillUnitIndex ~= nil then
+                local fuelTypes = {
+                    FillType.DIESEL,
+                    FillType.ELECTRICCHARGE,
+                    FillType.METHANE,
+                }
+                for _, fillType in ipairs(fuelTypes) do
+                    local fillUnitIndex = vehicle:getConsumerFillUnitIndex(fillType)
+                    if fillUnitIndex ~= nil then
+                        local capacity = vehicle:getFillUnitCapacity(fillUnitIndex)
+                        if capacity > 0 then
+                            local target = YardInventory.FUEL_BASE
+                                         + (math.random() * 2 - 1) * YardInventory.FUEL_RANGE
+                            target = math.max(0.05, math.min(0.35, target))
+                            local desired = capacity * target
+                            local current = vehicle:getFillUnitFillLevel(fillUnitIndex)
+                            local delta   = desired - current
+                            vehicle:addFillUnitFillLevel(vehicle:getOwnerFarmId(), fillUnitIndex, delta, fillType, ToolType.UNDEFINED, nil)
+                        end
+                    end
+                end
             end
 
             -- Exclude from Tab-cycle so the player can't switch into yard vehicles.
