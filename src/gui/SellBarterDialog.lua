@@ -118,6 +118,18 @@ function SellBarterDialog:calculateOffers(vehicle)
     local hybridCash = math.floor(hybridTotal * cashPortion)
     local hybridCredit = hybridTotal - hybridCash
 
+    -- If this vehicle was recently purchased from a yard, cap all offers below
+    -- the purchase price so the player can't profit from an immediate resale.
+    local recentPrice = UsedEquipmentYards.getRecentSalePrice(vehicle.uniqueId)
+    if recentPrice ~= nil and recentPrice > 0 then
+        local cap = recentPrice - 1
+        cashTotal   = math.min(cashTotal, cap)
+        creditTotal = math.min(creditTotal, cap)
+        hybridTotal = math.min(hybridTotal, cap)
+        hybridCash  = math.min(hybridCash, hybridTotal)
+        hybridCredit = hybridTotal - hybridCash
+    end
+
     return {
         {
             label  = g_i18n:getText("uey_sell_cashOffer"),

@@ -11,7 +11,15 @@
     <description>
         <en><![CDATA[Allows you to define custom vehicle sale yards that you can visit and buy used equipment from. Draw yard boundaries in-game, configure inventory, and watch equipment spawn and despawn dynamically.
 
-GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]></en>
+        Beta Changelog:
+
+        - Tightened up the pricing variance and also scaled it by price. 
+        - Yards track recent sales so you can no longer sell back equipment to a yard for profit.
+        - Returning a running vehicle will stop the motor.
+
+
+GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]>
+        </en>
         <de><![CDATA[Ermöglicht das Definieren benutzerdefinierter Fahrzeugverkaufsplätze, auf denen Sie gebrauchte Ausrüstung kaufen können.]]></de>
         <fr><![CDATA[Permet de définir des cours de vente de véhicules personnalisées où vous pouvez acheter de l'équipement d'occasion.]]></fr>
     </description>
@@ -41,12 +49,8 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]></en>
         <sourceFile filename="src/main.lua"/>
     </extraSourceFiles>
     <placeableSpecializations>
-        <specialization name="usedEquipmentYard"
-                        className="PlaceableUsedEquipmentYard"
-                        filename="src/PlaceableUsedEquipmentYard.lua" />
-        <specialization name="saleZone"
-                        className="PlaceableSaleZone"
-                        filename="src/PlaceableSaleZone.lua" />
+        <specialization name="usedEquipmentYard" className="PlaceableUsedEquipmentYard" filename="src/PlaceableUsedEquipmentYard.lua" />
+        <specialization name="saleZone" className="PlaceableSaleZone" filename="src/PlaceableSaleZone.lua" />
     </placeableSpecializations>
     <placeableTypes>
         <type name="usedEquipmentYard" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">

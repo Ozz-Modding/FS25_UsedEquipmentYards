@@ -116,12 +116,20 @@ YardInventory.TERRAIN_OFFSET           = 0.5
 YardInventory.OVERLAP_COLLISION_MASK   = 0x10061
 
 -- Price jitter — adds variety around the base sell-price formula.
--- PRICE_NORMAL_CHANCE: probability of the narrow band (0–1).
--- PRICE_NORMAL_SPREAD: ± multiplier for the narrow band (e.g. 0.10 = ±10%).
--- PRICE_WIDE_SPREAD: ± multiplier for the remaining wide band (e.g. 0.25 = ±25%).
+-- Spread scales inversely with price (sqrt curve). At the reference price (100k):
+--   normal band ≈ ±2.5%, wide band ≈ ±3.5%.
+-- Cheaper items get wider variance; expensive items tighten up.
 YardInventory.PRICE_NORMAL_CHANCE      = 0.85
-YardInventory.PRICE_NORMAL_SPREAD      = 0.10
-YardInventory.PRICE_WIDE_SPREAD        = 0.25
+YardInventory.PRICE_REFERENCE          = 100000
+YardInventory.PRICE_NORMAL_BASE        = 0.025   -- ±2.5% at reference price
+YardInventory.PRICE_WIDE_BASE          = 0.035   -- ±3.5% at reference price
+YardInventory.PRICE_SPREAD_MAX         = 0.12    -- cap for very cheap items
+
+function YardInventory.getPriceSpread(price, isWide)
+    local base = isWide and YardInventory.PRICE_WIDE_BASE or YardInventory.PRICE_NORMAL_BASE
+    local scale = math.sqrt(YardInventory.PRICE_REFERENCE / math.max(1, price))
+    return math.min(base * scale, YardInventory.PRICE_SPREAD_MAX)
+end
 
 -- ---------------------------------------------------------------------------
 -- TTL (time to live) — how long a spawned vehicle stays before expiring.
@@ -441,8 +449,8 @@ function YardInventory:rollItem()
 
     -- Add price variety around the base sell-price formula.
     local roll = math.random()
-    local spread = roll < YardInventory.PRICE_NORMAL_CHANCE and YardInventory.PRICE_NORMAL_SPREAD or
-    YardInventory.PRICE_WIDE_SPREAD
+    local isWide = roll >= YardInventory.PRICE_NORMAL_CHANCE
+    local spread = YardInventory.getPriceSpread(price, isWide)
     local jitter = 1 + (math.random() * 2 - 1) * spread
     price = price * jitter
 
@@ -1181,7 +1189,8 @@ function YardInventory:createItemFromVehicle(vehicle, purchasePrice)
 
     -- Apply the yard's standard price jitter.
     local roll = math.random()
-    local spread = roll < YardInventory.PRICE_NORMAL_CHANCE and YardInventory.PRICE_NORMAL_SPREAD or YardInventory.PRICE_WIDE_SPREAD
+    local isWide = roll >= YardInventory.PRICE_NORMAL_CHANCE
+    local spread = YardInventory.getPriceSpread(basePrice, isWide)
     local jitter = 1 + (math.random() * 2 - 1) * spread
     local finalPrice = math.max(1, math.floor(basePrice * jitter))
 

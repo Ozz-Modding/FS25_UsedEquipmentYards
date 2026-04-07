@@ -14,6 +14,41 @@ UsedEquipmentYards.activatables = {}
 -- The server uses yardManager instead; this table is only non-empty on remote clients.
 UsedEquipmentYards.clientYards = {}
 
+-- Recent sales memory: ring buffer of { uniqueId, price } for vehicles sold to
+-- players. Used to prevent profit from immediately selling a vehicle back.
+-- Synced to all clients and persisted to savegame.
+UsedEquipmentYards.MAX_RECENT_SALES = 10
+UsedEquipmentYards.recentSales = {}
+
+function UsedEquipmentYards.addRecentSale(uniqueId, price)
+    if uniqueId == nil or price == nil then return end
+    -- Update existing entry if present.
+    for i, entry in ipairs(UsedEquipmentYards.recentSales) do
+        if entry.uniqueId == uniqueId then
+            entry.price = price
+            return
+        end
+    end
+    -- Evict oldest if at capacity.
+    if #UsedEquipmentYards.recentSales >= UsedEquipmentYards.MAX_RECENT_SALES then
+        table.remove(UsedEquipmentYards.recentSales, 1)
+    end
+    UsedEquipmentYards.recentSales[#UsedEquipmentYards.recentSales + 1] = {
+        uniqueId = uniqueId,
+        price    = price,
+    }
+end
+
+function UsedEquipmentYards.getRecentSalePrice(uniqueId)
+    if uniqueId == nil then return nil end
+    for _, entry in ipairs(UsedEquipmentYards.recentSales) do
+        if entry.uniqueId == uniqueId then
+            return entry.price
+        end
+    end
+    return nil
+end
+
 function UsedEquipmentYards:loadMap(filename)
     PriceTagRenderer.load()
     YardConfigDialog.register()
@@ -50,6 +85,7 @@ function UsedEquipmentYards:delete()
     UsedEquipmentYards.pendingClientItems = {}
     UsedEquipmentYards.vehicleToItem = {}
     UsedEquipmentYards.clientYards = {}
+    UsedEquipmentYards.recentSales = {}
     BarterState.delete()
     YardCredit.delete()
     PriceTagRenderer.delete()
@@ -404,6 +440,64 @@ function UsedEquipmentYards:update(dt)
             table.remove(pending, i)
         end
         i = i - 1
+    end
+end
+
+-- ---------------------------------------------------------------------------
+-- Recent sales persistence (XML)
+-- ---------------------------------------------------------------------------
+
+function UsedEquipmentYards.saveRecentSalesToXML(xmlFile, rootKey)
+    for i, entry in ipairs(UsedEquipmentYards.recentSales) do
+        local eKey = ("%s.recentSales.entry(%d)"):format(rootKey, i - 1)
+        setXMLString(xmlFile, eKey .. "#uniqueId", entry.uniqueId)
+        setXMLInt(xmlFile, eKey .. "#price", entry.price)
+    end
+end
+
+function UsedEquipmentYards.loadRecentSalesFromXML(xmlFile, rootKey)
+    UsedEquipmentYards.recentSales = {}
+    local i = 0
+    while true do
+        local eKey = ("%s.recentSales.entry(%d)"):format(rootKey, i)
+        if not hasXMLProperty(xmlFile, eKey) then break end
+        local uid   = getXMLString(xmlFile, eKey .. "#uniqueId")
+        local price = getXMLInt(xmlFile, eKey .. "#price") or 0
+        if uid ~= nil and price > 0 then
+            UsedEquipmentYards.recentSales[#UsedEquipmentYards.recentSales + 1] = {
+                uniqueId = uid,
+                price    = price,
+            }
+        end
+        i = i + 1
+    end
+end
+
+-- ---------------------------------------------------------------------------
+-- Recent sales network streaming (for InitialClientStateEvent)
+-- ---------------------------------------------------------------------------
+
+function UsedEquipmentYards.writeRecentSalesStream(streamId)
+    local sales = UsedEquipmentYards.recentSales
+    streamWriteInt32(streamId, #sales)
+    for _, entry in ipairs(sales) do
+        streamWriteString(streamId, entry.uniqueId)
+        streamWriteInt32(streamId, entry.price)
+    end
+end
+
+function UsedEquipmentYards.readRecentSalesStream(streamId)
+    UsedEquipmentYards.recentSales = {}
+    local count = streamReadInt32(streamId)
+    for _ = 1, count do
+        local uid   = streamReadString(streamId)
+        local price = streamReadInt32(streamId)
+        if uid ~= nil and price > 0 then
+            UsedEquipmentYards.recentSales[#UsedEquipmentYards.recentSales + 1] = {
+                uniqueId = uid,
+                price    = price,
+            }
+        end
     end
 end
 

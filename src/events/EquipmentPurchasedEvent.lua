@@ -7,12 +7,14 @@ function EquipmentPurchasedEvent.emptyNew()
     return Event.new(EquipmentPurchasedEvent_mt)
 end
 
-function EquipmentPurchasedEvent.new(yardId, itemIndex, farmId, creditUsed)
+function EquipmentPurchasedEvent.new(yardId, itemIndex, farmId, creditUsed, vehicleUniqueId, purchasePrice)
     local self = EquipmentPurchasedEvent.emptyNew()
-    self.yardId     = yardId
-    self.itemIndex  = itemIndex
-    self.farmId     = farmId
-    self.creditUsed = creditUsed or 0
+    self.yardId          = yardId
+    self.itemIndex       = itemIndex
+    self.farmId          = farmId
+    self.creditUsed      = creditUsed or 0
+    self.vehicleUniqueId = vehicleUniqueId or ""
+    self.purchasePrice   = purchasePrice or 0
     return self
 end
 
@@ -21,13 +23,17 @@ function EquipmentPurchasedEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, self.itemIndex)
     streamWriteInt32(streamId, self.farmId)
     streamWriteInt32(streamId, self.creditUsed)
+    streamWriteString(streamId, self.vehicleUniqueId)
+    streamWriteInt32(streamId, self.purchasePrice)
 end
 
 function EquipmentPurchasedEvent:readStream(streamId, connection)
-    self.yardId     = streamReadInt32(streamId)
-    self.itemIndex  = streamReadInt32(streamId)
-    self.farmId     = streamReadInt32(streamId)
-    self.creditUsed = streamReadInt32(streamId)
+    self.yardId          = streamReadInt32(streamId)
+    self.itemIndex       = streamReadInt32(streamId)
+    self.farmId          = streamReadInt32(streamId)
+    self.creditUsed      = streamReadInt32(streamId)
+    self.vehicleUniqueId = streamReadString(streamId)
+    self.purchasePrice   = streamReadInt32(streamId)
     self:run(connection)
 end
 
@@ -63,6 +69,9 @@ function EquipmentPurchasedEvent:run(connection)
         end
 
         local vehicle = item.vehicle
+        local vehicleUniqueId = (vehicle ~= nil) and vehicle.uniqueId or ""
+        local purchasePrice = item.price
+
         if vehicle ~= nil then
             vehicle:setOwnerFarmId(self.farmId)
             PriceTagRenderer.removeTag(vehicle)
@@ -70,11 +79,14 @@ function EquipmentPurchasedEvent:run(connection)
             EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
         end
 
+        -- Record this sale so resale offers are capped below purchase price.
+        UsedEquipmentYards.addRecentSale(vehicleUniqueId, purchasePrice)
+
         -- Remove from inventory tracking; keepVehicle=true — vehicle stays.
         yard.inventory:removeItem(item, true)
 
         -- Broadcast so remote multiplayer clients also clean up their state.
-        g_server:broadcastEvent(EquipmentPurchasedEvent.new(self.yardId, self.itemIndex, self.farmId, creditUsed))
+        g_server:broadcastEvent(EquipmentPurchasedEvent.new(self.yardId, self.itemIndex, self.farmId, creditUsed, vehicleUniqueId, purchasePrice))
         return
     end
 
@@ -103,6 +115,11 @@ function EquipmentPurchasedEvent:run(connection)
     -- Sync credit deduction on this client.
     if self.creditUsed > 0 then
         YardCredit.deductCredit(self.farmId, self.yardId, self.creditUsed)
+    end
+
+    -- Record this sale so resale offers are capped below purchase price.
+    if self.vehicleUniqueId ~= "" and self.purchasePrice > 0 then
+        UsedEquipmentYards.addRecentSale(self.vehicleUniqueId, self.purchasePrice)
     end
 
     -- Clean up client-side item registry (remote MP clients).

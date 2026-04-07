@@ -154,6 +154,11 @@ function TestDriveEvent:serverReturnTestDrive(item, yard)
         end
     end
 
+    -- Stop engine before teleporting back.
+    if vehicle.stopMotor ~= nil then
+        vehicle:stopMotor()
+    end
+
     -- Remove from physics, teleport, re-add (ensures clean repositioning).
     vehicle:removeFromPhysics()
     vehicle:setAbsolutePosition(td.origX, td.origY, td.origZ, td.origRx, td.origRy, td.origRz)

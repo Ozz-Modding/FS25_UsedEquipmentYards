@@ -53,6 +53,9 @@ function InitialClientStateEvent:writeStream(streamId, connection)
     -- Sell offer cache.
     SellBarterDialog.writeOfferCacheStream(streamId)
 
+    -- Recent sales memory.
+    UsedEquipmentYards.writeRecentSalesStream(streamId)
+
     -- Yard vehicle items — so remote clients can interact with them.
     local totalItems = 0
     for _, yard in pairs(yards) do
@@ -111,6 +114,9 @@ function InitialClientStateEvent:readStream(streamId, connection)
 
     -- Sell offer cache.
     SellBarterDialog.readOfferCacheStream(streamId)
+
+    -- Recent sales memory.
+    UsedEquipmentYards.readRecentSalesStream(streamId)
 
     -- Yard vehicle items.
     local totalItems = streamReadInt32(streamId)
