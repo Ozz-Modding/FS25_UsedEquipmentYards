@@ -57,6 +57,22 @@ YardInventory.QUALITY                  = {
         wearMin = 0.05,
         wearMax = 0.25,
     },
+    EX_DEMO = {
+        hoursMin = 1,
+        hoursMax = 4,
+        damageMin = 0.0,
+        damageMax = 0.05,
+        wearMin = 0.0,
+        wearMax = 0.10,
+    },
+    NEW = {
+        hoursMin = 0.2,
+        hoursMax = 1,
+        damageMin = 0.0,
+        damageMax = 0.0,
+        wearMin = 0.0,
+        wearMax = 0.0,
+    },
 }
 
 -- ---------------------------------------------------------------------------
@@ -945,10 +961,17 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             vehicle:setOperatingTime(item.operatingTime or 0)
 
             -- Apply dirt based on yard dirtiness config ± DIRT_RANGE.
+            -- NEW quality forces zero dirt; EX_DEMO caps dirt at a light dusting.
             if vehicle.setDirtAmount ~= nil then
-                local base = self.config.dirtiness or 0.20
-                local range = YardInventory.DIRT_RANGE
-                local dirt = base + (math.random() * 2 - 1) * range
+                local qualityKey = self.config.quality
+                local dirt
+                if qualityKey == "NEW" or qualityKey == "EX_DEMO" then
+                    dirt = 0
+                else
+                    local base = self.config.dirtiness or 0.20
+                    local range = YardInventory.DIRT_RANGE
+                    dirt = base + (math.random() * 2 - 1) * range
+                end
                 vehicle:setDirtAmount(math.max(0, math.min(1, dirt)))
             end
 

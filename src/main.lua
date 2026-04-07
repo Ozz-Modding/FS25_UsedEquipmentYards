@@ -394,13 +394,13 @@ if PlayerHUDUpdater ~= nil then
         box:setTitle(vehicle:getFullName())
         box:addLine(g_i18n:getText("uey_hud_forSale"), g_i18n:formatMoney(item.price))
 
-        local damagePercent = math.floor((item.damage or 0) * 100)
-        local wearPercent   = math.floor((item.wear   or 0) * 100)
-        local hours         = math.floor((item.operatingTime or 0) / 3600000)
+        local damagePercent = (item.damage or 0) * 100
+        local wearPercent   = (item.wear   or 0) * 100
+        local hours         = (item.operatingTime or 0) / 3600000
 
-        box:addLine(g_i18n:getText("uey_hud_damage"), ("%d %%"):format(damagePercent))
-        box:addLine(g_i18n:getText("uey_hud_wear"),   ("%d %%"):format(wearPercent))
-        box:addLine(g_i18n:getText("uey_hud_hours"),   tostring(hours))
+        box:addLine(g_i18n:getText("uey_hud_damage"), ("%.2f %%"):format(damagePercent))
+        box:addLine(g_i18n:getText("uey_hud_wear"),   ("%.2f %%"):format(wearPercent))
+        box:addLine(g_i18n:getText("uey_hud_hours"),   ("%.2f"):format(hours))
         box:showNextFrame()
     end)
 end

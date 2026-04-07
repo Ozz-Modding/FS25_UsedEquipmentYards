@@ -156,7 +156,6 @@ function BarterDialog:populateDialog()
         g_storeManager:getItemByXMLFilename(vehicle.configFileName).brandIndex) or nil
     self.brandText:setText(brand ~= nil and brand.title or "—")
     self.ownersText:setText(tostring(item.numOwners or 1))
-    self.hoursText:setText(tostring(math.floor((item.operatingTime or 0) / 3600000)))
     self.damageText:setText(("%d %%"):format(math.floor((item.damage or 0) * 100)))
     self.wearText:setText(("%d %%"):format(math.floor((item.wear or 0) * 100)))
 

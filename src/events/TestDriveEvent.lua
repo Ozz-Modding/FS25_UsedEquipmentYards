@@ -154,9 +154,12 @@ function TestDriveEvent:serverReturnTestDrive(item, yard)
         end
     end
 
-    -- Stop engine before teleporting back.
+    -- Stop engine and turn off lights before teleporting back.
     if vehicle.stopMotor ~= nil then
         vehicle:stopMotor()
+    end
+    if vehicle.deactivateLights ~= nil then
+        vehicle:deactivateLights()
     end
 
     -- Remove from physics, teleport, re-add (ensures clean repositioning).

@@ -19,14 +19,11 @@
                 <Text profile="ueyWeightLabel" text="$l10n_uey_barter_owners" position="320px -34px"  size="90px 20px"/>
                 <Text profile="ueySettingLabel" text="" id="ownersText"       position="410px -34px"  size="100px 20px"/>
 
-                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_hours"  position="10px -54px"   size="90px 20px"/>
-                <Text profile="ueySettingLabel" text="" id="hoursText"        position="100px -54px"  size="200px 20px"/>
+                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_damage" position="10px -54px"   size="90px 20px"/>
+                <Text profile="ueySettingLabel" text="" id="damageText"       position="100px -54px"  size="100px 20px"/>
 
-                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_damage" position="320px -54px"  size="90px 20px"/>
-                <Text profile="ueySettingLabel" text="" id="damageText"       position="410px -54px"  size="100px 20px"/>
-
-                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_wear"   position="10px -74px"   size="90px 20px"/>
-                <Text profile="ueySettingLabel" text="" id="wearText"         position="100px -74px"  size="200px 20px"/>
+                <Text profile="ueyWeightLabel" text="$l10n_uey_barter_wear"   position="320px -54px"  size="90px 20px"/>
+                <Text profile="ueySettingLabel" text="" id="wearText"         position="410px -54px"  size="200px 20px"/>
             </GuiElement>
 
             <!-- ======== ROW 2: Specifications (horizontal wrap, scrollable) ======== -->

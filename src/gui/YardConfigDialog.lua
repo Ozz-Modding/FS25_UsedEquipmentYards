@@ -7,7 +7,7 @@ YardConfigDialog                      = {}
 
 local YardConfigDialog_mt             = Class(YardConfigDialog, MessageDialog)
 
-YardConfigDialog.QUALITY_OPTIONS      = { "LOW", "MEDIUM", "HIGH" }
+YardConfigDialog.QUALITY_OPTIONS      = { "LOW", "MEDIUM", "HIGH", "EX_DEMO", "NEW" }
 YardConfigDialog.DIRTINESS_STEP       = 0.05 -- 5% increments
 YardConfigDialog.MAX_WEIGHT           = 10
 YardConfigDialog.MAX_BRAND_WEIGHT     = 3

@@ -34,7 +34,7 @@
         <text name="uey_config_quality"          text="Quality"/>
         <text name="uey_config_quality_desc"     text="Controls the hours, damage and wear of equipment. Lower quality equipment will cost less than higher quality equipment."/>
         <text name="uey_config_dirtiness"        text="Dirtiness"/>
-        <text name="uey_config_dirtiness_desc"   text="Average dirt level of equipment."/>
+        <text name="uey_config_dirtiness_desc"   text="Average dirt level. Not used for Ex-Demo and New Quality."/>
         <text name="uey_config_workingWidth"      text="Working Width"/>
         <text name="uey_config_workingWidth_desc" text="Filter equipment by working width."/>
         <text name="uey_config_minWorkingWidth"  text="Min Width"/>
@@ -60,6 +60,8 @@
         <text name="uey_config_quality_LOW"      text="Low"/>
         <text name="uey_config_quality_MEDIUM"   text="Medium"/>
         <text name="uey_config_quality_HIGH"     text="High"/>
+        <text name="uey_config_quality_EX_DEMO" text="Ex-Demo"/>
+        <text name="uey_config_quality_NEW"     text="New"/>
 
         <!-- Barter dialog -->
         <text name="uey_action_barter"              text="Barter:"/>

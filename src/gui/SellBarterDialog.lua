@@ -122,7 +122,7 @@ function SellBarterDialog:calculateOffers(vehicle)
     -- the purchase price so the player can't profit from an immediate resale.
     local recentPrice = UsedEquipmentYards.getRecentSalePrice(vehicle.uniqueId)
     if recentPrice ~= nil and recentPrice > 0 then
-        local cap = recentPrice - 1
+        local cap = math.floor(recentPrice * 0.99)
         cashTotal   = math.min(cashTotal, cap)
         creditTotal = math.min(creditTotal, cap)
         hybridTotal = math.min(hybridTotal, cap)
