@@ -13,12 +13,12 @@
 
         Beta Changelog:
 
-        - Tightened up the pricing variance and also scaled it by price. 
-        - Yards track recent sales so you can no longer sell back equipment to a yard for profit.
-        - Returning a running test-drive vehicle will stop the motor and turn off the lights.
-        - Added Ex-Demo and New options for quality. These settings are for dealership yards and ignore dirt level.
-        - Removed hours from the info section of the barter dialog as more accurate values are in the specifications section.
-        - HUD stats improved toshow 2 decimal places
+- Tightened up the pricing variance and also scaled it by price. 
+- Yards track recent sales so you can no longer sell back equipment to a yard for profit.
+- Returning a running test-drive vehicle will stop the motor and turn off the lights.
+- Added Ex-Demo and New options for quality. These settings are for dealership yards and ignore dirt level.
+- Removed hours from the info section of the barter dialog as more accurate values are in the specifications section.
+- HUD stats improved toshow 2 decimal places
 
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]>
@@ -70,6 +70,8 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]>
         <storeItem xmlFilename="xml/YardFence.xml" />
         <storeItem xmlFilename="xml/UsedEquipmentYard.xml" />
         <storeItem xmlFilename="xml/SaleZone.xml" />
+        <storeItem xmlFilename="xml/smallAdBoard.xml" />
+        <storeItem xmlFilename="xml/largeAdBoard.xml" />
     </storeItems>
     <multiplayer supported="true"/>
     <l10n filenamePrefix="languages/l10n" />

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="simplePlaceable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
+        <storeData>
+        <name>Small Advertising Sign</name>
+        <image>textures/store_smallAdBoard.png</image>
+        <price>50</price>
+        <functions>
+            <function>This sign advertises: Offer Prices</function>
+        </functions>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>NONE</brand>
+        <species>PLACEABLE</species>
+        <category>decoration</category>
+        <brush>
+            <type>placeable</type>
+            <category>decoration</category>
+            <tab>decoration</tab>
+        </brush>
+		<canBeSold>true</canBeSold>
+    </storeData>
+
+    <base>
+        <filename>i3d/smallAdBoard.i3d</filename>
+	<boughtWithFarmland>true</boughtWithFarmland>
+    </base>
+
+    <placement useRandomYRotation="false" useManualYRotation="true" >
+        <testAreas>
+            <testArea startNode="testAreaStart01" endNode="testAreaEnd01" />
+        </testAreas>
+        <sounds>
+            <place template="smallImp" pitchScale="1.6"/>
+        </sounds>
+    </placement>
+
+    <clearAreas>
+        <clearArea startNode="clearArea1Start" widthNode="clearArea1Width" heightNode="clearArea1Height"/>
+    </clearAreas>
+
+    <leveling requireLeveling="true" maxSmoothDistance="2" maxSlope="75" maxEdgeAngle="30">
+        <levelAreas>
+            <levelArea startNode="levelArea1Start" widthNode="levelArea1Width" heightNode="levelArea1Height" groundType="asphalt"/>
+        </levelAreas>
+    </leveling>
+
+    <indoorAreas>
+        <indoorArea startNode="indoorArea1Start" widthNode="indoorArea1Width" heightNode="indoorArea1Height"/>
+    </indoorAreas>
+
+    <ai>
+        <updateAreas>
+            <updateArea startNode="testArea1Start" endNode="testArea1End" />
+        </updateAreas>
+    </ai>
+	
+
+	<solarPanels>
+        <solarPanelsConfigurations title="Board Selection">
+			 <solarPanelsConfiguration name="Under 10000" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="10000" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>			
+			 <solarPanelsConfiguration name="Under 10000 (Pole)" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="10000" visibilityActive="true" visibilityInactive="false"/>
+                <objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			 <solarPanelsConfiguration name="Under 75000" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="75000" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			 <solarPanelsConfiguration name="Under 75000 (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="75000" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			<solarPanelsConfiguration name="Under 100000" isActive="true" price="0" incomePerHour="0">
+		        <objectChange node="100000" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Under 100000 (Pole)" isActive="true" price="0" incomePerHour="0">
+		        <objectChange node="100000" visibilityActive="true" visibilityInactive="false"/>
+		        <objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+		
+			<solarPanelsConfiguration name="Under 250000" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="250000" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+			
+			<solarPanelsConfiguration name="Under 250000 (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="250000" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			<solarPanelsConfiguration name="Under 500000" isActive="true" price="0" incomePerHour="0">
+			    <objectChange node="500000" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Under 500000 (Pole)" isActive="true" price="0" incomePerHour="0">
+			    <objectChange node="500000" visibilityActive="true" visibilityInactive="false"/>
+			    <objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			<solarPanelsConfiguration name="Under 750000" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="750000" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Under 750000 (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="750000" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			<solarPanelsConfiguration name="Under 999999" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="999999" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Under 999999 (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="999999" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Pole Only" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+			
+			<solarPanelsConfiguration name="Keep Off" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="KeepOff" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+			
+			<solarPanelsConfiguration name="Keep Off (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="KeepOff" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+			
+			<solarPanelsConfiguration name="Lunch" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="Lunch" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+			
+			<solarPanelsConfiguration name="Lunch" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="Lunch" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+			
+			
+			<solarPanelsConfiguration name="No Parking" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="NoParking" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>					
+			
+			<solarPanelsConfiguration name="No Parking (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="NoParking" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>					
+			
+			<solarPanelsConfiguration name="Toilets (Left)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="WeeLeft" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>					
+			
+			<solarPanelsConfiguration name="Toilets (Left) (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="WeeLeft" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>					
+			
+			<solarPanelsConfiguration name="Toilets (Right)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="WeeRight" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>					
+			
+			<solarPanelsConfiguration name="Toilets (Right) (Pole)" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="WeeRight" visibilityActive="true" visibilityInactive="false"/>
+				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>			
+
+			
+
+			
+        </solarPanelsConfigurations>
+	</solarPanels>
+	
+    <i3dMappings>
+        <i3dMapping id="clearArea1Start" 	node="0>0|0" />
+        <i3dMapping id="clearArea1Width" 	node="0>0|0|0" />
+        <i3dMapping id="clearArea1Height" 	node="0>0|0|1" />
+        <i3dMapping id="levelArea1Start" 	node="0>1|0" />
+        <i3dMapping id="levelArea1Width" 	node="0>1|0|0" />
+        <i3dMapping id="levelArea1Height" 	node="0>1|0|1" />
+        <i3dMapping id="testArea1Start" 	node="0>2|0" />
+        <i3dMapping id="testArea1End" 		node="0>2|0|0" />
+		<i3dMapping id="10000" 				node="0>4|0" />
+		<i3dMapping id="75000" 				node="0>4|1" />
+		<i3dMapping id="100000" 			node="0>4|2" />
+		<i3dMapping id="250000" 			node="0>4|3" />
+		<i3dMapping id="500000" 			node="0>4|4" />
+		<i3dMapping id="750000" 			node="0>4|5" />
+		<i3dMapping id="999999" 			node="0>4|6" />
+		<i3dMapping id="pole" 				node="0>4|7" />
+		<i3dMapping id="KeepOff" 			node="0>4|8" />
+		<i3dMapping id="Lunch" 				node="0>4|9" />
+		<i3dMapping id="NoParking" 			node="0>4|10" />
+		<i3dMapping id="WeeLeft" 			node="0>4|11" />
+		<i3dMapping id="WeeRight" 			node="0>4|12" />
+    </i3dMappings>
+</placeable>

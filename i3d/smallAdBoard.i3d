@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="smallAdBoard.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.11"/>
+  </Asset>
+
+  <Files>
+    <File fileId="1" filename="../textures/10000.png"/>
+    <File fileId="5" filename="../textures/100000.png"/>
+    <File fileId="6" filename="../textures/250000.png"/>
+    <File fileId="7" filename="../textures/500000.png"/>
+    <File fileId="4" filename="../textures/75000.png"/>
+    <File fileId="8" filename="../textures/750000.png"/>
+    <File fileId="9" filename="../textures/999999.png"/>
+    <File fileId="17" filename="../textures/KeepOff.dds"/>
+    <File fileId="19" filename="../textures/NoParking.dds"/>
+    <File fileId="20" filename="../textures/WeeLeft.dds"/>
+    <File fileId="21" filename="../textures/WeeRight.dds"/>
+    <File fileId="18" filename="../textures/lunch.dds"/>
+    <File fileId="2" filename="$data/maps/textures/shared/default_normal.png"/>
+    <File fileId="3" filename="$data/maps/textures/shared/default_specular.png"/>
+    <File fileId="11" filename="$data/placeables/brandless/fences/EU/fence02/fence02_diffuse.png"/>
+    <File fileId="12" filename="$data/placeables/brandless/fences/EU/fence02/fence02_normal.png"/>
+    <File fileId="13" filename="$data/placeables/brandless/fences/EU/fence02/fence02_specular.png"/>
+    <File fileId="14" filename="$data/shaders/placeableShader.xml"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="fence02_mat" materialId="5" customShaderId="14">
+      <Texture fileId="11"/>
+      <Normalmap fileId="12"/>
+      <Glossmap fileId="13"/>
+    </Material>
+    <Material name="lambert1" materialId="6" diffuseColor="0.164706 0.164706 0.164706 1">
+    </Material>
+    <Material name="Sign" materialId="7">
+      <Texture fileId="5"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="8">
+      <Texture fileId="6"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="9">
+      <Texture fileId="7"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="10">
+      <Texture fileId="4"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="11">
+      <Texture fileId="8"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="12">
+      <Texture fileId="9"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="72">
+      <Texture fileId="17"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="80">
+      <Texture fileId="18"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="94">
+      <Texture fileId="19"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="106">
+      <Texture fileId="20"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign" materialId="114">
+      <Texture fileId="21"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="Sign1" materialId="13">
+      <Texture fileId="1"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="smallAdBoard.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="Sign" nodeId="20">
+      <TransformGroup name="clearAreas" nodeId="21">
+        <TransformGroup name="clearAreaStart01" translation="-0.397 -4.76837e-07 -0.11527" nodeId="22">
+          <TransformGroup name="clearAreaWidth01" translation="0.869 4.76837e-07 0.0074481" nodeId="23"/>
+          <TransformGroup name="clearAreaHeight01" translation="0.009 -4.76837e-07 0.31434" nodeId="24"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="levelAreas" nodeId="25">
+        <TransformGroup name="levelAreaStart01" translation="-0.397265 -4.8e-07 -0.11527" nodeId="26">
+          <TransformGroup name="levelAreaWidth01" translation="0.868833 4.8e-07 0.0074481" nodeId="27"/>
+          <TransformGroup name="levelAreaHeight01" translation="0.009 -4.8e-07 0.31434" nodeId="28"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="indoorAreas" nodeId="29">
+        <TransformGroup name="indoorAreaStart01" translation="-0.397265 -4.8e-07 -0.11527" nodeId="30">
+          <TransformGroup name="indoorAreaWidth01" translation="0.868833 4.8e-07 0.0074481" nodeId="31"/>
+          <TransformGroup name="indoorAreaHeight01" translation="0.009 -4.8e-07 0.31434" nodeId="32"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="testAreas" nodeId="33">
+        <TransformGroup name="testAreaStart01" translation="-0.397265 -4.8e-07 -0.11527" nodeId="34">
+          <TransformGroup name="testAreaEnd01" translation="0.868833 4.8e-07 0.211531" nodeId="35"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="visuals" rotation="-0 90 0" clipDistance="80" nodeId="36">
+        <Shape name="10000" shapeId="1" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="37" castsShadows="true" receiveShadows="true" materialIds="13"/>
+        <Shape name="75000" shapeId="1" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="38" castsShadows="true" receiveShadows="true" materialIds="10"/>
+        <Shape name="100000" shapeId="2" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="39" castsShadows="true" receiveShadows="true" materialIds="7"/>
+        <Shape name="250000" shapeId="2" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="40" castsShadows="true" receiveShadows="true" materialIds="8"/>
+        <Shape name="500000" rotation="0 -4.07111e-13 0" shapeId="2" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="41" castsShadows="true" receiveShadows="true" materialIds="9"/>
+        <Shape name="750000" shapeId="2" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="42" castsShadows="true" receiveShadows="true" materialIds="11"/>
+        <Shape name="999999" shapeId="3" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="43" castsShadows="true" receiveShadows="true" materialIds="12"/>
+        <TransformGroup name="Pole01" translation="-0.0226727 -0.300577 -0.209742" rotation="-0 -90 0" scale="1 0.830672 1" clipDistance="121" nodeId="44">
+          <Shape name="col" shapeId="4" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" nodeId="45" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="visual" shapeId="5" nodeId="46" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <TransformGroup name="Pole01" translation="0.487261 0 -0.12928" clipDistance="121" nodeId="47">
+            <Shape name="col" shapeId="4" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" nodeId="48" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+            <Shape name="visual" shapeId="5" nodeId="49" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          </TransformGroup>
+        </TransformGroup>
+        <Shape name="KeepOff" shapeId="3" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="55" castsShadows="true" receiveShadows="true" materialIds="72"/>
+        <Shape name="Lunch" shapeId="3" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="76" castsShadows="true" receiveShadows="true" materialIds="80"/>
+        <Shape name="NoParking" shapeId="3" visibility="false" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="90" castsShadows="true" receiveShadows="true" materialIds="94"/>
+        <Shape name="WeeLeft" shapeId="3" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="102" castsShadows="true" receiveShadows="true" materialIds="106"/>
+        <Shape name="WeeRight" shapeId="3" static="true" collisionFilterGroup="0x3e" collisionFilterMask="0xfffffbff" clipDistance="3000" nodeId="110" castsShadows="true" receiveShadows="true" materialIds="114"/>
+      </TransformGroup>
+    </TransformGroup>
+  </Scene>
+
+</i3D>

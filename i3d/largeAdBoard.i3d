@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="largeAdBoard.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.11"/>
+  </Asset>
+
+  <Files>
+    <File fileId="8" filename="../textures/AdL01.dds"/>
+    <File fileId="11" filename="../textures/AdL02.dds"/>
+    <File fileId="12" filename="../textures/AdL03.dds"/>
+    <File fileId="13" filename="../textures/AdL04.dds"/>
+    <File fileId="14" filename="../textures/AdL05.dds"/>
+    <File fileId="15" filename="../textures/AdL06.dds"/>
+    <File fileId="16" filename="../textures/AdL07.dds"/>
+    <File fileId="17" filename="../textures/AdL08.dds"/>
+    <File fileId="18" filename="../textures/AdL09.dds"/>
+    <File fileId="19" filename="../textures/AdL10.dds"/>
+    <File fileId="20" filename="../textures/AdL_Ross.dds"/>
+    <File fileId="1" filename="$data/maps/mapAS/textures/props/ads/adGround_diffuse.png"/>
+    <File fileId="2" filename="$data/maps/mapAS/textures/props/ads/adGround_normal.png"/>
+    <File fileId="3" filename="$data/maps/mapAS/textures/props/ads/adGround_specular.png"/>
+    <File fileId="4" filename="$data/shaders/placeableShader.xml"/>
+    <File fileId="9" filename="$data/shared/default_normal.dds"/>
+    <File fileId="10" filename="$data/shared/default_specular.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="adGround_mat" materialId="5" customShaderId="4">
+      <Texture fileId="1"/>
+      <Normalmap fileId="2"/>
+      <Glossmap fileId="3"/>
+    </Material>
+    <Material name="lambert1" materialId="6" diffuseColor="0.501961 0.501961 0.501961 1">
+    </Material>
+    <Material name="Material.001" materialId="7">
+      <Texture fileId="8"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="8">
+      <Texture fileId="11"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="9">
+      <Texture fileId="12"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="10">
+      <Texture fileId="13"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="11">
+      <Texture fileId="14"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="12">
+      <Texture fileId="15"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="13">
+      <Texture fileId="16"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="14">
+      <Texture fileId="17"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="15">
+      <Texture fileId="18"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="86">
+      <Texture fileId="19"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="16">
+      <Texture fileId="20"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="largeAdBoard.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="Sign" nodeId="21">
+      <TransformGroup name="clearAreas" nodeId="22">
+        <TransformGroup name="clearAreaStart01" translation="-0.595 -4.76837e-07 -0.303824" nodeId="23">
+          <TransformGroup name="clearAreaWidth01" translation="1.351 4.76837e-07 0.0074481" nodeId="24"/>
+          <TransformGroup name="clearAreaHeight01" translation="0.009 -4.76837e-07 0.605684" nodeId="25"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="levelAreas" nodeId="26">
+        <TransformGroup name="levelAreaStart01" translation="-0.594969 -4.8e-07 -0.303824" nodeId="27">
+          <TransformGroup name="levelAreaWidth01" translation="1.35125 4.8e-07 0.0074481" nodeId="28"/>
+          <TransformGroup name="levelAreaHeight01" translation="0.009 -4.8e-07 0.605684" nodeId="29"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="indoorAreas" nodeId="30">
+        <TransformGroup name="indoorAreaStart01" translation="-0.594969 -4.8e-07 -0.303824" nodeId="31">
+          <TransformGroup name="indoorAreaWidth01" translation="1.35125 4.8e-07 0.0074481" nodeId="32"/>
+          <TransformGroup name="indoorAreaHeight01" translation="0.009 -4.8e-07 0.605684" nodeId="33"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="testAreas" nodeId="34">
+        <TransformGroup name="testAreaStart01" translation="-0.529422 -4.8e-07 -0.333839" nodeId="35">
+          <TransformGroup name="testAreaEnd01" translation="1.03788 4.8e-07 0.635637" nodeId="36"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="visuals" rotation="-0 90 0" clipDistance="80" nodeId="37">
+        <TransformGroup name="largeAdBoard01" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="38">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="39" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="40" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="41" castsShadows="true" receiveShadows="true" materialIds="7"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard02" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="42">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="43" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="44" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="45" castsShadows="true" receiveShadows="true" materialIds="8"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard03" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="46">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="47" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="48" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="49" castsShadows="true" receiveShadows="true" materialIds="9"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard04" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="50">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="51" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="52" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="53" castsShadows="true" receiveShadows="true" materialIds="10"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard05" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="54">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="55" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="56" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="57" castsShadows="true" receiveShadows="true" materialIds="11"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard06" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="58">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="59" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="60" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="61" castsShadows="true" receiveShadows="true" materialIds="12"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard07" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="62">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="63" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="64" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="65" castsShadows="true" receiveShadows="true" materialIds="13"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard08" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="66">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="67" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="68" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="69" castsShadows="true" receiveShadows="true" materialIds="14"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard09" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="70">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="71" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="72" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="73" castsShadows="true" receiveShadows="true" materialIds="15"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard10" rotation="-0 -90 0" clipDistance="80" nodeId="79">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="80" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="81" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="82" castsShadows="true" receiveShadows="true" materialIds="86"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard_Ross" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="74">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="75" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="76" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL_Ross" rotation="90 -0 0" shapeId="3" nodeId="77" castsShadows="true" receiveShadows="true" materialIds="16"/>
+        </TransformGroup>
+      </TransformGroup>
+    </TransformGroup>
+  </Scene>
+
+</i3D>

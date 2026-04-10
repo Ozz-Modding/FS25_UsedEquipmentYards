@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<placeable type="simplePlaceable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
+        <storeData>
+        <name>Large Advertising Sign</name>
+        <image>textures/store_largeAdBoard.png</image>
+        <price>50</price>
+        <functions>
+            <function>This sign advertises: Brands and Deals </function>
+        </functions>
+        <dailyUpkeep>0</dailyUpkeep>
+        <lifetime>1000</lifetime>
+        <rotation>0</rotation>
+        <brand>NONE</brand>
+        <species>PLACEABLE</species>
+        <category>decoration</category>
+        <brush>
+            <type>placeable</type>
+            <category>decoration</category>
+            <tab>decoration</tab>
+        </brush>
+		<canBeSold>true</canBeSold>
+    </storeData>
+
+    <base>
+        <filename>i3d/largeAdBoard.i3d</filename>
+	<boughtWithFarmland>true</boughtWithFarmland>
+    </base>
+
+    <placement useRandomYRotation="false" useManualYRotation="true" >
+        <testAreas>
+            <testArea startNode="testAreaStart01" endNode="testAreaEnd01" />
+        </testAreas>
+        <sounds>
+            <place template="smallImp" pitchScale="1.6"/>
+        </sounds>
+    </placement>
+
+    <clearAreas>
+        <clearArea startNode="clearArea1Start" widthNode="clearArea1Width" heightNode="clearArea1Height"/>
+    </clearAreas>
+
+    <leveling requireLeveling="true" maxSmoothDistance="2" maxSlope="75" maxEdgeAngle="30">
+        <levelAreas>
+            <levelArea startNode="levelArea1Start" widthNode="levelArea1Width" heightNode="levelArea1Height" groundType="asphalt"/>
+        </levelAreas>
+    </leveling>
+
+    <indoorAreas>
+        <indoorArea startNode="indoorArea1Start" widthNode="indoorArea1Width" heightNode="indoorArea1Height"/>
+    </indoorAreas>
+
+    <ai>
+        <updateAreas>
+            <updateArea startNode="testArea1Start" endNode="testArea1End" />
+        </updateAreas>
+    </ai>
+	
+
+	<solarPanels>
+        <solarPanelsConfigurations title="Board Selection">
+			 <solarPanelsConfiguration name="Ad - Sold Here" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL01" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>			
+
+			 <solarPanelsConfiguration name="Ad - Low Prices" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdL02" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			<solarPanelsConfiguration name="Ad - You Sell We Buy" isActive="true" price="0" incomePerHour="0">
+		        <objectChange node="AdL03" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+		
+			<solarPanelsConfiguration name="Ad - Test Drives" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdL04" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+
+			<solarPanelsConfiguration name="Dealer - Massey" isActive="true" price="0" incomePerHour="0">
+			    <objectChange node="AdL05" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			<solarPanelsConfiguration name="Dealer - New Holland" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdL06" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+			<solarPanelsConfiguration name="Dealer - Claas" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdL07" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Dealer - John Deere" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdL08" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Dealer - Fendt" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdL09" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+			
+			<solarPanelsConfiguration name="Dealer - JCB" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdL10" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>	
+			
+			<solarPanelsConfiguration name="AdLRoss" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="AdLRoss" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
+
+        </solarPanelsConfigurations>
+	</solarPanels>
+	
+    <i3dMappings>
+        <i3dMapping id="clearArea1Start" 	node="0>0|0" />
+        <i3dMapping id="clearArea1Width" 	node="0>0|0|0" />
+        <i3dMapping id="clearArea1Height" 	node="0>0|0|1" />
+        <i3dMapping id="levelArea1Start" 	node="0>1|0" />
+        <i3dMapping id="levelArea1Width" 	node="0>1|0|0" />
+        <i3dMapping id="levelArea1Height" 	node="0>1|0|1" />
+        <i3dMapping id="testArea1Start" 	node="0>2|0" />
+        <i3dMapping id="testArea1End" 		node="0>2|0|0" />
+		<i3dMapping id="AdL01" 				node="0>4|0" />
+		<i3dMapping id="AdL02" 				node="0>4|1" />
+		<i3dMapping id="AdL03" 				node="0>4|2" />
+		<i3dMapping id="AdL04" 				node="0>4|3" />
+		<i3dMapping id="AdL05" 				node="0>4|4" />
+		<i3dMapping id="AdL06" 				node="0>4|5" />
+		<i3dMapping id="AdL07" 				node="0>4|6" />
+		<i3dMapping id="AdL08" 				node="0>4|7" />
+		<i3dMapping id="AdL09" 				node="0>4|8" />
+		<i3dMapping id="AdL10" 				node="0>4|9" />
+		<i3dMapping id="AdLRoss"			node="0>4|10" />
+    </i3dMappings>
+</placeable>
