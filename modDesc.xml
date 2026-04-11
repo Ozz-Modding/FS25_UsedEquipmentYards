@@ -47,6 +47,7 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]>
         <sourceFile filename="src/events/YardConfigChangedEvent.lua"/>
         <sourceFile filename="src/events/VehicleItemRemovedEvent.lua"/>
         <sourceFile filename="src/events/BarterAttemptEvent.lua"/>
+        <sourceFile filename="src/events/ResetInventoryEvent.lua"/>
         <sourceFile filename="src/YardNameGenerator.lua"/>
         <sourceFile filename="src/YardConfigActivatable.lua"/>
         <sourceFile filename="src/YardVehicleActivatable.lua"/>

@@ -194,6 +194,9 @@
         <text name="configname_plot29"          text="Plot 29"/>
         <text name="configname_plot30"          text="Plot 30"/>
 
+        <!-- Permissions -->
+        <text name="uey_warning_adminOnly"     text="Only the server admin can place or remove yards."/>
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>

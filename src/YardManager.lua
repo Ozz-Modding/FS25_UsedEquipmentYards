@@ -111,6 +111,9 @@ function YardManager:save()
 end
 
 function YardManager:onHourChanged()
+    local count = 0
+    for _ in pairs(self.yards) do count = count + 1 end
+    print(("[UsedEquipmentYards] onHourChanged — %d yard(s)"):format(count))
     for _, yard in pairs(self.yards) do
         yard.inventory:onHourChanged()
     end

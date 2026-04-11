@@ -108,12 +108,29 @@ function UsedEquipmentYards:unregisterConsoleCommands()
 end
 
 function UsedEquipmentYards:consoleResetInventory(id)
-    if self.yardManager == nil then return "YardManager not active (server only)." end
-    if id == nil or id == "all" then
-        self.yardManager:resetAllInventories()
-        return "All yard inventories reset."
+    -- Server: execute directly.
+    if self.yardManager ~= nil then
+        if id == nil or id == "all" then
+            self.yardManager:resetAllInventories()
+            return "All yard inventories reset."
+        end
+        return self.yardManager:resetInventory(tonumber(id))
     end
-    return self.yardManager:resetInventory(tonumber(id))
+
+    -- Client (admin on dedicated server): send event to server.
+    if g_client ~= nil and g_currentMission.isMasterUser then
+        local yardId = -1
+        if id ~= nil and id ~= "all" then
+            yardId = tonumber(id) or -1
+        end
+        g_client:getServerConnection():sendEvent(ResetInventoryEvent.new(yardId))
+        if yardId == -1 then
+            return "Reset all inventories requested (sent to server)."
+        end
+        return ("Reset inventory for yard %d requested (sent to server)."):format(yardId)
+    end
+
+    return "Only the server host or admin can reset inventories."
 end
 
 -- ---------------------------------------------------------------------------

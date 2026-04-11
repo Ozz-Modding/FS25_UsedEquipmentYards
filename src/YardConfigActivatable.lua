@@ -21,6 +21,9 @@ function YardConfigActivatable:getIsActivatable()
     if g_localPlayer == nil or g_localPlayer.rootNode == nil then return false end
     if g_localPlayer:getCurrentVehicle() ~= nil then return false end
 
+    -- MP: only server admins can configure yards.
+    if not PlaceableUsedEquipmentYard.isAdminInMP() then return false end
+
     -- Must be inside the yard bounds.
     local px, _, pz = getWorldTranslation(g_localPlayer.rootNode)
     if not self.yard:containsPoint(px, pz) then return false end
@@ -30,8 +33,15 @@ end
 
 function YardConfigActivatable:getDistance(x, y, z)
     if self.yard == nil then return math.huge end
+    -- If the player is inside the yard, return a small distance so the
+    -- prompt passes the activatable system's distance threshold. The yard
+    -- can be much larger than that threshold, so measuring from the centre
+    -- would hide the prompt near the edges.
+    if self.yard:containsPoint(x, z) then
+        return 2.0
+    end
     local b = self.yard.bounds
-    return MathUtil.vector3Length(x - b.cx, y - (b.cy or 0), z - b.cz) + 0.5
+    return MathUtil.vector3Length(x - b.cx, y - (b.cy or 0), z - b.cz)
 end
 
 function YardConfigActivatable:run()
