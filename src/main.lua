@@ -267,9 +267,12 @@ end
 
 --- Register a yard received from the server. Creates a lightweight UsedEquipmentYard
 --- (no server-side spawning) and adds a YardConfigActivatable for the local player.
-function UsedEquipmentYards.registerClientYard(yardId, yardName, bounds)
+function UsedEquipmentYards.registerClientYard(yardId, yardName, bounds, config)
     if UsedEquipmentYards.clientYards[yardId] ~= nil then return end
     local yard = UsedEquipmentYard.new(yardId, yardName, bounds)
+    if config ~= nil then
+        yard.inventory:applyConfig(config)
+    end
     UsedEquipmentYards.clientYards[yardId] = yard
     UsedEquipmentYards.addActivatable(yard)
 end

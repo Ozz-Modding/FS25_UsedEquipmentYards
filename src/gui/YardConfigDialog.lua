@@ -409,18 +409,22 @@ function YardConfigDialog:onNameEscPressed()
 end
 
 function YardConfigDialog:onClickApply()
-    if self.yard ~= nil and self.config ~= nil then
-        self.yard.inventory:applyConfig(self.config)
+    if self.yard == nil or self.config == nil then
+        YardConfigDialog:superClass().close(self)
+        return
     end
 
-    -- Apply name change.
-    if self.yard ~= nil and self.yardNameInput ~= nil then
+    local yardName = self.yard.name
+    if self.yardNameInput ~= nil then
         local newName = self.yardNameInput:getText()
-        if newName ~= nil and newName ~= "" and newName ~= self.yard.name then
-            YardNameGenerator.rename(self.yard.name, newName)
-            self.yard.name = newName
+        if newName ~= nil and newName ~= "" then
+            yardName = newName
         end
     end
+
+    -- Send event to server for authoritative application and broadcast.
+    g_client:getServerConnection():sendEvent(
+        YardConfigChangedEvent.new(self.yard.id, yardName, self.config))
 
     YardConfigDialog:superClass().close(self)
 end

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <placeable type="simplePlaceable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
         <storeData>
-        <name>Large Advertising Sign</name>
+        <name>$l10n_largeAdSign</name>
         <image>textures/store_largeAdBoard.png</image>
         <price>50</price>
         <functions>
-            <function>This sign advertises: Brands and Deals </function>
+            <function>$l10n_function_largeAdSign</function>
         </functions>
         <dailyUpkeep>0</dailyUpkeep>
         <lifetime>1000</lifetime>
@@ -57,48 +57,48 @@
 	
 
 	<solarPanels>
-        <solarPanelsConfigurations title="Board Selection">
-			 <solarPanelsConfiguration name="Ad - Sold Here" isActive="true" price="0" incomePerHour="0">
+        <solarPanelsConfigurations title="$l10n_config_Board">
+			 <solarPanelsConfiguration name="$l10n_configname_soldHere" isActive="true" price="0" incomePerHour="0">
                 <objectChange node="AdL01" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>			
 
-			 <solarPanelsConfiguration name="Ad - Low Prices" isActive="true" price="0" incomePerHour="0">
+			 <solarPanelsConfiguration name="$l10n_configname_lowPrices" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdL02" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="Ad - You Sell We Buy" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_weBuy" isActive="true" price="0" incomePerHour="0">
 		        <objectChange node="AdL03" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 		
-			<solarPanelsConfiguration name="Ad - Test Drives" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_testDrives" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdL04" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 
-			<solarPanelsConfiguration name="Dealer - Massey" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_massey" isActive="true" price="0" incomePerHour="0">
 			    <objectChange node="AdL05" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="Dealer - New Holland" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_newHolland" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdL06" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="Dealer - Claas" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_claas" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdL07" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Dealer - John Deere" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_johnDeere" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdL08" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Dealer - Fendt" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_fendt" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdL09" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Dealer - JCB" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_jcb" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdL10" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 			
-			<solarPanelsConfiguration name="AdLRoss" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_rossAgri" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="AdLRoss" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 

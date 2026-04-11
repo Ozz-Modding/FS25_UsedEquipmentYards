@@ -44,6 +44,9 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]>
         <sourceFile filename="src/gui/SellBarterDialog.lua"/>
         <sourceFile filename="src/events/VehicleSoldEvent.lua"/>
         <sourceFile filename="src/events/OfferCacheSyncEvent.lua"/>
+        <sourceFile filename="src/events/YardConfigChangedEvent.lua"/>
+        <sourceFile filename="src/events/VehicleItemRemovedEvent.lua"/>
+        <sourceFile filename="src/events/BarterAttemptEvent.lua"/>
         <sourceFile filename="src/YardNameGenerator.lua"/>
         <sourceFile filename="src/YardConfigActivatable.lua"/>
         <sourceFile filename="src/YardVehicleActivatable.lua"/>
@@ -72,6 +75,7 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards]]>
         <storeItem xmlFilename="xml/SaleZone.xml" />
         <storeItem xmlFilename="xml/smallAdBoard.xml" />
         <storeItem xmlFilename="xml/largeAdBoard.xml" />
+        <storeItem xmlFilename="xml/plotBoard.xml" />
     </storeItems>
     <multiplayer supported="true"/>
     <l10n filenamePrefix="languages/l10n" />

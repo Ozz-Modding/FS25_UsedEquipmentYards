@@ -115,6 +115,85 @@
         <text name="uey_credit_label"            text="Yard Credit"/>
         <text name="uey_credit_none"             text="None"/>
 
+        <!-- Signs: Large Ad Board -->
+        <text name="largeAdSign"                text="Large Advertising Sign"/>
+        <text name="function_largeAdSign"       text="This Sign Advertises Brands and Deals"/>
+        <text name="config_Board"               text="Board Selection"/>
+        <text name="configname_soldHere"        text="Ad - Sold Here"/>
+        <text name="configname_lowPrices"       text="Ad - Low Prices"/>
+        <text name="configname_weBuy"           text="Ad - You Sell We Buy"/>
+        <text name="configname_testDrives"      text="Ad - Test Drives"/>
+        <text name="configname_massey"          text="Dealer - Massey"/>
+        <text name="configname_newHolland"      text="Dealer - New Holland"/>
+        <text name="configname_claas"           text="Dealer - Claas"/>
+        <text name="configname_johnDeere"       text="Dealer - John Deere"/>
+        <text name="configname_fendt"           text="Dealer - Fendt"/>
+        <text name="configname_jcb"             text="Dealer - JCB"/>
+        <text name="configname_rossAgri"        text="Ross Agri Yard"/>
+
+        <!-- Signs: Small Ad Board -->
+        <text name="smallAdSign"                text="Small Advertising Sign"/>
+        <text name="function_smallAdSign"       text="This sign advertises Offer Prices"/>
+        <text name="configname_10000"           text="Under 10000"/>
+        <text name="configname_10000p"          text="Under 10000 (Pole)"/>
+        <text name="configname_75000"           text="Under 75000"/>
+        <text name="configname_75000p"          text="Under 75000 (Pole)"/>
+        <text name="configname_100000"          text="Under 100000"/>
+        <text name="configname_100000p"         text="Under 100000 (Pole)"/>
+        <text name="configname_250000"          text="Under 250000"/>
+        <text name="configname_250000p"         text="Under 250000 (Pole)"/>
+        <text name="configname_500000"          text="Under 500000"/>
+        <text name="configname_500000p"         text="Under 500000 (Pole)"/>
+        <text name="configname_750000"          text="Under 750000"/>
+        <text name="configname_750000p"         text="Under 750000 (Pole)"/>
+        <text name="configname_999999"          text="Under 999999"/>
+        <text name="configname_999999p"         text="Under 999999 (Pole)"/>
+        <text name="configname_PoleOnly"        text="Pole Only"/>
+        <text name="configname_KeepOff"         text="Keep Off Grass"/>
+        <text name="configname_KeepOffp"        text="Keep Off Grass (Pole)"/>
+        <text name="configname_Lunch"           text="Lunch"/>
+        <text name="configname_Lunchp"          text="Lunch (Pole)"/>
+        <text name="configname_NoParking"       text="No Parking"/>
+        <text name="configname_NoParkingp"      text="No Parking (Pole)"/>
+        <text name="configname_ToiletsLeft"     text="Toilets (Left)"/>
+        <text name="configname_ToiletsLeftp"    text="Toilets (Left) (Pole)"/>
+        <text name="configname_ToiletsRight"    text="Toilets (Right)"/>
+        <text name="configname_ToiletsRightp"   text="Toilets (Right) (Pole)"/>
+
+        <!-- Signs: Plot Board -->
+        <text name="plotSign"                   text="Plot Signs"/>
+        <text name="function_plotSign"          text="Assign Plots for Vehicles and Equipment"/>
+        <text name="configname_plot01"          text="Plot 01"/>
+        <text name="configname_plot02"          text="Plot 02"/>
+        <text name="configname_plot03"          text="Plot 03"/>
+        <text name="configname_plot04"          text="Plot 04"/>
+        <text name="configname_plot05"          text="Plot 05"/>
+        <text name="configname_plot06"          text="Plot 06"/>
+        <text name="configname_plot07"          text="Plot 07"/>
+        <text name="configname_plot08"          text="Plot 08"/>
+        <text name="configname_plot09"          text="Plot 09"/>
+        <text name="configname_plot10"          text="Plot 10"/>
+        <text name="configname_plot11"          text="Plot 11"/>
+        <text name="configname_plot12"          text="Plot 12"/>
+        <text name="configname_plot13"          text="Plot 13"/>
+        <text name="configname_plot14"          text="Plot 14"/>
+        <text name="configname_plot15"          text="Plot 15"/>
+        <text name="configname_plot16"          text="Plot 16"/>
+        <text name="configname_plot17"          text="Plot 17"/>
+        <text name="configname_plot18"          text="Plot 18"/>
+        <text name="configname_plot19"          text="Plot 19"/>
+        <text name="configname_plot20"          text="Plot 20"/>
+        <text name="configname_plot21"          text="Plot 21"/>
+        <text name="configname_plot22"          text="Plot 22"/>
+        <text name="configname_plot23"          text="Plot 23"/>
+        <text name="configname_plot24"          text="Plot 24"/>
+        <text name="configname_plot25"          text="Plot 25"/>
+        <text name="configname_plot26"          text="Plot 26"/>
+        <text name="configname_plot27"          text="Plot 27"/>
+        <text name="configname_plot28"          text="Plot 28"/>
+        <text name="configname_plot29"          text="Plot 29"/>
+        <text name="configname_plot30"          text="Plot 30"/>
+
         <!-- Console / status messages -->
         <text name="uey_yardCreated"           text="Yard '%s' created."/>
         <text name="uey_yardRemoved"           text="Yard '%s' removed."/>

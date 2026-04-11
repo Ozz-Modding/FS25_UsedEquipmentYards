@@ -23,6 +23,8 @@ function YardCreatedEvent:writeStream(streamId, connection)
     streamWriteFloat32(streamId, self.bounds.cz)
     streamWriteFloat32(streamId, self.bounds.sizeX)
     streamWriteFloat32(streamId, self.bounds.sizeZ)
+    streamWriteFloat32(streamId, self.bounds.anchorX or self.bounds.cx)
+    streamWriteFloat32(streamId, self.bounds.anchorZ or self.bounds.cz)
 
     -- Stream polygon vertices for accurate containsPoint on clients.
     local poly = self.bounds.polygon
@@ -46,6 +48,8 @@ function YardCreatedEvent:readStream(streamId, connection)
         sizeX = streamReadFloat32(streamId),
         sizeZ = streamReadFloat32(streamId),
     }
+    self.bounds.anchorX = streamReadFloat32(streamId)
+    self.bounds.anchorZ = streamReadFloat32(streamId)
     local vertCount = streamReadInt32(streamId)
     if vertCount >= 3 then
         local poly = {}

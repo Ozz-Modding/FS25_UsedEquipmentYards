@@ -1388,6 +1388,15 @@ function YardInventory:removeItem(item, keepVehicle)
     -- Free grid points so the space can be reused.
     self:freeGridPoints(item)
 
+    -- Find the item index before removing so we can notify clients.
+    local itemIndex = nil
+    for i, v in ipairs(self.items) do
+        if v == item then
+            itemIndex = i
+            break
+        end
+    end
+
     if item.vehicle ~= nil then
         for i, v in ipairs(self.vehicles) do
             if v == item.vehicle then
@@ -1403,11 +1412,14 @@ function YardInventory:removeItem(item, keepVehicle)
         item.vehicle = nil
     end
 
-    for i, v in ipairs(self.items) do
-        if v == item then
-            table.remove(self.items, i)
-            break
-        end
+    if itemIndex ~= nil then
+        table.remove(self.items, itemIndex)
+    end
+
+    -- Notify remote clients so they clean up stale item data.
+    -- Skip when keepVehicle=true (purchases) — EquipmentPurchasedEvent handles that.
+    if not keepVehicle and itemIndex ~= nil and g_server ~= nil then
+        g_server:broadcastEvent(VehicleItemRemovedEvent.new(self.yard.id, itemIndex))
     end
 
     -- Space freed up — schedule pending sold items after a delay so the

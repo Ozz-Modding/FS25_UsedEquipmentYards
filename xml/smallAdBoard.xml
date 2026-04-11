@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <placeable type="simplePlaceable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
         <storeData>
-        <name>Small Advertising Sign</name>
+        <name>$l10n_smallAdSign</name>
         <image>textures/store_smallAdBoard.png</image>
         <price>50</price>
         <functions>
-            <function>This sign advertises: Offer Prices</function>
+            <function>$l10n_function_smallAdSign</function>
         </functions>
         <dailyUpkeep>0</dailyUpkeep>
         <lifetime>1000</lifetime>
@@ -57,114 +57,114 @@
 	
 
 	<solarPanels>
-        <solarPanelsConfigurations title="Board Selection">
-			 <solarPanelsConfiguration name="Under 10000" isActive="true" price="0" incomePerHour="0">
+        <solarPanelsConfigurations title="$l10n_config_Board">
+			 <solarPanelsConfiguration name="$l10n_configname_10000" isActive="true" price="0" incomePerHour="0">
                 <objectChange node="10000" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>			
-			 <solarPanelsConfiguration name="Under 10000 (Pole)" isActive="true" price="0" incomePerHour="0">
+			 <solarPanelsConfiguration name="$l10n_configname_10000p" isActive="true" price="0" incomePerHour="0">
                 <objectChange node="10000" visibilityActive="true" visibilityInactive="false"/>
                 <objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			 <solarPanelsConfiguration name="Under 75000" isActive="true" price="0" incomePerHour="0">
+			 <solarPanelsConfiguration name="$l10n_configname_75000" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="75000" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
-			 <solarPanelsConfiguration name="Under 75000 (Pole)" isActive="true" price="0" incomePerHour="0">
+			 <solarPanelsConfiguration name="$l10n_configname_75000p" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="75000" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="Under 100000" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_100000" isActive="true" price="0" incomePerHour="0">
 		        <objectChange node="100000" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Under 100000 (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_100000p" isActive="true" price="0" incomePerHour="0">
 		        <objectChange node="100000" visibilityActive="true" visibilityInactive="false"/>
 		        <objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 		
-			<solarPanelsConfiguration name="Under 250000" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_250000" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="250000" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 			
-			<solarPanelsConfiguration name="Under 250000 (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_250000p" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="250000" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="Under 500000" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_500000" isActive="true" price="0" incomePerHour="0">
 			    <objectChange node="500000" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Under 500000 (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_500000p" isActive="true" price="0" incomePerHour="0">
 			    <objectChange node="500000" visibilityActive="true" visibilityInactive="false"/>
 			    <objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="Under 750000" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_750000" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="750000" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Under 750000 (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_750000p" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="750000" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="Under 999999" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_999999" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="999999" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Under 999999 (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_999999p" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="999999" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>
 			
-			<solarPanelsConfiguration name="Pole Only" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_PoleOnly" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 			
-			<solarPanelsConfiguration name="Keep Off" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_KeepOff" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="KeepOff" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 			
-			<solarPanelsConfiguration name="Keep Off (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_KeepOffp" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="KeepOff" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 			
-			<solarPanelsConfiguration name="Lunch" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_Lunch" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="Lunch" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 			
-			<solarPanelsConfiguration name="Lunch" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_Lunchp" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="Lunch" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>	
 			
 			
-			<solarPanelsConfiguration name="No Parking" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_NoParking" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="NoParking" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>					
 			
-			<solarPanelsConfiguration name="No Parking (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_NoParkingp" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="NoParking" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>					
 			
-			<solarPanelsConfiguration name="Toilets (Left)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_ToiletsLeft" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="WeeLeft" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>					
 			
-			<solarPanelsConfiguration name="Toilets (Left) (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_ToiletsLeftp" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="WeeLeft" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>					
 			
-			<solarPanelsConfiguration name="Toilets (Right)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_ToiletsRight" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="WeeRight" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>					
 			
-			<solarPanelsConfiguration name="Toilets (Right) (Pole)" isActive="true" price="0" incomePerHour="0">
+			<solarPanelsConfiguration name="$l10n_configname_ToiletsRightp" isActive="true" price="0" incomePerHour="0">
 				<objectChange node="WeeRight" visibilityActive="true" visibilityInactive="false"/>
 				<objectChange node="pole" visibilityActive="true" visibilityInactive="false"/>
 			</solarPanelsConfiguration>			

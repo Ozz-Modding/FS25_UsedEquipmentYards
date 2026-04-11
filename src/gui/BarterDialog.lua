@@ -300,8 +300,8 @@ function BarterDialog:onClickMakeOffer()
         return
     end
 
-    -- Consume a chance.
-    BarterState.recordAttempt(farmId, self.yard.id)
+    -- Consume a chance — send to server so all clients on this farm see it.
+    g_client:getServerConnection():sendEvent(BarterAttemptEvent.new(farmId, self.yard.id))
 
     -- Client-side accept/reject.
     if self.currentOffer >= (self.item.minPrice or self.item.price) then
