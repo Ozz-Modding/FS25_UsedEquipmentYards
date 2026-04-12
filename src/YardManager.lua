@@ -25,13 +25,11 @@ function YardManager:load()
 
     local filePath = savePath .. YardManager.SAVE_FILENAME
     if not fileExists(filePath) then
-        print("[UsedEquipmentYards] No save file found, starting fresh.")
         return
     end
 
     local xmlFile = loadXMLFile("UsedEquipmentYards", filePath)
     if xmlFile == nil then
-        print("[UsedEquipmentYards] ERROR: Failed to open save file.")
         return
     end
 
@@ -68,8 +66,6 @@ function YardManager:load()
 
     local count = 0
     for _ in pairs(self.yards) do count = count + 1 end
-    print(("[UsedEquipmentYards] Loaded %d yard(s)."):format(count))
-
     -- Don't spawn vehicles here — g_terrainNode may not be ready yet.
     -- Spawning is deferred to spawnAllYards(), called from onMissionStarted.
 end
@@ -90,7 +86,6 @@ function YardManager:save()
 
     local xmlFile = createXMLFile("UsedEquipmentYards", savePath .. YardManager.SAVE_FILENAME, "UsedEquipmentYards")
     if xmlFile == nil then
-        print("[UsedEquipmentYards] ERROR: Failed to create save file.")
         return
     end
 
@@ -113,7 +108,6 @@ end
 function YardManager:onHourChanged()
     local count = 0
     for _ in pairs(self.yards) do count = count + 1 end
-    print(("[UsedEquipmentYards] onHourChanged — %d yard(s)"):format(count))
     for _, yard in pairs(self.yards) do
         yard.inventory:onHourChanged()
     end
@@ -141,7 +135,6 @@ function YardManager:createYard(_, bounds)
     UsedEquipmentYards.addActivatable(yard)
     -- Notify remote MP clients so they can register the yard client-side.
     g_server:broadcastEvent(YardCreatedEvent.new(yard))
-    print(("[UsedEquipmentYards] Created yard '%s' (id=%d)."):format(name, id))
     return yard
 end
 

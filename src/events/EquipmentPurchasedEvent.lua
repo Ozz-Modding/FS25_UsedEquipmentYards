@@ -57,7 +57,6 @@ function EquipmentPurchasedEvent:run(connection)
         local farm = g_farmManager:getFarmById(self.farmId)
         local creditAvailable = YardCredit.getBalance(self.farmId, self.yardId)
         if farm == nil or (farm:getBalance() + creditAvailable) < item.price then
-            print(("[UsedEquipmentYards] Purchase rejected: insufficient funds (farm %d)"):format(self.farmId))
             return
         end
 

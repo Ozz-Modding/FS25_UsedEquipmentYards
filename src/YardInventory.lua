@@ -329,8 +329,6 @@ function YardInventory:spawn()
     -- Try to place any pending sold items that were queued before the save.
     self:trySpawnPendingSoldItem()
 
-    print(("[UsedEquipmentYards] Yard '%s': %d vehicles re-associated, %d orphaned items removed, %d grid points, %d pending sold."):format(
-        self.yard.name, associated, orphaned, #self.spawnGrid, #self.pendingSoldItems))
 end
 
 --- Attempt to spawn a single vehicle (hourly tick).
@@ -1304,7 +1302,6 @@ function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
     -- No room — hide the vehicle until space opens.
     self:hideVehicle(vehicle)
     self.pendingSoldItems[#self.pendingSoldItems + 1] = item
-    print(("[UsedEquipmentYards] Yard '%s': no room for sold vehicle, hidden until space opens."):format(self.yard.name))
     return item
 end
 

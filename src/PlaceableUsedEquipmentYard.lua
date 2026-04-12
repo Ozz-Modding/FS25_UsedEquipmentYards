@@ -87,7 +87,6 @@ end
 function PlaceableUsedEquipmentYard:getCanBePlacedAt(superFunc, x, y, z, farmId)
     local isAdmin = PlaceableUsedEquipmentYard.isAdminInMP()
     if not isAdmin then
-        print("[UsedEquipmentYards] getCanBePlacedAt: blocked — not admin in MP")
         return false, g_i18n:getText("uey_warning_adminOnly")
     end
     return superFunc(self, x, y, z, farmId)
@@ -153,7 +152,6 @@ function PlaceableUsedEquipmentYard:finishFenceCustomization(superFunc, user, su
         if data ~= nil then
             data.createDelayMs = nil
         end
-        print(("[UsedEquipmentYards] finishFenceCustomization — success=%s"):format(tostring(success)))
         PlaceableUsedEquipmentYard.createYardFromCurrentFence(self)
     end
 end
@@ -167,7 +165,7 @@ function PlaceableUsedEquipmentYard:onPostFinalizePlacement()
     if data == nil then return end
     -- Long delay: gives the player time to draw a custom fence.
     -- finishFenceCustomization cancels this if the normal path fires.
-    data.createDelayMs = 120000  -- 2 minutes
+    data.createDelayMs = 120000 -- 2 minutes
     self:raiseActive()
 end
 
@@ -181,7 +179,6 @@ function PlaceableUsedEquipmentYard:onUpdate(dt)
     end
     data.createDelayMs = nil
     if data.yardId == nil then
-        print("[UsedEquipmentYards] onUpdate fallback: creating yard from default fence")
         PlaceableUsedEquipmentYard.createYardFromCurrentFence(self)
     end
 end
@@ -193,9 +190,9 @@ end
 function PlaceableUsedEquipmentYard.getYardCorners(rootNode)
     local h = PlaceableUsedEquipmentYard.DEFAULT_HALF_SIZE
     local offsets = {
-        { -h, 0 },   -- near-left
-        { h, 0 },    -- near-right
-        { h, 2 * h }, -- far-right
+        { -h, 0 },     -- near-left
+        { h, 0 },      -- near-right
+        { h, 2 * h },  -- far-right
         { -h, 2 * h }, -- far-left
     }
     local corners = {}
@@ -252,7 +249,6 @@ end
 -- ---------------------------------------------------------------------------
 
 function PlaceableUsedEquipmentYard:onLoad(savegame)
-    print(("[UsedEquipmentYards] PlaceableUsedEquipmentYard:onLoad — isServer=%s"):format(tostring(self.isServer)))
     self[PlaceableUsedEquipmentYard.KEY] = { yardId = nil }
 
     if savegame ~= nil then
@@ -293,29 +289,23 @@ end
 function PlaceableUsedEquipmentYard.createYardFromCurrentFence(placeable)
     local data = placeable[PlaceableUsedEquipmentYard.KEY]
     if data == nil then
-        print("[UsedEquipmentYards] createYardFromCurrentFence: KEY data is nil!")
         return
     end
     if data.yardId ~= nil then
-        print(("[UsedEquipmentYards] createYardFromCurrentFence: already created (yardId=%d)"):format(data.yardId))
         return
     end
     data.pendingCreate = false
 
     local bounds = PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
     if bounds == nil then
-        print("[UsedEquipmentYards] WARNING: fence has no segments, cannot create yard.")
         return
     end
 
     local manager = UsedEquipmentYards.yardManager
     if manager == nil then
-        print("[UsedEquipmentYards] createYardFromCurrentFence: yardManager is nil!")
         return
     end
 
-    print(("[UsedEquipmentYards] createYardFromCurrentFence: creating yard with %d polygon vertices"):format(
-        bounds.polygon and #bounds.polygon or 0))
     local yard = manager:createYard("Yard", bounds)
     data.yardId = yard.id
 end

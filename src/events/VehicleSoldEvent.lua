@@ -45,13 +45,11 @@ function VehicleSoldEvent:run(connection)
         -- -----------------------------------------------------------------
         local vehicle = NetworkUtil.getObject(self.vehicleId)
         if vehicle == nil then
-            print("[UsedEquipmentYards] VehicleSoldEvent: vehicle not found.")
             return
         end
 
         -- Validate ownership.
         if vehicle:getOwnerFarmId() ~= self.farmId then
-            print("[UsedEquipmentYards] VehicleSoldEvent: farm doesn't own this vehicle.")
             return
         end
 
@@ -62,7 +60,6 @@ function VehicleSoldEvent:run(connection)
         if yard == nil then return end
 
         if not yard.inventory:wouldBuyVehicle(vehicle) then
-            print("[UsedEquipmentYards] VehicleSoldEvent: yard would not buy this vehicle.")
             return
         end
 
@@ -74,7 +71,6 @@ function VehicleSoldEvent:run(connection)
                 vehicle:getPrice(), vehicle:getRepairPrice(), vehicle:getRepaintPrice())
             local totalOffered = self.cashAmount + self.creditAmount
             if totalOffered > baseValue * 1.10 then
-                print("[UsedEquipmentYards] VehicleSoldEvent: offer exceeds expected value.")
                 return
             end
         end
