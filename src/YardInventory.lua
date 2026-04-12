@@ -523,6 +523,7 @@ function YardInventory:buildStorePool()
 
     for _, si in pairs(g_storeManager:getItems()) do
         if si.showInStore and si.extraContentId == nil
+            and si.bundleInfo == nil
             and si.price >= YardInventory.MIN_VEHICLE_PRICE
             and si.price <= effectiveMaxPrice
             and StoreItemUtil.getIsVehicle(si) then
@@ -1107,6 +1108,10 @@ function YardInventory:wouldBuyVehicle(vehicle)
     end
     if not si.showInStore or si.extraContentId ~= nil then
         Logging.info("[UEY] wouldBuy: %s not shown in store or is extra content", si.xmlFilename)
+        return false
+    end
+    if si.bundleInfo ~= nil then
+        Logging.info("[UEY] wouldBuy: %s is a bundle item, skipping", si.xmlFilename)
         return false
     end
     -- Note: MIN_VEHICLE_PRICE is only used for the spawn pool, not for
