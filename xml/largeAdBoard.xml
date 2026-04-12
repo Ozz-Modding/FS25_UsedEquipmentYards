@@ -36,22 +36,22 @@
     </placement>
 
     <clearAreas>
-        <clearArea startNode="clearArea1Start" widthNode="clearArea1Width" heightNode="clearArea1Height"/>
+        <clearArea startNode="clearAreaStart01" widthNode="clearAreaWidth01" heightNode="clearAreaHeight01"/>
     </clearAreas>
 
     <leveling requireLeveling="true" maxSmoothDistance="2" maxSlope="75" maxEdgeAngle="30">
         <levelAreas>
-            <levelArea startNode="levelArea1Start" widthNode="levelArea1Width" heightNode="levelArea1Height" groundType="asphalt"/>
+            <levelArea startNode="levelAreaStart01" widthNode="levelAreaWidth01" heightNode="levelAreaHeight01" groundType="asphalt"/>
         </levelAreas>
     </leveling>
 
     <indoorAreas>
-        <indoorArea startNode="indoorArea1Start" widthNode="indoorArea1Width" heightNode="indoorArea1Height"/>
+        <indoorArea startNode="indoorAreaStart01" widthNode="indoorAreaWidth01" heightNode="indoorAreaHeight01"/>
     </indoorAreas>
 
     <ai>
         <updateAreas>
-            <updateArea startNode="testArea1Start" endNode="testArea1End" />
+            <updateArea startNode="testAreaStart01" endNode="testAreaEnd01" />
         </updateAreas>
     </ai>
 	
@@ -106,14 +106,17 @@
 	</solarPanels>
 	
     <i3dMappings>
-        <i3dMapping id="clearArea1Start" 	node="0>0|0" />
-        <i3dMapping id="clearArea1Width" 	node="0>0|0|0" />
-        <i3dMapping id="clearArea1Height" 	node="0>0|0|1" />
-        <i3dMapping id="levelArea1Start" 	node="0>1|0" />
-        <i3dMapping id="levelArea1Width" 	node="0>1|0|0" />
-        <i3dMapping id="levelArea1Height" 	node="0>1|0|1" />
-        <i3dMapping id="testArea1Start" 	node="0>2|0" />
-        <i3dMapping id="testArea1End" 		node="0>2|0|0" />
+        <i3dMapping id="clearAreaStart01" 	node="0>0|0" />
+        <i3dMapping id="clearAreaWidth01" 	node="0>0|0|0" />
+        <i3dMapping id="clearAreaHeight01" 	node="0>0|0|1" />
+        <i3dMapping id="levelAreaStart01" 	node="0>1|0" />
+        <i3dMapping id="levelAreaWidth01" 	node="0>1|0|0" />
+        <i3dMapping id="levelAreaHeight01" 	node="0>1|0|1" />
+        <i3dMapping id="indoorAreaStart01" 	node="0>2|0" />
+        <i3dMapping id="indoorAreaWidth01" 	node="0>2|0|0" />
+        <i3dMapping id="indoorAreaHeight01" node="0>2|0|1" />
+        <i3dMapping id="testAreaStart01" 	node="0>3|0" />
+        <i3dMapping id="testAreaEnd01" 		node="0>3|0|0" />
 		<i3dMapping id="AdL01" 				node="0>4|0" />
 		<i3dMapping id="AdL02" 				node="0>4|1" />
 		<i3dMapping id="AdL03" 				node="0>4|2" />
