@@ -111,7 +111,7 @@ function YardConfigChangedEvent:run(connection)
     end
 
     -- CLIENT: apply config + name to local client yard.
-    local yard = UsedEquipmentYards.clientYards[self.yardId]
+    local yard = UsedEquipmentYards.getYard(self.yardId)
     if yard ~= nil then
         if self.yardName ~= nil and self.yardName ~= "" then
             yard.name = self.yardName

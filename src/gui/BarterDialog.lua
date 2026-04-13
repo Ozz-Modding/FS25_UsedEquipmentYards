@@ -71,11 +71,13 @@ function BarterDialog.show(yard, item)
     -- DEV: hot-reload XML on every open for faster iteration.
     -- BarterDialog.register()
 
-    local itemIndex = nil
-    for i, itm in ipairs(yard.inventory.items) do
-        if itm == item then
-            itemIndex = i
-            break
+    local itemIndex = item.itemIndex
+    if itemIndex == nil then
+        for i, itm in pairs(yard.inventory.items) do
+            if itm == item then
+                itemIndex = i
+                break
+            end
         end
     end
     if itemIndex == nil then return end

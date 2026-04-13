@@ -64,8 +64,6 @@ function YardManager:load()
         end
     end
 
-    local count = 0
-    for _ in pairs(self.yards) do count = count + 1 end
     -- Don't spawn vehicles here — g_terrainNode may not be ready yet.
     -- Spawning is deferred to spawnAllYards(), called from onMissionStarted.
 end
@@ -106,8 +104,6 @@ function YardManager:save()
 end
 
 function YardManager:onHourChanged()
-    local count = 0
-    for _ in pairs(self.yards) do count = count + 1 end
     for _, yard in pairs(self.yards) do
         yard.inventory:onHourChanged()
     end

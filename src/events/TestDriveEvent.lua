@@ -93,37 +93,14 @@ end
 -- ---------------------------------------------------------------------------
 
 function TestDriveEvent:serverStartTestDrive(item, yard)
-    local vehicle = item.vehicle
-    if item.testDrive ~= nil then return end  -- already on test drive
-
-    -- Check if this farm has already test-driven this vehicle.
+    if item.testDrive ~= nil then return end
     if item.testDrivenByFarms ~= nil and item.testDrivenByFarms[self.farmId] then return end
 
-    -- Save original position.
-    local ox, oy, oz = getWorldTranslation(vehicle.rootNode)
-    local rx, ry, rz = getRotation(vehicle.rootNode)
+    -- Assign to farm so the player can enter.
+    item.vehicle:setOwnerFarmId(self.farmId)
 
-    -- Calculate return deadline: current hour + DURATION, rounded up to next whole hour.
-    local env = g_currentMission.environment
-    local returnByHour = env.currentHour + TestDriveEvent.DURATION_HOURS + 1
-    local returnByDay  = env.currentMonotonicDay
-    if returnByHour >= 24 then
-        returnByHour = returnByHour - 24
-        returnByDay  = returnByDay + 1
-    end
-
-    item.testDrive = {
-        farmId      = self.farmId,
-        returnByDay = returnByDay,
-        returnByHour = returnByHour,
-        origX = ox, origY = oy, origZ = oz,
-        origRx = rx, origRy = ry, origRz = rz,
-    }
-
-    -- Temporarily assign to farm and unlock.
-    vehicle:setOwnerFarmId(self.farmId)
-    PriceTagRenderer.removeTag(vehicle)
-    EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+    -- Shared: set testDrive data, remove tag, unlock.
+    self:clientStartTestDrive(item)
 end
 
 -- ---------------------------------------------------------------------------
@@ -134,7 +111,7 @@ function TestDriveEvent:serverReturnTestDrive(item, yard)
     local vehicle = item.vehicle
     local td = item.testDrive
     if td == nil then return end
-    if td.farmId ~= self.farmId then return end  -- not your test drive
+    if td.farmId ~= self.farmId then return end
 
     -- Kick out any player currently in the vehicle.
     if vehicle.getIsEntered ~= nil and vehicle:getIsEntered() then
@@ -167,28 +144,16 @@ function TestDriveEvent:serverReturnTestDrive(item, yard)
     vehicle:setAbsolutePosition(td.origX, td.origY, td.origZ, td.origRx, td.origRy, td.origRz)
     vehicle:addToPhysics()
 
-    -- Re-lock and restore yard ownership.
+    -- Restore yard ownership.
     vehicle:setOwnerFarmId(0)
-    PriceTagRenderer.addTag(vehicle, item)
-    if vehicle.setIsTabbable ~= nil then
-        vehicle:setIsTabbable(false)
-    end
-    if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
-        vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function()
-            return false, nil
-        end)
-    end
 
-    -- Record that this farm has used their test drive for this vehicle.
-    if item.testDrivenByFarms == nil then item.testDrivenByFarms = {} end
-    item.testDrivenByFarms[self.farmId] = true
-
-    item.testDrive = nil
+    -- Shared: update item state, re-add tag, re-lock.
+    self:clientReturnTestDrive(item)
 end
 
 -- ---------------------------------------------------------------------------
--- Client: mirror state changes (vehicle ownership/controls already synced
--- via the vehicle system, but we update item.testDrive for UI)
+-- Shared: item state, price tags, and vehicle restrictions.
+-- Called from both server and client paths.
 -- ---------------------------------------------------------------------------
 
 function TestDriveEvent:clientStartTestDrive(item)
@@ -211,10 +176,21 @@ function TestDriveEvent:clientStartTestDrive(item)
         origX = ox, origY = oy, origZ = oz,
         origRx = rx, origRy = ry, origRz = rz,
     }
+
+    PriceTagRenderer.removeTag(vehicle)
+    UsedEquipmentYards.clearVehicleRestrictions(vehicle)
 end
 
 function TestDriveEvent:clientReturnTestDrive(item)
+    local vehicle = item.vehicle
+
     if item.testDrivenByFarms == nil then item.testDrivenByFarms = {} end
     item.testDrivenByFarms[self.farmId] = true
     item.testDrive = nil
+
+    PriceTagRenderer.addTag(vehicle, item)
+    if vehicle.setIsTabbable ~= nil then vehicle:setIsTabbable(false) end
+    if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
+        vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function() return false, nil end)
+    end
 end

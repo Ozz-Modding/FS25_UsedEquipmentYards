@@ -236,6 +236,7 @@ function YardInventory:onHourChanged()
                 local fine = math.max(TestDriveEvent.FINE_MINIMUM,
                     math.floor(item.price * TestDriveEvent.FINE_PER_HOUR))
                 g_currentMission:addMoneyChange(-fine, td.farmId, MoneyType.OTHER, true)
+                g_farmManager:getFarmById(td.farmId):changeBalance(-fine, MoneyType.OTHER)
             end
         end
     end
@@ -288,7 +289,7 @@ function YardInventory:spawn()
                 -- Re-apply yard vehicle state.
                 if item.testDrive ~= nil then
                     vehicle:setOwnerFarmId(item.testDrive.farmId)
-                    EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+                    UsedEquipmentYards.clearVehicleRestrictions(vehicle)
                 else
                     -- Lock the vehicle and add price tag.
                     if vehicle.setIsTabbable ~= nil then vehicle:setIsTabbable(false) end
@@ -1005,7 +1006,7 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
 
             -- Block driving inputs. Stored in spec_drivable.playerControlAllowedFunctions
             -- keyed by NetworkUtil.getObjectId(vehicle). Cleared on purchase via
-            -- EquipmentPurchasedEvent.clearVehicleRestrictions().
+            -- UsedEquipmentYards.clearVehicleRestrictions().
             if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
                 vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function()
                     return false, nil
@@ -1020,7 +1021,7 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             -- keep it unlocked for the borrowing farm. Otherwise lock it.
             if item.testDrive ~= nil then
                 vehicle:setOwnerFarmId(item.testDrive.farmId)
-                EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+                UsedEquipmentYards.clearVehicleRestrictions(vehicle)
             else
                 PriceTagRenderer.addTag(vehicle, item)
             end

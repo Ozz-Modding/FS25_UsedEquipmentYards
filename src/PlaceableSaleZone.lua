@@ -44,6 +44,8 @@ function PlaceableSaleZone.registerEventListeners(placeableType)
     SpecializationUtil.registerEventListener(placeableType, "onLoad", PlaceableSaleZone)
     SpecializationUtil.registerEventListener(placeableType, "onPostFinalizePlacement", PlaceableSaleZone)
     SpecializationUtil.registerEventListener(placeableType, "onDelete", PlaceableSaleZone)
+    SpecializationUtil.registerEventListener(placeableType, "onReadStream", PlaceableSaleZone)
+    SpecializationUtil.registerEventListener(placeableType, "onWriteStream", PlaceableSaleZone)
 end
 
 -- ---------------------------------------------------------------------------
@@ -156,6 +158,21 @@ function PlaceableSaleZone:onPostFinalizePlacement()
     local nearestYard = PlaceableSaleZone.findNearestYard(x, z)
     if nearestYard ~= nil then
         data.yardId = nearestYard.id
+    end
+end
+
+function PlaceableSaleZone:onWriteStream(streamId, connection)
+    local data = self[PlaceableSaleZone.KEY]
+    local yardId = data ~= nil and data.yardId or 0
+    streamWriteInt32(streamId, yardId)
+end
+
+function PlaceableSaleZone:onReadStream(streamId, connection)
+    local data = self[PlaceableSaleZone.KEY]
+    if data == nil then return end
+    local yardId = streamReadInt32(streamId)
+    if yardId ~= 0 then
+        data.yardId = yardId
     end
 end
 

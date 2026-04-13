@@ -75,9 +75,10 @@ function VehicleSoldEvent:run(connection)
             end
         end
 
-        -- Pay cash.
+        -- Pay cash (server: stat tracking + balance).
         if self.cashAmount > 0 then
             g_currentMission:addMoneyChange(self.cashAmount, self.farmId, MoneyType.SHOP_VEHICLE_SELL, true)
+            g_farmManager:getFarmById(self.farmId):changeBalance(self.cashAmount, MoneyType.SHOP_VEHICLE_SELL)
         end
 
         -- Add credit.
@@ -96,9 +97,12 @@ function VehicleSoldEvent:run(connection)
     end
 
     -- -----------------------------------------------------------------
-    -- CLIENT: remote client receiving broadcast — sync credit locally.
+    -- CLIENT: remote client receiving broadcast — sync balance and credit.
     -- Vehicle transfer/deletion is handled by the server + broadcastEvent.
     -- -----------------------------------------------------------------
+    if self.cashAmount > 0 then
+        g_farmManager:getFarmById(self.farmId):changeBalance(self.cashAmount, MoneyType.SHOP_VEHICLE_SELL)
+    end
     if self.creditAmount > 0 then
         YardCredit.addCredit(self.farmId, self.yardId, self.creditAmount)
     end

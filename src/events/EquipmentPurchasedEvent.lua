@@ -65,6 +65,7 @@ function EquipmentPurchasedEvent:run(connection)
         local cashCost = item.price - creditUsed
         if cashCost > 0 then
             g_currentMission:addMoneyChange(-cashCost, self.farmId, MoneyType.SHOP_VEHICLE_BUY, true)
+            g_farmManager:getFarmById(self.farmId):changeBalance(-cashCost, MoneyType.SHOP_VEHICLE_BUY)
         end
 
         local vehicle = item.vehicle
@@ -74,8 +75,8 @@ function EquipmentPurchasedEvent:run(connection)
         if vehicle ~= nil then
             vehicle:setOwnerFarmId(self.farmId)
             PriceTagRenderer.removeTag(vehicle)
-            EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
-            EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+            UsedEquipmentYards.restoreLicensePlate(vehicle)
+            UsedEquipmentYards.clearVehicleRestrictions(vehicle)
         end
 
         -- Record this sale so resale offers are capped below purchase price.
@@ -103,15 +104,19 @@ function EquipmentPurchasedEvent:run(connection)
                 local vehicle = item.vehicle
                 if vehicle ~= nil then
                     PriceTagRenderer.removeTag(vehicle)
-                    EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
-                    EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
+                    UsedEquipmentYards.restoreLicensePlate(vehicle)
+                    UsedEquipmentYards.clearVehicleRestrictions(vehicle)
                 end
                 yard.inventory:removeItem(item, true)
             end
         end
     end
 
-    -- Sync credit deduction on this client.
+    -- Sync balance and credit deduction on this client.
+    local cashCost = self.purchasePrice - (self.creditUsed or 0)
+    if cashCost > 0 then
+        g_farmManager:getFarmById(self.farmId):changeBalance(-cashCost, MoneyType.SHOP_VEHICLE_BUY)
+    end
     if self.creditUsed > 0 then
         YardCredit.deductCredit(self.farmId, self.yardId, self.creditUsed)
     end
@@ -125,41 +130,3 @@ function EquipmentPurchasedEvent:run(connection)
     UsedEquipmentYards.removeClientItem(self.yardId, self.itemIndex)
 end
 
---- Assign a fresh random license plate. Vehicles spawn with ownerFarmId=0 so
---- spec.licensePlateData is nil at spawn time; there is no original to restore.
---- Mirrors the shop's approach: get random data, then override placementIndex
---- with the vehicle's own preferred placement (getLicensePlateDialogSettings),
---- because the map-level default placement can be NONE on some maps.
-function EquipmentPurchasedEvent.restoreLicensePlate(vehicle)
-    if vehicle.spec_licensePlates == nil then return end
-    if vehicle.setLicensePlatesData == nil then return end
-    if not (vehicle.getHasLicensePlates ~= nil and vehicle:getHasLicensePlates()) then return end
-    if g_licensePlateManager == nil then return end
-
-    local plateData = g_licensePlateManager:getRandomLicensePlateData()
-
-    -- The map-level default placement can be NONE on some maps, which would
-    -- hide all plates. Use the vehicle's own preferred placement instead,
-    -- falling back to BOTH if the vehicle XML doesn't specify one.
-    local vehiclePlacement = nil
-    if vehicle.getLicensePlateDialogSettings ~= nil then
-        vehiclePlacement = vehicle:getLicensePlateDialogSettings()
-    end
-    plateData.placementIndex = vehiclePlacement or LicensePlateManager.PLACEMENT_OPTION.BOTH
-
-    vehicle:setLicensePlatesData(plateData)
-end
-
---- Re-enable driving and Tab cycling on a vehicle previously blocked for yard display.
-function EquipmentPurchasedEvent.clearVehicleRestrictions(vehicle)
-    -- Driving is blocked via spec_drivable.playerControlAllowedFunctions.
-    -- Clear the whole table so no functions can return false.
-    if vehicle.spec_drivable ~= nil then
-        vehicle.spec_drivable.playerControlAllowedFunctions = {}
-        vehicle.spec_drivable.hasPlayerControlAllowedFunctions = false
-    end
-
-    if vehicle.setIsTabbable ~= nil then
-        vehicle:setIsTabbable(true)
-    end
-end

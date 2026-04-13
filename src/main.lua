@@ -14,6 +14,15 @@ UsedEquipmentYards.activatables = {}
 -- The server uses yardManager instead; this table is only non-empty on remote clients.
 UsedEquipmentYards.clientYards = {}
 
+--- Look up a yard by ID, works on both server and client.
+function UsedEquipmentYards.getYard(yardId)
+    if UsedEquipmentYards.yardManager ~= nil then
+        local yard = UsedEquipmentYards.yardManager.yards[yardId]
+        if yard ~= nil then return yard end
+    end
+    return UsedEquipmentYards.clientYards[yardId]
+end
+
 -- Recent sales memory: ring buffer of { uniqueId, price } for vehicles sold to
 -- players. Used to prevent profit from immediately selling a vehicle back.
 -- Synced to all clients and persisted to savegame.
@@ -83,6 +92,7 @@ function UsedEquipmentYards:delete()
     UsedEquipmentYards.clientVehicleActivatables = {}
     UsedEquipmentYards.clientItems = {}
     UsedEquipmentYards.pendingClientItems = {}
+    UsedEquipmentYards.pendingClientRestrictions = {}
     UsedEquipmentYards.vehicleToItem = {}
     UsedEquipmentYards.clientYards = {}
     UsedEquipmentYards.recentSales = {}
@@ -320,14 +330,64 @@ UsedEquipmentYards.clientVehicleActivatables = {}
 -- { { yardId, itemIndex, vehicleObjectId, item }, ... }
 UsedEquipmentYards.pendingClientItems = {}
 
+-- Items whose vehicles are resolved but not fully loaded yet (spec_drivable missing).
+UsedEquipmentYards.pendingClientRestrictions = {}
+
+--- Apply yard vehicle restrictions on the client. Returns true if successful,
+--- false if the vehicle isn't fully loaded yet (retry later).
+function UsedEquipmentYards.applyClientRestrictions(vehicle, item)
+    if vehicle.spec_drivable == nil then return false end
+
+    local ok, err = pcall(vehicle.registerPlayerVehicleControlAllowedFunction,
+        vehicle, vehicle, function() return false, nil end)
+    if not ok then
+        return false
+    end
+
+    PriceTagRenderer.addTag(vehicle, item)
+    if vehicle.setIsTabbable ~= nil then vehicle:setIsTabbable(false) end
+    return true
+end
+
 function UsedEquipmentYards.findItemForVehicle(vehicle)
     return UsedEquipmentYards.vehicleToItem[vehicle]
+end
+
+--- Assign a fresh random license plate. Vehicles spawn with ownerFarmId=0 so
+--- spec.licensePlateData is nil at spawn time; there is no original to restore.
+function UsedEquipmentYards.restoreLicensePlate(vehicle)
+    if vehicle.spec_licensePlates == nil then return end
+    if vehicle.setLicensePlatesData == nil then return end
+    if not (vehicle.getHasLicensePlates ~= nil and vehicle:getHasLicensePlates()) then return end
+    if g_licensePlateManager == nil then return end
+
+    local plateData = g_licensePlateManager:getRandomLicensePlateData()
+    local vehiclePlacement = nil
+    if vehicle.getLicensePlateDialogSettings ~= nil then
+        vehiclePlacement = vehicle:getLicensePlateDialogSettings()
+    end
+    plateData.placementIndex = vehiclePlacement or LicensePlateManager.PLACEMENT_OPTION.BOTH
+
+    vehicle:setLicensePlatesData(plateData)
+end
+
+--- Re-enable driving and Tab cycling on a vehicle previously blocked for yard display.
+function UsedEquipmentYards.clearVehicleRestrictions(vehicle)
+    if vehicle.spec_drivable ~= nil then
+        vehicle.spec_drivable.playerControlAllowedFunctions = {}
+        vehicle.spec_drivable.hasPlayerControlAllowedFunctions = false
+    end
+    if vehicle.setIsTabbable ~= nil then
+        vehicle:setIsTabbable(true)
+    end
 end
 
 --- Called on remote clients when the server syncs a yard vehicle's item data.
 --- Creates the vehicle→item mapping and registers a YardVehicleActivatable.
 function UsedEquipmentYards.registerClientItem(yardId, itemIndex, item)
     if item.vehicle == nil then return end
+
+    item.itemIndex = itemIndex
 
     -- Store in client item registry.
     if UsedEquipmentYards.clientItems[yardId] == nil then
@@ -338,9 +398,17 @@ function UsedEquipmentYards.registerClientItem(yardId, itemIndex, item)
     -- Map vehicle → item (for HUD and lookups).
     UsedEquipmentYards.vehicleToItem[item.vehicle] = item
 
+    -- Apply client-side restrictions (server does this in YardInventory).
+    -- If the vehicle isn't fully loaded yet, queue for retry.
+    if item.testDrive == nil then
+        if not UsedEquipmentYards.applyClientRestrictions(item.vehicle, item) then
+            UsedEquipmentYards.pendingClientRestrictions[#UsedEquipmentYards.pendingClientRestrictions + 1] = item
+        end
+    end
+
     -- Register activatable if not already present.
     if UsedEquipmentYards.clientVehicleActivatables[item.vehicle] == nil then
-        local yard = UsedEquipmentYards.clientYards[yardId]
+        local yard = UsedEquipmentYards.getYard(yardId)
         if yard == nil then
             -- Create a minimal yard object if we don't have one yet.
             yard = { id = yardId, inventory = { items = {} } }
@@ -380,14 +448,19 @@ function UsedEquipmentYards.removeClientItem(yardId, itemIndex)
     local item = yardItems[itemIndex]
     if item == nil then return end
 
-    -- Remove activatable.
+    -- Clean up vehicle state.
     if item.vehicle ~= nil then
-        local activatable = UsedEquipmentYards.clientVehicleActivatables[item.vehicle]
+        local vehicle = item.vehicle
+        PriceTagRenderer.removeTag(vehicle)
+        UsedEquipmentYards.restoreLicensePlate(vehicle)
+        UsedEquipmentYards.clearVehicleRestrictions(vehicle)
+
+        local activatable = UsedEquipmentYards.clientVehicleActivatables[vehicle]
         if activatable ~= nil then
             g_currentMission.activatableObjectsSystem:removeActivatable(activatable)
-            UsedEquipmentYards.clientVehicleActivatables[item.vehicle] = nil
+            UsedEquipmentYards.clientVehicleActivatables[vehicle] = nil
         end
-        UsedEquipmentYards.vehicleToItem[item.vehicle] = nil
+        UsedEquipmentYards.vehicleToItem[vehicle] = nil
     end
 
     yardItems[itemIndex] = nil
@@ -460,6 +533,23 @@ function UsedEquipmentYards:update(dt)
             table.remove(pending, i)
         end
         i = i - 1
+    end
+
+    -- Retry restrictions for vehicles that weren't fully loaded yet (every 200ms).
+    local pendingR = UsedEquipmentYards.pendingClientRestrictions
+    if #pendingR > 0 then
+        UsedEquipmentYards.restrictionRetryTimer = (UsedEquipmentYards.restrictionRetryTimer or 0) - dt
+        if UsedEquipmentYards.restrictionRetryTimer <= 0 then
+            UsedEquipmentYards.restrictionRetryTimer = 200
+            i = #pendingR
+            while i >= 1 do
+                local item = pendingR[i]
+                if item.vehicle ~= nil and UsedEquipmentYards.applyClientRestrictions(item.vehicle, item) then
+                    table.remove(pendingR, i)
+                end
+                i = i - 1
+            end
+        end
     end
 end
 

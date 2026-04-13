@@ -79,11 +79,8 @@ function SaleZoneDialog:onClickSelect()
     local vehicle = self.vehicles[index]
     if vehicle == nil then return end
 
-    -- Resolve the linked yard.
-    local yard = nil
-    if UsedEquipmentYards.yardManager ~= nil then
-        yard = UsedEquipmentYards.yardManager.yards[self.yardId]
-    end
+    -- Resolve the linked yard (server or client).
+    local yard = UsedEquipmentYards.getYard(self.yardId)
 
     if yard == nil then
         self:close()
