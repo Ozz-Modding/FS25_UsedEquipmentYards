@@ -36,7 +36,7 @@
         </TransformGroup>
         <!-- node 1> : panel (connecting segment — invisible, we only want posts) -->
         <TransformGroup name="panel" nodeId="101">
-            <Shape name="visual" shapeId="1" visibility="false" nodeId="102" materialIds="491"/>
+            <Shape name="visual" shapeId="1" visibility="false" nodeId="102" materialIds="491" clipDistance="400"/>
         </TransformGroup>
     </Scene>
 </i3D>

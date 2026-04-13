@@ -42,6 +42,25 @@
   </Shapes>
 
   <Scene>
+    <TransformGroup name="areas" nodeId="200">
+      <TransformGroup name="clearArea" nodeId="201">
+        <TransformGroup name="start" nodeId="202">
+          <TransformGroup name="width" translation="1 0 0" nodeId="203"/>
+          <TransformGroup name="height" translation="0 0 1" nodeId="204"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="levelArea" nodeId="205">
+        <TransformGroup name="start" nodeId="206">
+          <TransformGroup name="width" translation="1 0 0" nodeId="207"/>
+          <TransformGroup name="height" translation="0 0 1" nodeId="208"/>
+        </TransformGroup>
+      </TransformGroup>
+      <TransformGroup name="testArea" nodeId="209">
+        <TransformGroup name="start" nodeId="210">
+          <TransformGroup name="end" translation="1 0 1" nodeId="211"/>
+        </TransformGroup>
+      </TransformGroup>
+    </TransformGroup>
     <TransformGroup name="electricalBox02" lockedgroup="true" translation="0 0 0" rotation="0 0 0" lodDistance="0 30" clipDistance="300" nodeId="173369">
       <Shape name="LOD0" shapeId="1" nodeId="173370" castsShadows="true" receiveShadows="true" materialIds="148">
         <Shape name="concrete" shapeId="2" nodeId="173371" castsShadows="true" receiveShadows="true" materialIds="106"/>

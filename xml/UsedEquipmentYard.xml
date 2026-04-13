@@ -25,16 +25,27 @@
 
     <base>
         <filename>i3d/box.i3d</filename>
+        <canBeRenamed>false</canBeRenamed>
+		<boughtWithFarmland>false</boughtWithFarmland>
     </base>
 
     <placement useRandomYRotation="false" useManualYRotation="true">
+        <testAreas>
+            <testArea startNode="testAreaStart" endNode="testAreaEnd" />
+        </testAreas>
         <sounds>
             <place template="smallImp" />
         </sounds>
     </placement>
 
-    <clearAreas />
-    <leveling />
+    <clearAreas>
+        <clearArea startNode="clearAreaStart" widthNode="clearAreaWidth" heightNode="clearAreaHeight" />
+    </clearAreas>
+    <leveling>
+        <levelAreas>
+            <levelArea startNode="levelAreaStart" widthNode="levelAreaWidth" heightNode="levelAreaHeight" />
+        </levelAreas>
+    </leveling>
     <indoorAreas />
     <tipOcclusionUpdateAreas />
     <ai>
@@ -47,8 +58,21 @@
                 <section segmentId="SEGMENT" customizable="true" />
             </sections>
         </fence>
+        <animals type="COW" maxNumAnimals="0" baseMaxNumAnimals="0" maxNumVisualAnimals="0">
+            <navigation />
+            <loadingTrigger />
+        </animals>
+        <food />
     </husbandry>
 
     <i3dMappings>
+        <i3dMapping id="clearAreaStart"  node="0>0|0" />
+        <i3dMapping id="clearAreaWidth"  node="0>0|0|0" />
+        <i3dMapping id="clearAreaHeight" node="0>0|0|1" />
+        <i3dMapping id="levelAreaStart"  node="0>1|0" />
+        <i3dMapping id="levelAreaWidth"  node="0>1|0|0" />
+        <i3dMapping id="levelAreaHeight" node="0>1|0|1" />
+        <i3dMapping id="testAreaStart"   node="0>2|0" />
+        <i3dMapping id="testAreaEnd"     node="0>2|0|0" />
     </i3dMappings>
 </placeable>

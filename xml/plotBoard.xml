@@ -1,228 +1,230 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<placeable type="simplePlaceable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
-        <storeData>
-        <name>$l10n_plotSign</name>
-        <image>textures/store_plotBoard.png</image>
-        <price>10</price>
-        <functions>
-            <function>$l10n_function_plotSign</function>
-        </functions>
-        <dailyUpkeep>0</dailyUpkeep>
-        <lifetime>1000</lifetime>
-        <rotation>0</rotation>
-        <brand>NONE</brand>
-        <species>PLACEABLE</species>
-        <category>decoration</category>
-        <brush>
-            <type>placeable</type>
-            <category>decoration</category>
-            <tab>decoration</tab>
-        </brush>
+<placeable type="simplePlaceable"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
+	<storeData>
+		<name>$l10n_plotSign</name>
+		<image>textures/store_plotBoard.png</image>
+		<price>10</price>
+		<functions>
+			<function>$l10n_function_plotSign</function>
+		</functions>
+		<dailyUpkeep>0</dailyUpkeep>
+		<lifetime>1000</lifetime>
+		<rotation>0</rotation>
+		<brand>NONE</brand>
+		<species>PLACEABLE</species>
+		<category>decoration</category>
+		<brush>
+			<type>placeable</type>
+			<category>decoration</category>
+			<tab>decoration</tab>
+		</brush>
 		<canBeSold>true</canBeSold>
-    </storeData>
+	</storeData>
 
-    <base>
-        <filename>i3d/plotBoard.i3d</filename>
-	<boughtWithFarmland>true</boughtWithFarmland>
-    </base>
+	<base>
+		<filename>i3d/plotBoard.i3d</filename>
+		<boughtWithFarmland>true</boughtWithFarmland>
+		<canBeRenamed>false</canBeRenamed>	
+	</base>
 
-    <placement useRandomYRotation="false" useManualYRotation="true" >
-        <testAreas>
-            <testArea startNode="testAreaStart01" endNode="testAreaEnd01" />
-        </testAreas>
-        <sounds>
-            <place template="smallImp" pitchScale="1.6"/>
-        </sounds>
-    </placement>
+	<placement useRandomYRotation="false" useManualYRotation="true">
+		<testAreas>
+			<testArea startNode="testAreaStart01" endNode="testAreaEnd01" />
+		</testAreas>
+		<sounds>
+			<place template="smallImp" pitchScale="1.6"/>
+		</sounds>
+	</placement>
 
-    <clearAreas>
-        <clearArea startNode="clearAreaStart01" widthNode="clearAreaWidth01" heightNode="clearAreaHeight01"/>
-    </clearAreas>
+	<clearAreas>
+		<clearArea startNode="clearAreaStart01" widthNode="clearAreaWidth01" heightNode="clearAreaHeight01"/>
+	</clearAreas>
 
-    <leveling requireLeveling="true" maxSmoothDistance="2" maxSlope="75" maxEdgeAngle="30">
-        <levelAreas>
-            <levelArea startNode="levelAreaStart01" widthNode="levelAreaWidth01" heightNode="levelAreaHeight01" />
-        </levelAreas>
-    </leveling>
+	<leveling requireLeveling="true" maxSmoothDistance="2" maxSlope="75" maxEdgeAngle="30">
+		<levelAreas>
+			<levelArea startNode="levelAreaStart01" widthNode="levelAreaWidth01" heightNode="levelAreaHeight01" />
+		</levelAreas>
+	</leveling>
 
-    <indoorAreas>
-        <indoorArea startNode="indoorAreaStart01" widthNode="indoorAreaWidth01" heightNode="indoorAreaHeight01"/>
-    </indoorAreas>
+	<indoorAreas>
+		<indoorArea startNode="indoorAreaStart01" widthNode="indoorAreaWidth01" heightNode="indoorAreaHeight01"/>
+	</indoorAreas>
 
-    <ai>
-        <updateAreas>
-            <updateArea startNode="testAreaStart01" endNode="testAreaEnd01" />
-        </updateAreas>
-    </ai>
-	
+	<ai>
+		<updateAreas>
+			<updateArea startNode="testAreaStart01" endNode="testAreaEnd01" />
+		</updateAreas>
+	</ai>
+
 
 	<solarPanels>
-        <solarPanelsConfigurations title="$l10n_config_Board">
-			 <solarPanelsConfiguration name="$l10n_configname_plot01" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="01" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+		<solarPanelsConfigurations title="$l10n_config_Board">
+			<solarPanelsConfiguration name="$l10n_configname_plot01" isActive="true" price="0" incomePerHour="0">
+				<objectChange node="01" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot02" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="02" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="02" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot03" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="03" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="03" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot04" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="04" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="04" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot05" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="05" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="05" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot06" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="06" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="06" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot07" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="07" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="07" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot08" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="08" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="08" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot09" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="09" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>		
+				<objectChange node="09" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot10" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="10" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="10" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot11" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="11" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="11" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot12" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="12" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="12" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot13" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="13" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="13" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot14" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="14" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="14" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot15" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="15" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="15" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot16" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="16" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="16" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot17" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="17" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="17" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot18" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="18" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="18" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot19" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="19" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="19" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot20" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="20" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="20" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot21" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="21" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="21" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot22" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="22" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="22" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot23" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="23" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="23" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot24" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="24" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="24" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot25" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="25" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="25" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot26" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="26" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="26" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot27" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="27" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="27" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot28" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="28" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="28" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot29" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="29" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+				<objectChange node="29" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
 			<solarPanelsConfiguration name="$l10n_configname_plot30" isActive="true" price="0" incomePerHour="0">
-                <objectChange node="30" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>			
+				<objectChange node="30" visibilityActive="true" visibilityInactive="false"/>
+			</solarPanelsConfiguration>
 
-			
-        </solarPanelsConfigurations>
+
+		</solarPanelsConfigurations>
 	</solarPanels>
-	
-    <i3dMappings>
-        <i3dMapping id="clearAreaStart01" 	node="0>0|0" />
-        <i3dMapping id="clearAreaWidth01" 	node="0>0|0|0" />
-        <i3dMapping id="clearAreaHeight01" 	node="0>0|0|1" />
-        <i3dMapping id="levelAreaStart01" 	node="0>1|0" />
-        <i3dMapping id="levelAreaWidth01" 	node="0>1|0|0" />
-        <i3dMapping id="levelAreaHeight01" 	node="0>1|0|1" />
-        <i3dMapping id="indoorAreaStart01" 	node="0>2|0" />
-        <i3dMapping id="indoorAreaWidth01" 	node="0>2|0|0" />
-        <i3dMapping id="indoorAreaHeight01" node="0>2|0|1" />
-        <i3dMapping id="testAreaStart01" 	node="0>3|0" />
-        <i3dMapping id="testAreaEnd01" 		node="0>3|0|0" />
-		<i3dMapping id="01" 				node="0>4|1" />
-		<i3dMapping id="02" 				node="0>4|2" />
-		<i3dMapping id="03" 				node="0>4|3" />
-		<i3dMapping id="04" 				node="0>4|4" />
-		<i3dMapping id="05" 				node="0>4|5" />
-		<i3dMapping id="06" 				node="0>4|6" />
-		<i3dMapping id="07" 				node="0>4|7" />
-		<i3dMapping id="08" 				node="0>4|8" />
-		<i3dMapping id="09" 				node="0>4|9" />
-		<i3dMapping id="10" 				node="0>4|10" />
-		<i3dMapping id="11" 				node="0>4|11" />
-		<i3dMapping id="12" 				node="0>4|12" />
-		<i3dMapping id="13" 				node="0>4|13" />
-		<i3dMapping id="14" 				node="0>4|14" />
-		<i3dMapping id="15" 				node="0>4|15" />
-		<i3dMapping id="16" 				node="0>4|16" />
-		<i3dMapping id="17" 				node="0>4|17" />
-		<i3dMapping id="18" 				node="0>4|18" />
-		<i3dMapping id="19" 				node="0>4|19" />
-		<i3dMapping id="20" 				node="0>4|20" />
-		<i3dMapping id="21" 				node="0>4|21" />
-		<i3dMapping id="22" 				node="0>4|22" />
-		<i3dMapping id="23" 				node="0>4|23" />
-		<i3dMapping id="24" 				node="0>4|24" />
-		<i3dMapping id="25" 				node="0>4|25" />
-		<i3dMapping id="26" 				node="0>4|26" />
-		<i3dMapping id="27" 				node="0>4|27" />
-		<i3dMapping id="28" 				node="0>4|28" />
-		<i3dMapping id="29" 				node="0>4|29" />
-		<i3dMapping id="30" 				node="0>4|30" />
-    </i3dMappings>
+
+	<i3dMappings>
+		<i3dMapping id="clearAreaStart01" node="0>0|0" />
+		<i3dMapping id="clearAreaWidth01" node="0>0|0|0" />
+		<i3dMapping id="clearAreaHeight01" node="0>0|0|1" />
+		<i3dMapping id="levelAreaStart01" node="0>1|0" />
+		<i3dMapping id="levelAreaWidth01" node="0>1|0|0" />
+		<i3dMapping id="levelAreaHeight01" node="0>1|0|1" />
+		<i3dMapping id="indoorAreaStart01" node="0>2|0" />
+		<i3dMapping id="indoorAreaWidth01" node="0>2|0|0" />
+		<i3dMapping id="indoorAreaHeight01" node="0>2|0|1" />
+		<i3dMapping id="testAreaStart01" node="0>3|0" />
+		<i3dMapping id="testAreaEnd01" node="0>3|0|0" />
+		<i3dMapping id="01" node="0>4|1" />
+		<i3dMapping id="02" node="0>4|2" />
+		<i3dMapping id="03" node="0>4|3" />
+		<i3dMapping id="04" node="0>4|4" />
+		<i3dMapping id="05" node="0>4|5" />
+		<i3dMapping id="06" node="0>4|6" />
+		<i3dMapping id="07" node="0>4|7" />
+		<i3dMapping id="08" node="0>4|8" />
+		<i3dMapping id="09" node="0>4|9" />
+		<i3dMapping id="10" node="0>4|10" />
+		<i3dMapping id="11" node="0>4|11" />
+		<i3dMapping id="12" node="0>4|12" />
+		<i3dMapping id="13" node="0>4|13" />
+		<i3dMapping id="14" node="0>4|14" />
+		<i3dMapping id="15" node="0>4|15" />
+		<i3dMapping id="16" node="0>4|16" />
+		<i3dMapping id="17" node="0>4|17" />
+		<i3dMapping id="18" node="0>4|18" />
+		<i3dMapping id="19" node="0>4|19" />
+		<i3dMapping id="20" node="0>4|20" />
+		<i3dMapping id="21" node="0>4|21" />
+		<i3dMapping id="22" node="0>4|22" />
+		<i3dMapping id="23" node="0>4|23" />
+		<i3dMapping id="24" node="0>4|24" />
+		<i3dMapping id="25" node="0>4|25" />
+		<i3dMapping id="26" node="0>4|26" />
+		<i3dMapping id="27" node="0>4|27" />
+		<i3dMapping id="28" node="0>4|28" />
+		<i3dMapping id="29" node="0>4|29" />
+		<i3dMapping id="30" node="0>4|30" />
+	</i3dMappings>
 </placeable>

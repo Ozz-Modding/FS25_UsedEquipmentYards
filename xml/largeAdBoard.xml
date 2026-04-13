@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<placeable type="simplePlaceable" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
-        <storeData>
+<placeable type="simplePlaceable"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../shared/xml/schema/placeable.xsd">
+    <storeData>
         <name>$l10n_largeAdSign</name>
         <image>textures/store_largeAdBoard.png</image>
         <price>50</price>
@@ -18,15 +19,16 @@
             <category>decoration</category>
             <tab>decoration</tab>
         </brush>
-		<canBeSold>true</canBeSold>
+        <canBeSold>true</canBeSold>
     </storeData>
 
     <base>
         <filename>i3d/largeAdBoard.i3d</filename>
-	<boughtWithFarmland>true</boughtWithFarmland>
+        <boughtWithFarmland>true</boughtWithFarmland>
+        <canBeRenamed>false</canBeRenamed>
     </base>
 
-    <placement useRandomYRotation="false" useManualYRotation="true" >
+    <placement useRandomYRotation="false" useManualYRotation="true">
         <testAreas>
             <testArea startNode="testAreaStart01" endNode="testAreaEnd01" />
         </testAreas>
@@ -54,79 +56,79 @@
             <updateArea startNode="testAreaStart01" endNode="testAreaEnd01" />
         </updateAreas>
     </ai>
-	
 
-	<solarPanels>
+
+    <solarPanels>
         <solarPanelsConfigurations title="$l10n_config_Board">
-			 <solarPanelsConfiguration name="$l10n_configname_soldHere" isActive="true" price="0" incomePerHour="0">
+            <solarPanelsConfiguration name="$l10n_configname_soldHere" isActive="true" price="0" incomePerHour="0">
                 <objectChange node="AdL01" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>			
+            </solarPanelsConfiguration>
 
-			 <solarPanelsConfiguration name="$l10n_configname_lowPrices" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdL02" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
+            <solarPanelsConfiguration name="$l10n_configname_lowPrices" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL02" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="$l10n_configname_weBuy" isActive="true" price="0" incomePerHour="0">
-		        <objectChange node="AdL03" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
-		
-			<solarPanelsConfiguration name="$l10n_configname_testDrives" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdL04" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
+            <solarPanelsConfiguration name="$l10n_configname_weBuy" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL03" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="$l10n_configname_massey" isActive="true" price="0" incomePerHour="0">
-			    <objectChange node="AdL05" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
+            <solarPanelsConfiguration name="$l10n_configname_testDrives" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL04" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="$l10n_configname_newHolland" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdL06" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
+            <solarPanelsConfiguration name="$l10n_configname_massey" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL05" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
 
-			<solarPanelsConfiguration name="$l10n_configname_claas" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdL07" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
-			
-			<solarPanelsConfiguration name="$l10n_configname_johnDeere" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdL08" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
-			
-			<solarPanelsConfiguration name="$l10n_configname_fendt" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdL09" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
-			
-			<solarPanelsConfiguration name="$l10n_configname_jcb" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdL10" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>	
-			
-			<solarPanelsConfiguration name="$l10n_configname_rossAgri" isActive="true" price="0" incomePerHour="0">
-				<objectChange node="AdLRoss" visibilityActive="true" visibilityInactive="false"/>
-			</solarPanelsConfiguration>
+            <solarPanelsConfiguration name="$l10n_configname_newHolland" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL06" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
+
+            <solarPanelsConfiguration name="$l10n_configname_claas" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL07" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
+
+            <solarPanelsConfiguration name="$l10n_configname_johnDeere" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL08" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
+
+            <solarPanelsConfiguration name="$l10n_configname_fendt" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL09" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
+
+            <solarPanelsConfiguration name="$l10n_configname_jcb" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdL10" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
+
+            <solarPanelsConfiguration name="$l10n_configname_rossAgri" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdLRoss" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
 
         </solarPanelsConfigurations>
-	</solarPanels>
-	
+    </solarPanels>
+
     <i3dMappings>
-        <i3dMapping id="clearAreaStart01" 	node="0>0|0" />
-        <i3dMapping id="clearAreaWidth01" 	node="0>0|0|0" />
-        <i3dMapping id="clearAreaHeight01" 	node="0>0|0|1" />
-        <i3dMapping id="levelAreaStart01" 	node="0>1|0" />
-        <i3dMapping id="levelAreaWidth01" 	node="0>1|0|0" />
-        <i3dMapping id="levelAreaHeight01" 	node="0>1|0|1" />
-        <i3dMapping id="indoorAreaStart01" 	node="0>2|0" />
-        <i3dMapping id="indoorAreaWidth01" 	node="0>2|0|0" />
+        <i3dMapping id="clearAreaStart01" node="0>0|0" />
+        <i3dMapping id="clearAreaWidth01" node="0>0|0|0" />
+        <i3dMapping id="clearAreaHeight01" node="0>0|0|1" />
+        <i3dMapping id="levelAreaStart01" node="0>1|0" />
+        <i3dMapping id="levelAreaWidth01" node="0>1|0|0" />
+        <i3dMapping id="levelAreaHeight01" node="0>1|0|1" />
+        <i3dMapping id="indoorAreaStart01" node="0>2|0" />
+        <i3dMapping id="indoorAreaWidth01" node="0>2|0|0" />
         <i3dMapping id="indoorAreaHeight01" node="0>2|0|1" />
-        <i3dMapping id="testAreaStart01" 	node="0>3|0" />
-        <i3dMapping id="testAreaEnd01" 		node="0>3|0|0" />
-		<i3dMapping id="AdL01" 				node="0>4|0" />
-		<i3dMapping id="AdL02" 				node="0>4|1" />
-		<i3dMapping id="AdL03" 				node="0>4|2" />
-		<i3dMapping id="AdL04" 				node="0>4|3" />
-		<i3dMapping id="AdL05" 				node="0>4|4" />
-		<i3dMapping id="AdL06" 				node="0>4|5" />
-		<i3dMapping id="AdL07" 				node="0>4|6" />
-		<i3dMapping id="AdL08" 				node="0>4|7" />
-		<i3dMapping id="AdL09" 				node="0>4|8" />
-		<i3dMapping id="AdL10" 				node="0>4|9" />
-		<i3dMapping id="AdLRoss"			node="0>4|10" />
+        <i3dMapping id="testAreaStart01" node="0>3|0" />
+        <i3dMapping id="testAreaEnd01" node="0>3|0|0" />
+        <i3dMapping id="AdL01" node="0>4|0" />
+        <i3dMapping id="AdL02" node="0>4|1" />
+        <i3dMapping id="AdL03" node="0>4|2" />
+        <i3dMapping id="AdL04" node="0>4|3" />
+        <i3dMapping id="AdL05" node="0>4|4" />
+        <i3dMapping id="AdL06" node="0>4|5" />
+        <i3dMapping id="AdL07" node="0>4|6" />
+        <i3dMapping id="AdL08" node="0>4|7" />
+        <i3dMapping id="AdL09" node="0>4|8" />
+        <i3dMapping id="AdL10" node="0>4|9" />
+        <i3dMapping id="AdLRoss" node="0>4|10" />
     </i3dMappings>
 </placeable>
