@@ -28,14 +28,34 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
         </en>
         <de><![CDATA[Gebrauchtgerätehöfe
 
-Ermöglicht das Definieren benutzerdefinierter Fahrzeugverkaufsplätze, auf denen Sie gebrauchte Ausrüstung kaufen können.
+Mit diesem Mod kannst du Gebrauchtgerätehöfe auf deiner Karte platzieren, auf denen du gebrauchte Fahrzeuge und Geräte kaufen kannst.
+
+- Zeichne Höfe auf die gleiche Weise, wie du eigene Weiden definierst. Du kannst sie überall auf der Karte platzieren.
+- Besuche die Höfe persönlich, um zu sehen, was verfügbar ist. Das Angebot ändert sich mit der Zeit, also schau regelmäßig vorbei. Es gibt kein Menü.
+- Konfiguriere Höfe, um festzulegen, welche Art von Ausrüstung verkauft wird, einschließlich der Qualität und der verfügbaren Marken.
+- Wähle aus verschiedenen Qualitätsstufen, von alten Geräten bis hin zu einem Händlerhof mit neuer oder Vorführware.
+- Verkaufe deine Ausrüstung an Höfe gegen Bargeld oder Guthaben, das du für zukünftige Einkäufe verwenden kannst.
+- Der Mod enthält auch dekorative Schilder, um einen authentischen Hof zu gestalten. Vielen Dank an Mr Dexxx dafür.
+- Verkaufsfahrzeuge haben spezielle „Zu verkaufen"-Nummernschilder, dank Mark Thor.
+
+Wenn du zum ersten Mal einen Hof zeichnest, erscheint nicht sofort etwas zum Verkauf. Es dauert eine Weile, bis Bestand generiert wird, und der Hof muss persönlich besucht werden, bevor Artikel zum Verkauf angezeigt werden. Wenn du den Anfangsbestand sofort füllen möchtest, gibt es den Befehl ueyResetInventory.
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 ]]>
         </de>
         <fr><![CDATA[Parcs D'équipement D'occasion
 
-Permet de définir des cours de vente de véhicules personnalisées où vous pouvez acheter de l'équipement d'occasion.
+Ce mod vous permet de placer des parcs d'équipement d'occasion sur votre carte, où vous pouvez acheter des véhicules et du matériel d'occasion.
+
+- Dessinez les parcs de la même manière que vous définissez des pâturages personnalisés. Vous pouvez les placer n'importe où sur la carte.
+- Visitez les parcs en personne pour voir ce qui est disponible. Le stock change au fil du temps, alors revenez régulièrement. Il n'y a pas de menu.
+- Configurez les parcs pour déterminer quel type d'équipement est vendu, y compris la qualité et les marques disponibles.
+- Choisissez parmi différentes options de qualité pour représenter du vieux matériel, ou plutôt un parc de concessionnaire avec du stock neuf ou de démonstration.
+- Vendez votre équipement aux parcs contre de l'argent ou un crédit utilisable pour de futurs achats.
+- Le mod inclut également des panneaux décoratifs pour créer un parc authentique. Un grand merci à Mr Dexxx pour ceux-ci.
+- Les véhicules en vente ont des plaques d'immatriculation personnalisées « À vendre », grâce à Mark Thor.
+
+Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiatement à la vente. Il faut du temps pour que le stock soit généré, et le parc doit être visité en personne avant que les articles n'apparaissent. Si vous préférez remplir le stock initial immédiatement, il existe la commande ueyResetInventory.
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 ]]>
