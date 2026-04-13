@@ -38,7 +38,7 @@ function YardConfigActivatable:getDistance(x, y, z)
     -- can be much larger than that threshold, so measuring from the centre
     -- would hide the prompt near the edges.
     if self.yard:containsPoint(x, z) then
-        return 2.0
+        return YardVehicleActivatable.ACTIVATION_DISTANCE + 1
     end
     local b = self.yard.bounds
     return MathUtil.vector3Length(x - b.cx, y - (b.cy or 0), z - b.cz)

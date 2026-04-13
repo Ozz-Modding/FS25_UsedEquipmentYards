@@ -958,6 +958,12 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             if vehicle.setDamageAmount ~= nil then
                 vehicle:setDamageAmount(item.damage or 0)
             end
+            -- Clear the wearable dirty flag so the server doesn't send a
+            -- delta update to clients whose i3d nodes aren't loaded yet.
+            -- Clients receive the correct initial state via onReadStream.
+            if vehicle.spec_wearable ~= nil then
+                vehicle:clearDirtyFlags(vehicle.spec_wearable.dirtyFlag)
+            end
             vehicle:setOperatingTime(item.operatingTime or 0)
 
             -- Apply dirt based on yard dirtiness config ± DIRT_RANGE.

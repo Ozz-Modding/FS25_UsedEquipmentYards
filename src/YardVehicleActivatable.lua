@@ -22,18 +22,19 @@ function YardVehicleActivatable.new(yard, item)
 end
 
 function YardVehicleActivatable:getIsActivatable()
-    if self.item == nil or self.item.vehicle == nil then return false end
+    if self.item == nil or self.item.vehicle == nil or self.item.vehicle.rootNode == nil then return false end
     if g_localPlayer == nil then return false end
     if g_localPlayer:getCurrentVehicle() ~= nil then return false end
 
-    local px, py, pz = getWorldTranslation(g_localPlayer.rootNode)
-    return self:getDistance(px, py, pz) <= YardVehicleActivatable.ACTIVATION_DISTANCE
+    local px, _, pz = getWorldTranslation(g_localPlayer.rootNode)
+    local vx, _, vz = getWorldTranslation(self.item.vehicle.rootNode)
+    return MathUtil.vector2Length(px - vx, pz - vz) <= YardVehicleActivatable.ACTIVATION_DISTANCE
 end
 
 function YardVehicleActivatable:getDistance(x, y, z)
     if self.item == nil or self.item.vehicle == nil or self.item.vehicle.rootNode == nil then return math.huge end
-    local vx, vy, vz = getWorldTranslation(self.item.vehicle.rootNode)
-    return MathUtil.vector3Length(x - vx, y - vy, z - vz)
+    local vx, _, vz = getWorldTranslation(self.item.vehicle.rootNode)
+    return MathUtil.vector2Length(x - vx, z - vz)
 end
 
 function YardVehicleActivatable:run()
