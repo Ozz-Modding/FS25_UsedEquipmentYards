@@ -371,6 +371,15 @@ function UsedEquipmentYards.restoreLicensePlate(vehicle)
     vehicle:setLicensePlatesData(plateData)
 end
 
+--- Exclude a vehicle from FS25_AdvancedDamageSystem processing so ADS doesn't
+--- drain its battery or trigger breakdowns while it sits in the yard.
+function UsedEquipmentYards.setADSExcluded(vehicle, excluded)
+    local spec = vehicle.spec_AdvancedDamageSystem
+    if spec ~= nil then
+        spec.isExcludedVehicle = excluded
+    end
+end
+
 --- Re-enable driving and Tab cycling on a vehicle previously blocked for yard display.
 function UsedEquipmentYards.clearVehicleRestrictions(vehicle)
     if vehicle.spec_drivable ~= nil then
@@ -380,6 +389,7 @@ function UsedEquipmentYards.clearVehicleRestrictions(vehicle)
     if vehicle.setIsTabbable ~= nil then
         vehicle:setIsTabbable(true)
     end
+    UsedEquipmentYards.setADSExcluded(vehicle, false)
 end
 
 --- Called on remote clients when the server syncs a yard vehicle's item data.

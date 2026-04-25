@@ -296,6 +296,7 @@ function YardInventory:spawn()
                     if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
                         vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function() return false, nil end)
                     end
+                    UsedEquipmentYards.setADSExcluded(vehicle, true)
                     PriceTagRenderer.addTag(vehicle, item)
                 end
 
@@ -1019,6 +1020,8 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
                 end)
             end
 
+            UsedEquipmentYards.setADSExcluded(vehicle, true)
+
             item.vehicle = vehicle
             self.vehicles[#self.vehicles + 1] = vehicle
             UsedEquipmentYards.vehicleToItem[vehicle] = item
@@ -1290,6 +1293,7 @@ function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
     if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
         vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function() return false, nil end)
     end
+    UsedEquipmentYards.setADSExcluded(vehicle, true)
 
     item.vehicle = vehicle
     self.items[#self.items + 1] = item
