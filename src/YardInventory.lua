@@ -1297,6 +1297,13 @@ function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
     end
     UsedEquipmentYards.setADSExcluded(vehicle, true)
 
+    if vehicle.stopMotor ~= nil then
+        vehicle:stopMotor()
+    end
+    if vehicle.deactivateLights ~= nil then
+        vehicle:deactivateLights()
+    end
+
     item.vehicle = vehicle
     self.items[#self.items + 1] = item
     UsedEquipmentYards.vehicleToItem[vehicle] = item

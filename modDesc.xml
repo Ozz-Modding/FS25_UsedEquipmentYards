@@ -30,6 +30,7 @@ Changelog:
 1.0.0.1:
 - When using FS25_AdvancedDamageSystem mod, vehicles will no longer be sold with breakdowns / low battery.
 - Lowered hours for low, medium and high quality vehicles.
+- Vehicles sold to a yard will have their engine stopped.
 
 ]]>
         </en>
