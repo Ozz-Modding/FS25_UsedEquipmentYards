@@ -34,16 +34,16 @@ YardInventory.HOURS_PER_YEAR           = 800
 
 YardInventory.QUALITY                  = {
     LOW = {
-        hoursMin = 60,
-        hoursMax = 120,
+        hoursMin = 30,
+        hoursMax = 60,
         damageMin = 0.35,
         damageMax = 0.7,
         wearMin = 0.5,
         wearMax = 1.0,
     },
     MEDIUM = {
-        hoursMin = 25,
-        hoursMax = 60,
+        hoursMin = 17,
+        hoursMax = 28,
         damageMin = 0.15,
         damageMax = 0.45,
         wearMin = 0.2,
@@ -51,7 +51,7 @@ YardInventory.QUALITY                  = {
     },
     HIGH = {
         hoursMin = 5,
-        hoursMax = 25,
+        hoursMax = 15,
         damageMin = 0.05,
         damageMax = 0.2,
         wearMin = 0.05,
