@@ -952,6 +952,10 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             vehicle:delete()
         else
             vehicleAccepted = true
+            -- Exclude from ADS before applying condition values — ADS blocks
+            -- setOperatingTime unless the vehicle is excluded or ADS itself is writing.
+            UsedEquipmentYards.setADSExcluded(vehicle, true)
+
             -- Apply the item's pre-rolled condition values.
             if vehicle.addWearAmount ~= nil then
                 vehicle:addWearAmount(item.wear or 0)
@@ -1019,8 +1023,6 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
                     return false, nil
                 end)
             end
-
-            UsedEquipmentYards.setADSExcluded(vehicle, true)
 
             item.vehicle = vehicle
             self.vehicles[#self.vehicles + 1] = vehicle
