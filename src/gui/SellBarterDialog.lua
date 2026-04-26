@@ -123,8 +123,9 @@ function SellBarterDialog:calculateOffers(vehicle)
     local recentPrice = UsedEquipmentYards.getRecentSalePrice(vehicle.uniqueId)
     if recentPrice ~= nil and recentPrice > 0 then
         local cap = math.floor(recentPrice * 0.99)
+        local creditCap = math.floor(recentPrice * 1.01)
         cashTotal   = math.min(cashTotal, cap)
-        creditTotal = math.min(creditTotal, cap)
+        creditTotal = math.min(creditTotal, creditCap)
         hybridTotal = math.min(hybridTotal, cap)
         hybridCash  = math.min(hybridCash, hybridTotal)
         hybridCredit = hybridTotal - hybridCash
