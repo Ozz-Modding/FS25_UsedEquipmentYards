@@ -257,15 +257,20 @@ function PlaceableUsedEquipmentYard:onLoad(savegame)
     end
 end
 
---- Called by ConstructionBrushHusbandry:onCustomizableFenceFinished after the
---- fence flow is fully complete — both the "Yes" path (after customization
---- finishes) and the "No" path (player accepted the default fence).
---- We return false (no meadow) but use this as the trigger to create the yard.
---- Called by ConstructionBrushHusbandry after the fence flow. Return false
---- so no meadow dialog is shown. Yard creation is handled by
---- finishFenceCustomization (primary) and onUpdate fallback instead,
---- because this callback does not fire reliably in multiplayer.
+--- Called by ConstructionBrushHusbandry after the fence flow in both "Yes"
+--- and "No" paths. Return false so no meadow dialog is shown.
+--- Also triggers yard creation for the "No" path where
+--- finishFenceCustomization never fires. The yardId guard in
+--- createYardFromCurrentFence prevents double creation.
+--- Does not fire reliably in MP — the onUpdate timer is the MP fallback.
 function PlaceableUsedEquipmentYard:getCanCreateMeadow()
+    if self.isServer then
+        local data = self[PlaceableUsedEquipmentYard.KEY]
+        if data ~= nil then
+            data.createDelayMs = nil
+        end
+        PlaceableUsedEquipmentYard.createYardFromCurrentFence(self)
+    end
     return false
 end
 

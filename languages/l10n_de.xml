@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+    <translationContributors>Ozz</translationContributors>
+    <texts>
+        <text name="uey_modTitle"              text="Gebrauchtmaschinenhoefe"/>
+        <text name="uey_yardLabel"             text="Gebrauchtmaschinenhof"/>
+        <text name="uey_function"              text="Verkaufshof fuer Gebrauchtmaschinen"/>
+        <text name="uey_fenceSegment"          text="Hofbegrenzungszaun"/>
+        <text name="uey_noItems"               text="Derzeit keine Maschinen in diesem Hof verfuegbar."/>
+
+        <!-- Purchase flow -->
+        <text name="uey_purchaseConfirm"       text="%s fuer $%s kaufen?"/>
+        <text name="uey_purchaseSuccess"       text="%s fuer $%s gekauft."/>
+        <text name="uey_purchaseFailed_funds"  text="Nicht genuegend Geld fuer diesen Kauf."/>
+
+        <!-- HUD info when looking at a yard vehicle -->
+        <text name="uey_hud_forSale"          text="Zu verkaufen"/>
+        <text name="uey_hud_damage"           text="Schaden"/>
+        <text name="uey_hud_wear"             text="Verschleiss"/>
+        <text name="uey_hud_hours"            text="Stunden"/>
+
+
+        <!-- Vehicle purchase -->
+        <text name="uey_action_buyVehicle"           text="Kaufen"/>
+        <text name="uey_purchase_title"              text="Fahrzeug kaufen"/>
+        <text name="uey_purchase_confirm"            text="%s fuer %s kaufen?"/>
+        <text name="uey_purchase_insufficient_funds" text="Nicht genuegend Geld."/>
+
+        <!-- Yard config dialog -->
+        <text name="uey_action_configureYard"    text="Hof konfigurieren"/>
+        <text name="uey_config_title"            text="Hof-Konfiguration"/>
+        <text name="uey_config_settings_header"  text="Konfiguration"/>
+        <text name="uey_config_yardName"          text="Hofname"/>
+        <text name="uey_config_quality"          text="Qualitaet"/>
+        <text name="uey_config_quality_desc"     text="Bestimmt die Stunden, Schaeden und den Verschleiss der Maschinen. Niedrigere Qualitaet kostet weniger."/>
+        <text name="uey_config_dirtiness"        text="Verschmutzung"/>
+        <text name="uey_config_dirtiness_desc"   text="Durchschnittlicher Schmutzgrad. Nicht verwendet fuer Ex-Demo und Neu."/>
+        <text name="uey_config_workingWidth"      text="Arbeitsbreite"/>
+        <text name="uey_config_workingWidth_desc" text="Maschinen nach Arbeitsbreite filtern."/>
+        <text name="uey_config_minWorkingWidth"  text="Min. Breite"/>
+        <text name="uey_config_maxWorkingWidth"  text="Max. Breite"/>
+        <text name="uey_config_noMinimum"        text="Kein Minimum"/>
+        <text name="uey_config_noMaximum"        text="Kein Maximum"/>
+        <text name="uey_config_maxPrice"         text="Hoechstpreis"/>
+        <text name="uey_config_maxPrice_desc"    text="Hofinventar auf einen Hoechstpreis begrenzen."/>
+        <text name="uey_config_weights_header"   text="Kategoriegewichtung"/>
+        <text name="uey_config_weights_desc"     text="Spawnwahrscheinlichkeit pro Kategorie festlegen (0 = deaktiviert)."/>
+        <text name="uey_config_avgStockHours"     text="Durchschnittliche Standzeit"/>
+        <text name="uey_config_avgStockHours_desc" text="Wie lange Fahrzeuge bleiben, bevor sie verschwinden."/>
+        <text name="uey_config_gridSpacing"      text="Rasterabstand"/>
+        <text name="uey_config_gridSpacing_desc" text="Abstand zwischen Spawnpunkten. Kleiner = mehr Fahrzeuge."/>
+        <text name="uey_config_allWeights"       text="Alle Gewichtungen"/>
+        <text name="uey_config_clearWeights"     text="Gewichtungen loeschen"/>
+        <text name="uey_config_brands_header"    text="Marken"/>
+        <text name="uey_config_brands_desc"      text="Spawnwahrscheinlichkeit pro Marke festlegen (0 = deaktiviert)."/>
+        <text name="uey_config_allBrands"        text="Alle Marken"/>
+        <text name="uey_config_clearBrands"      text="Marken loeschen"/>
+        <text name="uey_config_close"            text="Schliessen"/>
+        <text name="uey_config_apply"            text="Anwenden"/>
+        <text name="uey_config_quality_LOW"      text="Niedrig"/>
+        <text name="uey_config_quality_MEDIUM"   text="Mittel"/>
+        <text name="uey_config_quality_HIGH"     text="Hoch"/>
+        <text name="uey_config_quality_EX_DEMO" text="Ex-Demo"/>
+        <text name="uey_config_quality_NEW"     text="Neu"/>
+
+        <!-- Barter dialog -->
+        <text name="uey_action_barter"              text="Verhandeln:"/>
+        <text name="uey_barter_header"              text="Verhandlung"/>
+        <text name="uey_barter_askingPrice"         text="Angebotspreis"/>
+        <text name="uey_barter_yourOffer"           text="Ihr Angebot"/>
+        <text name="uey_barter_makeOffer"           text="Angebot abgeben"/>
+        <text name="uey_barter_buyNow"              text="Sofort kaufen"/>
+        <text name="uey_barter_vehicleInfo"         text="Fahrzeuginfo"/>
+        <text name="uey_barter_specs"               text="Spezifikationen"/>
+        <text name="uey_barter_brand"               text="Marke"/>
+        <text name="uey_barter_owners"              text="Vorbesitzer"/>
+        <text name="uey_barter_hours"               text="Stunden"/>
+        <text name="uey_barter_damage"              text="Schaden"/>
+        <text name="uey_barter_wear"                text="Verschleiss"/>
+        <text name="uey_barter_chancesRemaining"    text="Verbleibende Verhandlungsversuche heute: %d"/>
+        <text name="uey_barter_rejected"            text="Angebot abgelehnt. Versuchen Sie einen hoeheren Betrag."/>
+        <text name="uey_barter_noChances"           text="Keine Verhandlungsversuche mehr heute."/>
+        <text name="uey_barter_noFarm"             text="Sie muessen einer Farm angehoeren, um zu verhandeln."/>
+        <text name="uey_barter_invalid"            text="Dieses Angebot kann nicht verarbeitet werden."/>
+        <text name="uey_barter_purchased"          text="%s fuer %s gekauft."/>
+        <text name="uey_barter_testDrive"          text="Probefahrt"/>
+        <text name="uey_barter_testDriveTitle"     text="Probefahrt"/>
+        <text name="uey_barter_testDriveConfirm"   text="%s fuer eine 2-stuendige Probefahrt nehmen? Rueckgabe bis %d:00 Uhr oder stuendliche Strafen fallen an."/>
+        <text name="uey_barter_returnVehicle"      text="Fahrzeug zurueckgeben"/>
+        <text name="uey_barter_returnTitle"        text="Fahrzeug zurueckgeben"/>
+        <text name="uey_barter_returnConfirm"      text="Dieses Fahrzeug zum Hof zurueckbringen?"/>
+
+        <!-- Sale Zone -->
+        <text name="uey_saleZoneLabel"             text="Hof-Verkaufszone"/>
+        <text name="uey_saleZone_function"          text="Drive-in-Verkaufszone fuer einen Gebrauchtmaschinenhof"/>
+        <text name="uey_saleZone_action"            text="Fahrzeuge verkaufen"/>
+        <text name="uey_saleZone_dialogTitle"       text="Fahrzeug zum Verkaufen auswaehlen"/>
+        <text name="uey_saleZone_notNearYard"       text="Muss in der Naehe eines Gebrauchtmaschinenhofs platziert werden."/>
+
+        <!-- Sell flow -->
+        <text name="uey_sell_tryOtherYard"       text="Daran sind wir nicht interessiert, aber ich denke %s waere es."/>
+        <text name="uey_sell_nobodyInterested"   text="Dieser Haendler ist an diesem Fahrzeug nicht interessiert und kennt keinen anderen Hof, der es waere."/>
+        <text name="uey_sell_noFarm"             text="Sie muessen einer Farm angehoeren, um Fahrzeuge zu verkaufen."/>
+        <text name="uey_sell_offersHeader"       text="Verkaufsangebote"/>
+        <text name="uey_sell_cashOffer"          text="Barangebot"/>
+        <text name="uey_sell_creditOffer"        text="Kreditangebot"/>
+        <text name="uey_sell_hybridOffer"        text="Mischangebot"/>
+        <text name="uey_sell_cashLabel"          text="Bar"/>
+        <text name="uey_sell_creditLabel"        text="Kredit"/>
+        <text name="uey_sell_totalLabel"         text="Gesamt"/>
+        <text name="uey_sell_selectOffer"        text="Annehmen"/>
+        <text name="uey_sell_success"            text="%s verkauft. Bar: %s, Kredit: %s."/>
+
+        <!-- Yard Credit -->
+        <text name="uey_credit_label"            text="Hofkredit"/>
+        <text name="uey_credit_none"             text="Keiner"/>
+
+        <!-- Signs: Large Ad Board -->
+        <text name="largeAdSign"                text="Grosses Werbeschild"/>
+        <text name="function_largeAdSign"       text="Dieses Schild bewirbt Marken und Angebote"/>
+        <text name="config_Board"               text="Schildauswahl"/>
+        <text name="configname_soldHere"        text="Werbung - Hier verkauft"/>
+        <text name="configname_lowPrices"       text="Werbung - Guenstige Preise"/>
+        <text name="configname_weBuy"           text="Werbung - Sie verkaufen, wir kaufen"/>
+        <text name="configname_testDrives"      text="Werbung - Probefahrten"/>
+        <text name="configname_massey"          text="Haendler - Massey"/>
+        <text name="configname_newHolland"      text="Haendler - New Holland"/>
+        <text name="configname_claas"           text="Haendler - Claas"/>
+        <text name="configname_johnDeere"       text="Haendler - John Deere"/>
+        <text name="configname_fendt"           text="Haendler - Fendt"/>
+        <text name="configname_jcb"             text="Haendler - JCB"/>
+        <text name="configname_rossAgri"        text="Ross Agri Hof"/>
+
+        <!-- Signs: Small Ad Board -->
+        <text name="smallAdSign"                text="Kleines Werbeschild"/>
+        <text name="function_smallAdSign"       text="Dieses Schild bewirbt Angebotspreise"/>
+        <text name="configname_10000"           text="Unter 10000"/>
+        <text name="configname_10000p"          text="Unter 10000 (Pfosten)"/>
+        <text name="configname_75000"           text="Unter 75000"/>
+        <text name="configname_75000p"          text="Unter 75000 (Pfosten)"/>
+        <text name="configname_100000"          text="Unter 100000"/>
+        <text name="configname_100000p"         text="Unter 100000 (Pfosten)"/>
+        <text name="configname_250000"          text="Unter 250000"/>
+        <text name="configname_250000p"         text="Unter 250000 (Pfosten)"/>
+        <text name="configname_500000"          text="Unter 500000"/>
+        <text name="configname_500000p"         text="Unter 500000 (Pfosten)"/>
+        <text name="configname_750000"          text="Unter 750000"/>
+        <text name="configname_750000p"         text="Unter 750000 (Pfosten)"/>
+        <text name="configname_999999"          text="Unter 999999"/>
+        <text name="configname_999999p"         text="Unter 999999 (Pfosten)"/>
+        <text name="configname_PoleOnly"        text="Nur Pfosten"/>
+        <text name="configname_KeepOff"         text="Rasen nicht betreten"/>
+        <text name="configname_KeepOffp"        text="Rasen nicht betreten (Pfosten)"/>
+        <text name="configname_Lunch"           text="Mittagspause"/>
+        <text name="configname_Lunchp"          text="Mittagspause (Pfosten)"/>
+        <text name="configname_NoParking"       text="Parkverbot"/>
+        <text name="configname_NoParkingp"      text="Parkverbot (Pfosten)"/>
+        <text name="configname_ToiletsLeft"     text="Toiletten (Links)"/>
+        <text name="configname_ToiletsLeftp"    text="Toiletten (Links) (Pfosten)"/>
+        <text name="configname_ToiletsRight"    text="Toiletten (Rechts)"/>
+        <text name="configname_ToiletsRightp"   text="Toiletten (Rechts) (Pfosten)"/>
+
+        <!-- Signs: Plot Board -->
+        <text name="plotSign"                   text="Stellplatzschilder"/>
+        <text name="function_plotSign"          text="Stellplaetze fuer Fahrzeuge und Maschinen zuweisen"/>
+        <text name="configname_plot01"          text="Stellplatz 01"/>
+        <text name="configname_plot02"          text="Stellplatz 02"/>
+        <text name="configname_plot03"          text="Stellplatz 03"/>
+        <text name="configname_plot04"          text="Stellplatz 04"/>
+        <text name="configname_plot05"          text="Stellplatz 05"/>
+        <text name="configname_plot06"          text="Stellplatz 06"/>
+        <text name="configname_plot07"          text="Stellplatz 07"/>
+        <text name="configname_plot08"          text="Stellplatz 08"/>
+        <text name="configname_plot09"          text="Stellplatz 09"/>
+        <text name="configname_plot10"          text="Stellplatz 10"/>
+        <text name="configname_plot11"          text="Stellplatz 11"/>
+        <text name="configname_plot12"          text="Stellplatz 12"/>
+        <text name="configname_plot13"          text="Stellplatz 13"/>
+        <text name="configname_plot14"          text="Stellplatz 14"/>
+        <text name="configname_plot15"          text="Stellplatz 15"/>
+        <text name="configname_plot16"          text="Stellplatz 16"/>
+        <text name="configname_plot17"          text="Stellplatz 17"/>
+        <text name="configname_plot18"          text="Stellplatz 18"/>
+        <text name="configname_plot19"          text="Stellplatz 19"/>
+        <text name="configname_plot20"          text="Stellplatz 20"/>
+        <text name="configname_plot21"          text="Stellplatz 21"/>
+        <text name="configname_plot22"          text="Stellplatz 22"/>
+        <text name="configname_plot23"          text="Stellplatz 23"/>
+        <text name="configname_plot24"          text="Stellplatz 24"/>
+        <text name="configname_plot25"          text="Stellplatz 25"/>
+        <text name="configname_plot26"          text="Stellplatz 26"/>
+        <text name="configname_plot27"          text="Stellplatz 27"/>
+        <text name="configname_plot28"          text="Stellplatz 28"/>
+        <text name="configname_plot29"          text="Stellplatz 29"/>
+        <text name="configname_plot30"          text="Stellplatz 30"/>
+
+        <!-- Permissions -->
+        <text name="uey_warning_adminOnly"     text="Nur der Serveradministrator kann Hoefe platzieren oder entfernen."/>
+
+        <!-- Console / status messages -->
+        <text name="uey_yardCreated"           text="Hof '%s' erstellt."/>
+        <text name="uey_yardRemoved"           text="Hof '%s' entfernt."/>
+        <text name="uey_inventoryReset"        text="Inventar fuer '%s' zurueckgesetzt."/>
+        <text name="uey_allInventoriesReset"   text="Alle Hofinventare wurden zurueckgesetzt."/>
+    </texts>
+</l10n>

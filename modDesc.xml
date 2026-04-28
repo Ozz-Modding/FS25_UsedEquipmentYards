@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="107">
+<modDesc descVersion="108">
     <author>Ozz</author>
     <version>1.0.0.0</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
@@ -25,14 +25,6 @@ When you first draw a yard, nothing will immediately appear for sale. It takes t
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
-Changelog:
-
-1.0.0.1:
-- When using FS25_AdvancedDamageSystem mod, vehicles will no longer be sold with breakdowns / low battery.
-- Lowered hours for low, medium and high quality vehicles.
-- Vehicles sold to a yard will have their engine stopped.
-- Ensure if you buy a yard vehicle and sell it back, cash and credit offers differ. This only affects vehicles bought from and sold back to the same yard.
-
 ]]>
         </en>
         <de><![CDATA[Gebrauchtgerätehöfe
@@ -51,11 +43,6 @@ Wenn du zum ersten Mal einen Hof zeichnest, erscheint nicht sofort etwas zum Ver
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
-Änderungsprotokoll:
-
-1.0.0.1:
-- Bei Verwendung des FS25_AdvancedDamageSystem-Mods werden Fahrzeuge nicht mehr mit Defekten / leerer Batterie verkauft.
-
 ]]>
         </de>
         <fr><![CDATA[Parcs D'équipement D'occasion
@@ -73,11 +60,6 @@ Ce mod vous permet de placer des parcs d'équipement d'occasion sur votre carte,
 Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiatement à la vente. Il faut du temps pour que le stock soit généré, et le parc doit être visité en personne avant que les articles n'apparaissent. Si vous préférez remplir le stock initial immédiatement, il existe la commande ueyResetInventory.
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
-
-Journal des modifications:
-
-1.0.0.1:
-- Lors de l'utilisation du mod FS25_AdvancedDamageSystem, les véhicules ne seront plus vendus avec des pannes / batterie déchargée.
 
 ]]>
         </fr>
