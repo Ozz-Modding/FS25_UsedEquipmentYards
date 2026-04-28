@@ -129,7 +129,6 @@
         <text name="configname_johnDeere"       text="Concessionnaire - John Deere"/>
         <text name="configname_fendt"           text="Concessionnaire - Fendt"/>
         <text name="configname_jcb"             text="Concessionnaire - JCB"/>
-        <text name="configname_rossAgri"        text="Ross Agri Yard"/>
 
         <!-- Signs: Small Ad Board -->
         <text name="smallAdSign"                text="Petit panneau publicitaire"/>
