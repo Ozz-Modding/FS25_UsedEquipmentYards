@@ -58,7 +58,7 @@
                 <section segmentId="SEGMENT" customizable="true" />
             </sections>
         </fence>
-        <animals type="COW" maxNumAnimals="0" baseMaxNumAnimals="0" maxNumVisualAnimals="0">
+        <animals type="" maxNumAnimals="0" baseMaxNumAnimals="0" maxNumVisualAnimals="0">
             <navigation />
             <loadingTrigger />
         </animals>
