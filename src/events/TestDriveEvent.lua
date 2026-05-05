@@ -144,6 +144,25 @@ function TestDriveEvent:serverReturnTestDrive(item, yard)
     vehicle:setAbsolutePosition(td.origX, td.origY, td.origZ, td.origRx, td.origRy, td.origRz)
     vehicle:addToPhysics()
 
+    -- Top up fuel to minimum so Motorized:onPostLoad won't charge farmId 0 on reload.
+    -- addFillUnitFillLevel does not charge money — farmId is only used for access checks
+    -- on negative deltas, so passing self.farmId here has no financial effect.
+    if vehicle.getConsumerFillUnitIndex ~= nil then
+        local minFrac = YardInventory.FUEL_MIN
+        local fuelTypes = { FillType.DIESEL, FillType.ELECTRICCHARGE, FillType.METHANE }
+        for _, fillType in ipairs(fuelTypes) do
+            local fillUnitIndex = vehicle:getConsumerFillUnitIndex(fillType)
+            if fillUnitIndex ~= nil then
+                local capacity = vehicle:getFillUnitCapacity(fillUnitIndex)
+                local minLevel = capacity * minFrac
+                local current = vehicle:getFillUnitFillLevel(fillUnitIndex)
+                if current < minLevel then
+                    vehicle:addFillUnitFillLevel(self.farmId, fillUnitIndex, minLevel - current, fillType, ToolType.UNDEFINED, nil)
+                end
+            end
+        end
+    end
+
     -- Restore yard ownership.
     vehicle:setOwnerFarmId(0)
 
@@ -179,6 +198,7 @@ function TestDriveEvent:clientStartTestDrive(item)
 
     PriceTagRenderer.removeTag(vehicle)
     UsedEquipmentYards.clearVehicleRestrictions(vehicle)
+    UsedEquipmentYards.setADSExcluded(vehicle, true)
 end
 
 function TestDriveEvent:clientReturnTestDrive(item)

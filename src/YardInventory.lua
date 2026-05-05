@@ -101,8 +101,9 @@ YardInventory.DEFAULT_CONFIG           = {
 
 -- Dirt jitter range applied ± around the dirtiness base
 YardInventory.DIRT_RANGE               = 0.20
-YardInventory.FUEL_BASE                = 0.15  -- target fuel level (25%)
-YardInventory.FUEL_RANGE               = 0.08  -- ± random variation
+YardInventory.FUEL_BASE                = 0.15  -- target fuel level
+YardInventory.FUEL_RANGE               = 0.04  -- ± random variation
+YardInventory.FUEL_MIN                 = 0.11  -- floor: Motorized:onPostLoad charges farmId on < 10%
 
 -- Minimum vehicle new price to be included (filters out tiny items).
 YardInventory.MIN_VEHICLE_PRICE        = 2000
@@ -1000,7 +1001,7 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
                         if capacity > 0 then
                             local target = YardInventory.FUEL_BASE
                                          + (math.random() * 2 - 1) * YardInventory.FUEL_RANGE
-                            target = math.max(0.05, math.min(0.35, target))
+                            target = math.max(YardInventory.FUEL_MIN, math.min(0.35, target))
                             local desired = capacity * target
                             local current = vehicle:getFillUnitFillLevel(fillUnitIndex)
                             local delta   = desired - current
