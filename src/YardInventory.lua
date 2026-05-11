@@ -289,7 +289,6 @@ function YardInventory:spawn()
 
                 -- Re-apply yard vehicle state.
                 if item.testDrive ~= nil then
-                    vehicle:setOwnerFarmId(item.testDrive.farmId)
                     UsedEquipmentYards.clearVehicleRestrictions(vehicle)
                 else
                     -- Lock the vehicle and add price tag.
@@ -1032,7 +1031,6 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             -- If this vehicle has an active test drive (loaded from save),
             -- keep it unlocked for the borrowing farm. Otherwise lock it.
             if item.testDrive ~= nil then
-                vehicle:setOwnerFarmId(item.testDrive.farmId)
                 UsedEquipmentYards.clearVehicleRestrictions(vehicle)
             else
                 PriceTagRenderer.addTag(vehicle, item)

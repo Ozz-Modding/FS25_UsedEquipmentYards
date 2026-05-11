@@ -96,9 +96,6 @@ function TestDriveEvent:serverStartTestDrive(item, yard)
     if item.testDrive ~= nil then return end
     if item.testDrivenByFarms ~= nil and item.testDrivenByFarms[self.farmId] then return end
 
-    -- Assign to farm so the player can enter.
-    item.vehicle:setOwnerFarmId(self.farmId)
-
     -- Shared: set testDrive data, remove tag, unlock.
     self:clientStartTestDrive(item)
 end
@@ -162,9 +159,6 @@ function TestDriveEvent:serverReturnTestDrive(item, yard)
             end
         end
     end
-
-    -- Restore yard ownership.
-    vehicle:setOwnerFarmId(0)
 
     -- Shared: update item state, re-add tag, re-lock.
     self:clientReturnTestDrive(item)
