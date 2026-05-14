@@ -12,3 +12,4 @@ This mod allows you to place used equipment yards on your map, where you can buy
 
 When you first draw a yard, nothing will immediately appear for sale. It takes time for stock to be generated, and the yard needs to be visited in person before items will show up for sale. If you prefer to populate initial stock immediately, there is a command ueyResetInventory.
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/M4M41K5NPV)
