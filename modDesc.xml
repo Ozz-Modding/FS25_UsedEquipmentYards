@@ -30,6 +30,7 @@ Changelog:
 1.0.0.1:
 - Added new button in settings to reset all yard inventories
 - Remove guard that prevents ueyResetInventory from working if you don't have cheats enabled
+- Added Second Hand Brand New Day sign featuring Ross from The Farm Hand
 
 ]]>
         </en>
@@ -49,6 +50,13 @@ Wenn du zum ersten Mal einen Hof zeichnest, erscheint nicht sofort etwas zum Ver
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
+Änderungsprotokoll:
+
+1.0.0.1:
+- Neue Schaltfläche in den Einstellungen zum Zurücksetzen aller Hofinventare hinzugefügt
+- Sperre entfernt, die ueyResetInventory ohne aktivierte Cheats verhinderte
+- Second Hand Brand New Day-Schild mit Ross von The Farm Hand hinzugefügt
+
 ]]>
         </de>
         <fr><![CDATA[Parcs D'équipement D'occasion
@@ -66,6 +74,13 @@ Ce mod vous permet de placer des parcs d'équipement d'occasion sur votre carte,
 Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiatement à la vente. Il faut du temps pour que le stock soit généré, et le parc doit être visité en personne avant que les articles n'apparaissent. Si vous préférez remplir le stock initial immédiatement, il existe la commande ueyResetInventory.
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
+
+Journal des modifications :
+
+1.0.0.1 :
+- Ajout d'un bouton dans les paramètres pour réinitialiser tous les inventaires des parcs
+- Suppression de la restriction empêchant ueyResetInventory de fonctionner sans les cheats activés
+- Ajout du panneau Second Hand Brand New Day avec Ross de The Farm Hand
 
 ]]>
         </fr>

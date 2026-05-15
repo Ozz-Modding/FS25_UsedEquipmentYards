@@ -16,7 +16,7 @@
     <File fileId="17" filename="../textures/AdL08.dds"/>
     <File fileId="18" filename="../textures/AdL09.dds"/>
     <File fileId="19" filename="../textures/AdL10.dds"/>
-
+    <File fileId="20" filename="../textures/AdL_Ross.dds"/>
     <File fileId="1" filename="$data/maps/mapAS/textures/props/ads/adGround_diffuse.png"/>
     <File fileId="2" filename="$data/maps/mapAS/textures/props/ads/adGround_normal.png"/>
     <File fileId="3" filename="$data/maps/mapAS/textures/props/ads/adGround_specular.png"/>
@@ -81,6 +81,11 @@
     </Material>
     <Material name="Material.001" materialId="86">
       <Texture fileId="19"/>
+      <Normalmap fileId="9"/>
+      <Glossmap fileId="10"/>
+    </Material>
+    <Material name="Material.001" materialId="16">
+      <Texture fileId="20"/>
       <Normalmap fileId="9"/>
       <Glossmap fileId="10"/>
     </Material>
@@ -165,6 +170,11 @@
           <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="80" castsShadows="true" receiveShadows="true" materialIds="5"/>
           <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="81" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
           <Shape name="AdL" rotation="90 -0 0" shapeId="3" nodeId="82" castsShadows="true" receiveShadows="true" materialIds="86"/>
+        </TransformGroup>
+        <TransformGroup name="largeAdBoard_Ross" rotation="-0 -90 0" visibility="false" clipDistance="80" nodeId="74">
+          <Shape name="largeAdBoard" scale="2.5 1 1" shapeId="1" nodeId="75" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="col" shapeId="2" static="true" collisionFilterMask="0xfffffbff" density="0.0001" nodeId="76" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="6"/>
+          <Shape name="AdL_Ross" rotation="90 -0 0" shapeId="3" nodeId="77" castsShadows="true" receiveShadows="true" materialIds="16"/>
         </TransformGroup>
       </TransformGroup>
     </TransformGroup>

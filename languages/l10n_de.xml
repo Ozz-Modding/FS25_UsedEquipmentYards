@@ -129,6 +129,7 @@
         <text name="configname_johnDeere"       text="Haendler - John Deere"/>
         <text name="configname_fendt"           text="Haendler - Fendt"/>
         <text name="configname_jcb"             text="Haendler - JCB"/>
+        <text name="configname_rossAgri"        text="Ross Agri Hof"/>
 
         <!-- Signs: Small Ad Board -->
         <text name="smallAdSign"                text="Kleines Werbeschild"/>

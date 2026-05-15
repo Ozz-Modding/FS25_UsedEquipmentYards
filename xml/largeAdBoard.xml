@@ -100,6 +100,10 @@
                 <objectChange node="AdL10" visibilityActive="true" visibilityInactive="false"/>
             </solarPanelsConfiguration>
 
+            <solarPanelsConfiguration name="$l10n_configname_rossAgri" isActive="true" price="0" incomePerHour="0">
+                <objectChange node="AdLRoss" visibilityActive="true" visibilityInactive="false"/>
+            </solarPanelsConfiguration>
+
         </solarPanelsConfigurations>
     </solarPanels>
 
@@ -125,5 +129,6 @@
         <i3dMapping id="AdL08" node="0>4|7" />
         <i3dMapping id="AdL09" node="0>4|8" />
         <i3dMapping id="AdL10" node="0>4|9" />
+        <i3dMapping id="AdLRoss" node="0>4|10" />
     </i3dMappings>
 </placeable>

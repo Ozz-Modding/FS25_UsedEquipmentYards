@@ -129,6 +129,7 @@
         <text name="configname_johnDeere"       text="Dealer - John Deere"/>
         <text name="configname_fendt"           text="Dealer - Fendt"/>
         <text name="configname_jcb"             text="Dealer - JCB"/>
+        <text name="configname_rossAgri"        text="Ross Agri Yard"/>
 
         <!-- Signs: Small Ad Board -->
         <text name="smallAdSign"                text="Small Advertising Sign"/>
