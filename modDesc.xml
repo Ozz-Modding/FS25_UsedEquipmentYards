@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="108">
     <author>Ozz</author>
-    <version>1.0.0.0</version>
+    <version>1.0.0.1</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -24,6 +24,12 @@ This mod allows you to place used equipment yards on your map, where you can buy
 When you first draw a yard, nothing will immediately appear for sale. It takes time for stock to be generated, and the yard needs to be visited in person before items will show up for sale. If you prefer to populate initial stock immediately, there is a command ueyResetInventory.
 
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
+
+Changelog:
+
+1.0.0.1:
+- Added new button in settings to reset all yard inventories
+- Remove guard that prevents ueyResetInventory from working if you don't have cheats enabled
 
 ]]>
         </en>
@@ -91,6 +97,7 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
         <sourceFile filename="src/YardVehicleActivatable.lua"/>
         <sourceFile filename="src/SaleZoneActivatable.lua"/>
         <sourceFile filename="src/gui/SaleZoneDialog.lua"/>
+        <sourceFile filename="src/UeySettings.lua"/>
         <sourceFile filename="src/main.lua"/>
     </extraSourceFiles>
     <placeableSpecializations>

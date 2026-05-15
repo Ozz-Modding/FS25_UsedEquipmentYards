@@ -76,4 +76,23 @@
     </Profile>
     <Profile name="ueySliderBox" extends="fs25_listSliderBox" with="anchorTopLeft" />
 
+    <!-- Settings page button (reset inventory, etc.) -->
+    <Profile name="ueySettingsButton" extends="emptyPanel" with="anchorMiddleRight">
+        <size value="280px 32px"/>
+        <position value="-10px 0px"/>
+        <focusOnHighlight value="true"/>
+        <textResizeWidth value="200px"/>
+        <textSize value="16px"/>
+        <iconColor value="$preset_colorTransparent"/>
+        <iconFocusedColor value="$preset_colorTransparent"/>
+        <iconTextOffset value="0px -1px"/>
+        <iconHighlightedColor value="$preset_colorTransparent"/>
+        <textBold value="true"/>
+        <textUpperCase value="true"/>
+        <textAlignment value="center"/>
+        <textColor value="$preset_fs25_colorMainLight"/>
+        <textFocusedColor value="$preset_fs25_colorMainDark"/>
+        <textDisabledColor value="$preset_colorDisabled"/>
+    </Profile>
+
 </GUIProfiles>

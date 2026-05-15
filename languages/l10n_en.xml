@@ -193,6 +193,10 @@
         <text name="configname_plot29"          text="Plot 29"/>
         <text name="configname_plot30"          text="Plot 30"/>
 
+        <!-- Settings page -->
+        <text name="uey_settings_resetInventory_label" text="Reset All Yards"/>
+        <text name="uey_settings_resetInventory_text"  text="Reset Inventory"/>
+
         <!-- Permissions -->
         <text name="uey_warning_adminOnly"     text="Only the server admin can place or remove yards."/>
 

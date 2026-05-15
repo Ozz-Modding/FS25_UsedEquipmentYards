@@ -66,6 +66,7 @@ function UsedEquipmentYards:loadMap(filename)
     SellBarterDialog.register()
     BarterState.init()
     YardCredit.init()
+    UeySettings.initialize()
 
     if g_currentMission:getIsServer() then
         self.yardManager = YardManager.new(self)
@@ -77,9 +78,7 @@ function UsedEquipmentYards:loadMap(filename)
         end
     end
 
-    if g_addCheatCommands then
-        self:registerConsoleCommands()
-    end
+    self:registerConsoleCommands()
 end
 
 function UsedEquipmentYards:delete()
