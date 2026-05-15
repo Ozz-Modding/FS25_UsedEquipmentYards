@@ -27,6 +27,9 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
 
+1.0.0.2 [WIP]:
+- Reworked handling of vehicles when sold to a full yard to prevent. Previously we saw vehicles being placed strangely.
+
 1.0.0.1:
 - Added new button in settings to reset all yard inventories
 - Remove guard that prevents ueyResetInventory from working if you don't have cheats enabled

@@ -1324,12 +1324,10 @@ function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
     return item
 end
 
---- Hide a vehicle: remove from physics and move far below terrain.
---- Avoids visibility issues with wheels/components that aren't children
---- of rootNode. The engine still tracks and saves the vehicle.
+--- Hide a vehicle: remove from physics and disable rendering.
 function YardInventory:hideVehicle(vehicle)
     vehicle:removeFromPhysics()
-    vehicle:setAbsolutePosition(0, -200, 0, 0, 0, 0)
+    vehicle:setVisibility(false)
 end
 
 --- Reveal and place a hidden vehicle at a yard position.
@@ -1347,6 +1345,7 @@ function YardInventory:placeVehicleInYard(item, x, z, yaw)
 
     local terrainY = getTerrainHeightAtWorldPos(g_terrainNode, x, 0, z)
     vehicle:removeFromPhysics()
+    vehicle:setVisibility(true)
     vehicle:setAbsolutePosition(x, terrainY + YardInventory.TERRAIN_OFFSET, z, 0, yaw, 0)
     vehicle:addToPhysics()
 
