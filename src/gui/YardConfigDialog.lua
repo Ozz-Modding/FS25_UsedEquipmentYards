@@ -18,6 +18,7 @@ YardConfigDialog.MAX_WW_OPTIONS       = { 5, 10, 15, 20, 0 }                    
 YardConfigDialog.MAX_PRICE_OPTIONS    = { 50000, 100000, 150000, 200000, 250000, 0 } -- 0 = "No maximum"
 YardConfigDialog.AVG_STOCK_OPTIONS    = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168 }
 YardConfigDialog.GRID_SPACING_OPTIONS = { 4, 5, 6, 7, 8, 9, 10 }
+YardConfigDialog.MAX_DUPLICATES_OPTIONS = { 1, 2, 3, 4, 5, 0 }              -- 0 = unlimited
 
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES           = {
@@ -317,6 +318,20 @@ function YardConfigDialog:populateOptions()
         end
     end
     self.gridSpacingOption:setState(gridSpacingState)
+
+    -- Max duplicates
+    local maxDupTexts = {}
+    for _, v in ipairs(YardConfigDialog.MAX_DUPLICATES_OPTIONS) do
+        maxDupTexts[#maxDupTexts + 1] = v == 0 and g_i18n:getText("uey_config_unlimited") or tostring(v)
+    end
+    self.maxDuplicatesOption:setTexts(maxDupTexts)
+    local maxDupState = 2 -- default index for 2
+    for i, v in ipairs(YardConfigDialog.MAX_DUPLICATES_OPTIONS) do
+        if v == (self.config.maxDuplicates or 2) then
+            maxDupState = i; break
+        end
+    end
+    self.maxDuplicatesOption:setState(maxDupState)
 end
 
 -- ---------------------------------------------------------------------------
@@ -349,6 +364,10 @@ end
 
 function YardConfigDialog:onGridSpacingChanged(state, element)
     self.config.gridSpacing = YardConfigDialog.GRID_SPACING_OPTIONS[state] or 8
+end
+
+function YardConfigDialog:onMaxDuplicatesChanged(state, element)
+    self.config.maxDuplicates = YardConfigDialog.MAX_DUPLICATES_OPTIONS[state] or 2
 end
 
 function YardConfigDialog:onWeightChanged(state, element)

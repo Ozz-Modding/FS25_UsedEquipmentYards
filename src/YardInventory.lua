@@ -97,6 +97,7 @@ YardInventory.DEFAULT_CONFIG           = {
     maxPrice        = 0,   -- 0 = no maximum (hard cap MAX_VEHICLE_PRICE still applies)
     avgStockHours   = 96,  -- average hours a vehicle stays before TTL expiry
     gridSpacing     = 8,   -- metres between spawn grid points
+    maxDuplicates   = 2,   -- max same vehicle (by xmlFilename) on yard; 0 = unlimited
 }
 
 -- Dirt jitter range applied ± around the dirtiness base
@@ -168,6 +169,7 @@ function YardInventory.copyConfig(cfg)
         maxPrice        = cfg.maxPrice or 0,
         avgStockHours   = cfg.avgStockHours or 96,
         gridSpacing     = cfg.gridSpacing or 8,
+        maxDuplicates   = cfg.maxDuplicates or 2,
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
@@ -423,7 +425,8 @@ function YardInventory:generateOneItem()
 
     for _ = 1, MAX_REROLLS do
         local item = self:rollItem()
-        if item ~= nil and item.price <= YardInventory.MAX_VEHICLE_PRICE then
+        if item ~= nil and item.price <= YardInventory.MAX_VEHICLE_PRICE
+            and not self:isDuplicateLimitReached(item.xmlFilename) then
             self.items[#self.items + 1] = item
             return item
         end
@@ -503,6 +506,25 @@ function YardInventory:rollItem()
         ttlHours         = self:randomTTL(),
         vehicle          = nil,
     }
+end
+
+--- Check if the yard already has the maximum allowed duplicates of a given vehicle.
+---@param xmlFilename string
+---@return boolean
+function YardInventory:isDuplicateLimitReached(xmlFilename)
+    local maxDups = self.config.maxDuplicates or 2
+    if maxDups == 0 then return false end -- unlimited
+
+    local count = 0
+    for _, existingItem in ipairs(self.items) do
+        if existingItem.xmlFilename == xmlFilename then
+            count = count + 1
+            if count >= maxDups then
+                return true
+            end
+        end
+    end
+    return false
 end
 
 --- Build a weighted pool of { storeItem, weight } entries from the config.
@@ -1466,6 +1488,7 @@ function YardInventory:saveToXML(xmlFile, key)
     setXMLInt(xmlFile, key .. ".config#maxPrice", self.config.maxPrice or 0)
     setXMLInt(xmlFile, key .. ".config#avgStockHours", self.config.avgStockHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
     setXMLInt(xmlFile, key .. ".config#gridSpacing", self.config.gridSpacing or 8)
+    setXMLInt(xmlFile, key .. ".config#maxDuplicates", self.config.maxDuplicates or 2)
 
     local ci = 0
     for catName, weight in pairs(self.config.categories) do
@@ -1566,6 +1589,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             maxPrice        = getXMLInt(xmlFile, key .. ".config#maxPrice") or 0,
             avgStockHours   = getXMLInt(xmlFile, key .. ".config#avgStockHours") or YardInventory.DEFAULT_AVG_STOCK_HOURS,
             gridSpacing     = getXMLInt(xmlFile, key .. ".config#gridSpacing") or 8,
+            maxDuplicates   = getXMLInt(xmlFile, key .. ".config#maxDuplicates") or 2,
             categories = {},
             brands     = {},
         }

@@ -54,6 +54,7 @@ function InitialClientStateEvent:writeStream(streamId, connection)
         streamWriteInt32(streamId, cfg.maxPrice or 0)
         streamWriteInt32(streamId, cfg.avgStockHours or 96)
         streamWriteInt32(streamId, cfg.gridSpacing or 8)
+        streamWriteInt32(streamId, cfg.maxDuplicates or 2)
 
         local cats = {}
         for name, weight in pairs(cfg.categories or {}) do
@@ -147,6 +148,7 @@ function InitialClientStateEvent:readStream(streamId, connection)
             maxPrice        = streamReadInt32(streamId),
             avgStockHours   = streamReadInt32(streamId),
             gridSpacing     = streamReadInt32(streamId),
+            maxDuplicates   = streamReadInt32(streamId),
             categories      = {},
             brands          = {},
         }

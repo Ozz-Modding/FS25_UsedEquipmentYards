@@ -49,6 +49,9 @@
         <text name="uey_config_avgStockHours_desc" text="Wie lange Fahrzeuge bleiben, bevor sie verschwinden."/>
         <text name="uey_config_gridSpacing"      text="Rasterabstand"/>
         <text name="uey_config_gridSpacing_desc" text="Abstand zwischen Spawnpunkten. Kleiner = mehr Fahrzeuge."/>
+        <text name="uey_config_maxDuplicates"      text="Max. Duplikate"/>
+        <text name="uey_config_maxDuplicates_desc" text="Max. identische Fahrzeuge gleichzeitig auf dem Hof."/>
+        <text name="uey_config_unlimited"          text="Unbegrenzt"/>
         <text name="uey_config_allWeights"       text="Alle Gewichtungen"/>
         <text name="uey_config_clearWeights"     text="Gewichtungen loeschen"/>
         <text name="uey_config_brands_header"    text="Marken"/>

@@ -49,6 +49,9 @@
         <text name="uey_config_avgStockHours_desc" text="Duree de presence des vehicules avant leur depart."/>
         <text name="uey_config_gridSpacing"      text="Espacement de la grille"/>
         <text name="uey_config_gridSpacing_desc" text="Distance entre les points d'apparition. Plus petit = plus de vehicules."/>
+        <text name="uey_config_maxDuplicates"      text="Max. doublons"/>
+        <text name="uey_config_maxDuplicates_desc" text="Nombre max. de vehicules identiques sur le parc."/>
+        <text name="uey_config_unlimited"          text="Illimite"/>
         <text name="uey_config_allWeights"       text="Tous les poids"/>
         <text name="uey_config_clearWeights"     text="Effacer les poids"/>
         <text name="uey_config_brands_header"    text="Marques"/>
