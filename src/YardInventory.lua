@@ -1110,14 +1110,59 @@ function YardInventory.randomConfiguration(storeItem)
         end
     end
 
+    -- Start from a random configuration set if available.
     if storeItem.configurations ~= nil and storeItem.configurationSets ~= nil then
         local numSets = #storeItem.configurationSets
         if numSets > 0 then
             local chosen = math.random(1, numSets)
-            for k, v in pairs(storeItem.configurationSets[chosen]) do
-                result[k] = v
+            local setConfigs = storeItem.configurationSets[chosen].configurations
+            if setConfigs ~= nil then
+                for k, v in pairs(setConfigs) do
+                    result[k] = v
+                end
             end
         end
+    end
+
+    -- Configs that should only rarely differ from default (25% chance).
+    local conservativeConfigs = { color = true, wheel = true, rimColor = true }
+
+    -- Randomly pick any selectable option for configs not covered by a set.
+    if storeItem.configurations ~= nil then
+        local configSets = storeItem.configurationSets or {}
+        for cfgName, cfgItems in pairs(storeItem.configurations) do
+            if #cfgItems > 1 then
+                local coveredBySet = false
+                for _, set in ipairs(configSets) do
+                    if set.configurations[cfgName] ~= nil then
+                        coveredBySet = true
+                        break
+                    end
+                end
+                if not coveredBySet then
+                    local shouldRandomize = true
+                    if conservativeConfigs[cfgName] then
+                        shouldRandomize = math.random() < 0.25
+                    end
+                    if shouldRandomize then
+                        local selectable = {}
+                        for i = 1, #cfgItems do
+                            if cfgItems[i].isSelectable then
+                                selectable[#selectable + 1] = i
+                            end
+                        end
+                        if #selectable > 0 then
+                            result[cfgName] = selectable[math.random(1, #selectable)]
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    print(string.format("[UEY] randomConfiguration for %s:", storeItem.xmlFilename))
+    for k, v in pairs(result) do
+        print(string.format("[UEY]   %s = %d", k, v))
     end
 
     return result

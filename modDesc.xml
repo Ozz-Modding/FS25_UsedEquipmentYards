@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="108">
     <author>Ozz</author>
-    <version>1.0.0.3</version>
+    <version>1.0.0.4</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -26,6 +26,9 @@ When you first draw a yard, nothing will immediately appear for sale. It takes t
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
+
+1.0.0.4 [WIP]:
+- Yard vehicles now have randomised configuration.
 
 1.0.0.3:
 - Add max duplicates option. You can now set a limit on how many of the same item can be for sale at once.
