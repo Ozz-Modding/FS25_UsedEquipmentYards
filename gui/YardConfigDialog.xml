@@ -119,6 +119,15 @@
                     <MultiTextOption profile="ueyMultiTextOption" id="includeNoYearOption"
                         position="200px -100px" size="180px 32px" onClick="onIncludeNoYearChanged"/>
                 </GuiElement>
+
+                <!-- Hire Purchasing section -->
+                <GuiElement profile="ueySection" position="0px -220px" size="400px 60px" id="hirePurchaseSection" visible="false">
+                    <Text profile="ueySettingLabel" text="Hire Purchase" position="0px 0px" size="400px 24px"/>
+
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_config_allowHirePurchase" position="0px -30px" size="200px 26px"/>
+                    <MultiTextOption profile="ueyMultiTextOption" id="allowHirePurchaseOption"
+                        position="200px -28px" size="180px 32px" onClick="onAllowHirePurchaseChanged"/>
+                </GuiElement>
             </GuiElement>
         </GuiElement>
 

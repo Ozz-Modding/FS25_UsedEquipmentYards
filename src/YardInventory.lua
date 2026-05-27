@@ -173,6 +173,7 @@ function YardInventory.copyConfig(cfg)
         minYear         = cfg.minYear or 0,
         maxYear         = cfg.maxYear or 0,
         includeNoYear   = cfg.includeNoYear ~= false,
+        allowHirePurchase = cfg.allowHirePurchase ~= false,
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
@@ -1566,6 +1567,7 @@ function YardInventory:saveToXML(xmlFile, key)
     setXMLInt(xmlFile, key .. ".config#minYear", self.config.minYear or 0)
     setXMLInt(xmlFile, key .. ".config#maxYear", self.config.maxYear or 0)
     setXMLBool(xmlFile, key .. ".config#includeNoYear", self.config.includeNoYear ~= false)
+    setXMLBool(xmlFile, key .. ".config#allowHirePurchase", self.config.allowHirePurchase ~= false)
 
     local ci = 0
     for catName, weight in pairs(self.config.categories) do
@@ -1672,6 +1674,7 @@ function YardInventory:loadFromXML(xmlFile, key)
             minYear         = getXMLInt(xmlFile, key .. ".config#minYear") or 0,
             maxYear         = getXMLInt(xmlFile, key .. ".config#maxYear") or 0,
             includeNoYear   = getXMLBool(xmlFile, key .. ".config#includeNoYear") ~= false,
+            allowHirePurchase = getXMLBool(xmlFile, key .. ".config#allowHirePurchase") ~= false,
             categories      = {},
             brands          = {},
         }

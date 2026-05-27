@@ -35,6 +35,7 @@ function YardConfigChangedEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, cfg.minYear or 0)
     streamWriteInt32(streamId, cfg.maxYear or 0)
     streamWriteBool(streamId, cfg.includeNoYear ~= false)
+    streamWriteBool(streamId, cfg.allowHirePurchase ~= false)
 
     -- Categories: count then name+weight pairs.
     local cats = {}
@@ -75,6 +76,7 @@ function YardConfigChangedEvent:readStream(streamId, connection)
         minYear         = streamReadInt32(streamId),
         maxYear         = streamReadInt32(streamId),
         includeNoYear   = streamReadBool(streamId),
+        allowHirePurchase = streamReadBool(streamId),
         categories      = {},
         brands          = {},
     }

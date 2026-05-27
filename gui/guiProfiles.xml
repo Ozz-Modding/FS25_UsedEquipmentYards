@@ -42,6 +42,15 @@
         <textColor value="$preset_fs25_colorMainLight"/>
     </Profile>
 
+    <!-- Table header label (green, same size as weight label) -->
+    <Profile name="ueyTableHeader" extends="baseReference" with="anchorTopLeft">
+        <textBold value="true"/>
+        <textSize value="15px"/>
+        <textAlignment value="left"/>
+        <textVerticalAlignment value="middle"/>
+        <textColor value="$preset_fs25_colorMainHighlight"/>
+    </Profile>
+
     <!-- MultiTextOption with top-left anchor for absolute positioning in our dialog -->
     <Profile name="ueyMultiTextOption" extends="fs25_settingsMultiTextOption" with="anchorTopLeft">
     </Profile>

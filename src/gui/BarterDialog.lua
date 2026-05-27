@@ -186,6 +186,19 @@ function BarterDialog:updateButtonStates()
     self.makeOfferButton.disabled = noChances or isOnTestDrive
     self.buyNowButton.disabled = isOnTestDrive
 
+    -- Hire purchase button: visible only if mod loaded and yard config allows it.
+    local showHP = g_modIsLoaded["FS25_HirePurchasing"]
+        and self.yard ~= nil
+        and self.yard.inventory ~= nil
+        and self.yard.inventory.config.allowHirePurchase ~= false
+    if self.hirePurchaseButton ~= nil then
+        self.hirePurchaseButton:setVisible(showHP == true)
+        self.hirePurchaseButton.disabled = isOnTestDrive
+    end
+    if self.hirePurchaseSeparator ~= nil then
+        self.hirePurchaseSeparator:setVisible(showHP == true)
+    end
+
     -- Test drive button: shows "Return" if our test drive, "Test Drive" otherwise.
     -- Only drivable categories (tractors, loaders, skid steers) are eligible.
     local canTestDrive = false
@@ -400,6 +413,29 @@ function BarterDialog:onReturnConfirm(confirmed)
     g_client:getServerConnection():sendEvent(
         TestDriveEvent.new(self.yard.id, self.itemIndex, farmId, TestDriveEvent.ACTION_RETURN))
     BarterDialog:superClass().close(self)
+end
+
+function BarterDialog:onClickHirePurchase()
+    if self.item == nil or self.yard == nil then return end
+
+    local farmId = BarterDialog.getLocalFarmId()
+    if farmId == nil then return end
+
+    local farm = g_farmManager:getFarmById(farmId)
+    if farm == nil then return end
+
+    local credit = YardCredit.getBalance(farmId, self.yard.id)
+    local remainder = self.item.price - credit
+    if remainder <= 0 then
+        self.resultText:setText(g_i18n:getText("uey_hp_creditCoversAll"))
+        return
+    end
+
+    local yard = self.yard
+    local item = self.item
+    local itemIndex = self.itemIndex
+    BarterDialog:superClass().close(self)
+    HirePurchaseDialog.show(yard, item, itemIndex, remainder, credit)
 end
 
 function BarterDialog:onClickClose()

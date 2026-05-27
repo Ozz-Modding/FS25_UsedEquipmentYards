@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="800px 580px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="ueyColumnHeader" text="$l10n_uey_hp_title" id="dialogTitleElement" position="40px -15px" size="720px 28px"/>
+
+            <!-- Summary -->
+            <GuiElement profile="ueySection" position="40px -50px" size="720px 80px">
+                <Text profile="ueyWeightLabel" text="$l10n_uey_hp_vehiclePrice" position="0px 0px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="vehiclePriceText" position="160px 0px" size="200px 22px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_hp_creditApplied" position="380px 0px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="creditAppliedText" position="540px 0px" size="180px 22px"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_hp_amountToFinance" position="0px -30px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="financeAmountText" position="160px -30px" size="200px 22px"/>
+            </GuiElement>
+
+            <!-- Deposit and Duration -->
+            <GuiElement profile="ueySection" position="40px -150px" size="720px 80px">
+                <Text profile="ueyWeightLabel" text="$l10n_uey_hp_deposit" position="0px 0px" size="120px 26px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="depositOption"
+                    position="120px 2px" size="320px 32px" onClick="onClickDepositLevel"/>
+
+                <Text profile="ueyWeightLabel" text="$l10n_uey_hp_duration" position="0px -38px" size="120px 26px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="durationOption"
+                    position="120px -36px" size="320px 32px" onClick="onClickDuration"/>
+            </GuiElement>
+
+            <!-- Offers table header -->
+            <GuiElement profile="ueySection" position="40px -250px" size="720px 22px">
+                <Text profile="ueyTableHeader" text="$l10n_uey_hp_offer"    position="0px 0px"   size="80px 20px"/>
+                <Text profile="ueyTableHeader" text="$l10n_uey_hp_interest" position="80px 0px"  size="120px 20px"/>
+                <Text profile="ueyTableHeader" text="$l10n_uey_hp_monthly"  position="200px 0px" size="160px 20px"/>
+                <Text profile="ueyTableHeader" text="$l10n_uey_hp_final"    position="360px 0px" size="160px 20px"/>
+                <Text profile="ueyTableHeader" text="$l10n_uey_hp_total"    position="520px 0px" size="160px 20px"/>
+            </GuiElement>
+
+            <!-- Offer rows -->
+            <GuiElement profile="ueySection" position="40px -275px" size="720px 120px">
+                <Text profile="ueySettingDesc" text="1" position="0px 0px"     size="80px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer1Interest"    position="80px 0px"  size="120px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer1Monthly"     position="200px 0px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer1Final"       position="360px 0px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer1Total"       position="520px 0px" size="160px 22px"/>
+
+                <Text profile="ueySettingDesc" text="2" position="0px -26px"   size="80px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer2Interest"    position="80px -26px"  size="120px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer2Monthly"     position="200px -26px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer2Final"       position="360px -26px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer2Total"       position="520px -26px" size="160px 22px"/>
+
+                <Text profile="ueySettingDesc" text="3" position="0px -52px"   size="80px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer3Interest"    position="80px -52px"  size="120px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer3Monthly"     position="200px -52px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer3Final"       position="360px -52px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer3Total"       position="520px -52px" size="160px 22px"/>
+
+                <Text profile="ueySettingDesc" text="4" position="0px -78px"   size="80px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer4Interest"    position="80px -78px"  size="120px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer4Monthly"     position="200px -78px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer4Final"       position="360px -78px" size="160px 22px"/>
+                <Text profile="ueySettingLabel" text="" id="offer4Total"       position="520px -78px" size="160px 22px"/>
+            </GuiElement>
+
+            <!-- Offer selection -->
+            <GuiElement profile="ueySection" position="40px -410px" size="720px 40px">
+                <Text profile="ueyWeightLabel" text="$l10n_uey_hp_selectOffer" position="0px 0px" size="120px 26px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="offerOption"
+                    position="120px 2px" size="200px 32px" onClick="onClickOfferSelection"/>
+            </GuiElement>
+        </GuiElement>
+
+        <!-- Buttons -->
+        <BoxLayout profile="fs25_dialogButtonBox" size="760px 60px">
+            <Button profile="buttonOK" text="$l10n_uey_hp_confirm" onClick="onClickConfirm" id="confirmButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>
+        </BoxLayout>
+    </GuiElement>
+</GUI>

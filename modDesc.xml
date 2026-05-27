@@ -28,8 +28,10 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 Changelog:
 
 1.0.0.4 [WIP]:
-- Yard vehicles now have randomised configuration.
+- Yard vehicles now have randomised configuration
 - Added support for Vehicle Years mod
+- Added support for Hire Purchasing mod
+- Filter out Fish Food from inventory weights to prevent it spawning
 
 1.0.0.3:
 - Add max duplicates option. You can now set a limit on how many of the same item can be for sale at once.
@@ -123,6 +125,8 @@ Journal des modifications :
         <sourceFile filename="src/events/VehicleItemRemovedEvent.lua"/>
         <sourceFile filename="src/events/BarterAttemptEvent.lua"/>
         <sourceFile filename="src/events/ResetInventoryEvent.lua"/>
+        <sourceFile filename="src/events/HirePurchaseYardEvent.lua"/>
+        <sourceFile filename="src/gui/HirePurchaseDialog.lua"/>
         <sourceFile filename="src/YardNameGenerator.lua"/>
         <sourceFile filename="src/YardConfigActivatable.lua"/>
         <sourceFile filename="src/YardVehicleActivatable.lua"/>

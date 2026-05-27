@@ -2,7 +2,7 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
-    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="800px 630px">
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="930px 630px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -57,11 +57,13 @@
         </GuiElement>
 
         <!-- Buttons -->
-        <BoxLayout profile="fs25_dialogButtonBox" size="760px 60px">
+        <BoxLayout profile="fs25_dialogButtonBox" size="890px 60px">
             <Button profile="buttonActivate" text="$l10n_uey_barter_makeOffer" onClick="onClickMakeOffer" id="makeOfferButton"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonOK" text="$l10n_uey_barter_buyNow" onClick="onClickBuyNow" id="buyNowButton"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonSearch" text="$l10n_uey_barter_hirePurchase" onClick="onClickHirePurchase" id="hirePurchaseButton" visible="false"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator" id="hirePurchaseSeparator" visible="false"/>
             <Button profile="buttonExtra1" text="$l10n_uey_barter_testDrive" onClick="onClickTestDrive" id="testDriveButton"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonBack" text="$l10n_uey_config_close" onClick="onClickClose"/>

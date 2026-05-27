@@ -6,6 +6,11 @@ UsedEquipmentYards = {}
 UsedEquipmentYards.dir     = g_currentModDirectory
 UsedEquipmentYards.modName = g_currentModName
 
+function UsedEquipmentYards.getHirePurchaseEnv()
+    if g_currentMission.LeasingOptions == nil then return nil end
+    return getfenv(g_currentMission.LeasingOptions.registerLeaseDeal)
+end
+
 -- Activatables registered with the activatable system (one per yard).
 UsedEquipmentYards.activatables = {}
 
@@ -64,6 +69,9 @@ function UsedEquipmentYards:loadMap(filename)
     BarterDialog.register()
     SaleZoneDialog.register()
     SellBarterDialog.register()
+    if g_modIsLoaded["FS25_HirePurchasing"] then
+        HirePurchaseDialog.register()
+    end
     BarterState.init()
     YardCredit.init()
     UeySettings.initialize()

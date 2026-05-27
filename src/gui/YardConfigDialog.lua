@@ -39,6 +39,7 @@ YardConfigDialog.SKIP_NAMES           = {
     ["PALLETSEEDS"]               = true,
     ["PALLETVEGETABLES"]          = true,
     ["PALLETSILAGE"]              = true,
+    ["PALLETANIMALS"]              = true,
     ["PALLETGRASSLAND"]           = true,
     ["PALLETSEEDSROOTCROPS"]      = true,
     ["SPECIALCROPSPALLETS"]       = true,
@@ -394,6 +395,8 @@ end
 -- ---------------------------------------------------------------------------
 
 function YardConfigDialog:populateModOptions()
+    self:populateHirePurchaseOptions()
+
     -- Vehicle Years
     if g_modIsLoaded["FS25_Vehicle_Years"] and self.vehicleYearsSection ~= nil then
         self.vehicleYearsSection:setVisible(true)
@@ -443,6 +446,21 @@ end
 
 function YardConfigDialog:onIncludeNoYearChanged(state, element)
     self.config.includeNoYear = (state == 1)
+end
+
+-- Hire Purchasing
+
+function YardConfigDialog:populateHirePurchaseOptions()
+    if not g_modIsLoaded["FS25_HirePurchasing"] or self.hirePurchaseSection == nil then return end
+    self.hirePurchaseSection:setVisible(true)
+
+    self.allowHirePurchaseOption:setTexts({ g_i18n:getText("uey_config_yes"), g_i18n:getText("uey_config_no") })
+    local state = (self.config.allowHirePurchase == false) and 2 or 1
+    self.allowHirePurchaseOption:setState(state)
+end
+
+function YardConfigDialog:onAllowHirePurchaseChanged(state, element)
+    self.config.allowHirePurchase = (state == 1)
 end
 
 -- ---------------------------------------------------------------------------

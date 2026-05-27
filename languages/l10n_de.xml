@@ -74,6 +74,26 @@
         <text name="uey_config_includeNoYear"      text="Unbekannte einschl."/>
         <text name="uey_config_yes"                text="Ja"/>
         <text name="uey_config_no"                 text="Nein"/>
+        <!-- Hire Purchasing -->
+        <text name="uey_config_allowHirePurchase"  text="Erlauben"/>
+        <text name="uey_barter_hirePurchase"       text="Ratenkauf"/>
+        <text name="uey_hp_title"                  text="Ratenkauf"/>
+        <text name="uey_hp_vehiclePrice"           text="Fahrzeugpreis"/>
+        <text name="uey_hp_creditApplied"          text="Guthaben"/>
+        <text name="uey_hp_amountToFinance"        text="Finanzierungsbetrag"/>
+        <text name="uey_hp_deposit"                text="Anzahlung"/>
+        <text name="uey_hp_duration"               text="Laufzeit"/>
+        <text name="uey_hp_offer"                  text="Angebot"/>
+        <text name="uey_hp_interest"               text="Zinsen"/>
+        <text name="uey_hp_monthly"                text="Monatlich"/>
+        <text name="uey_hp_final"                  text="Schlussrate"/>
+        <text name="uey_hp_total"                  text="Gesamtkosten"/>
+        <text name="uey_hp_selectOffer"            text="Angebot waehlen"/>
+        <text name="uey_hp_confirm"                text="Bestaetigen"/>
+        <text name="uey_hp_year"                   text="Jahr"/>
+        <text name="uey_hp_years"                  text="Jahre"/>
+        <text name="uey_hp_notEnoughDeposit"       text="Sie koennen die Mindestanzahlung von %s nicht leisten."/>
+        <text name="uey_hp_creditCoversAll"        text="Ihr Guthaben deckt den vollen Preis. Verwenden Sie stattdessen Sofortkauf."/>
 
         <!-- Barter dialog -->
         <text name="uey_action_barter"              text="Verhandeln:"/>

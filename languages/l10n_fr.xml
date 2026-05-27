@@ -74,6 +74,26 @@
         <text name="uey_config_includeNoYear"      text="Inclure inconnus"/>
         <text name="uey_config_yes"                text="Oui"/>
         <text name="uey_config_no"                 text="Non"/>
+        <!-- Hire Purchasing -->
+        <text name="uey_config_allowHirePurchase"  text="Autoriser"/>
+        <text name="uey_barter_hirePurchase"       text="Location-vente"/>
+        <text name="uey_hp_title"                  text="Location-vente"/>
+        <text name="uey_hp_vehiclePrice"           text="Prix du vehicule"/>
+        <text name="uey_hp_creditApplied"          text="Credit applique"/>
+        <text name="uey_hp_amountToFinance"        text="Montant a financer"/>
+        <text name="uey_hp_deposit"                text="Acompte"/>
+        <text name="uey_hp_duration"               text="Duree"/>
+        <text name="uey_hp_offer"                  text="Offre"/>
+        <text name="uey_hp_interest"               text="Interets"/>
+        <text name="uey_hp_monthly"                text="Mensualite"/>
+        <text name="uey_hp_final"                  text="Frais finaux"/>
+        <text name="uey_hp_total"                  text="Cout total"/>
+        <text name="uey_hp_selectOffer"            text="Choisir l'offre"/>
+        <text name="uey_hp_confirm"                text="Confirmer"/>
+        <text name="uey_hp_year"                   text="an"/>
+        <text name="uey_hp_years"                  text="ans"/>
+        <text name="uey_hp_notEnoughDeposit"       text="Vous ne pouvez pas payer l'acompte minimum de %s."/>
+        <text name="uey_hp_creditCoversAll"        text="Votre credit couvre le prix total. Utilisez Acheter maintenant."/>
 
         <!-- Barter dialog -->
         <text name="uey_action_barter"              text="Negocier :"/>
