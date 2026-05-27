@@ -40,10 +40,7 @@ end
 function EquipmentPurchasedEvent:run(connection)
     if not connection:getIsServer() then
         -- -----------------------------------------------------------------
-        -- SERVER: validate, deduct, transfer ownership, apply local cleanup,
-        -- then broadcast to any remote clients.
-        -- Doing cleanup here (not in the client branch) avoids relying on
-        -- the broadcast looping back synchronously in SP.
+        -- SERVER: received from client — validate, deduct, transfer, broadcast.
         -- -----------------------------------------------------------------
         local manager = UsedEquipmentYards.yardManager
         if manager == nil then return end
@@ -94,7 +91,7 @@ function EquipmentPurchasedEvent:run(connection)
     -- CLIENT: remote client receiving the broadcast — clean up local state.
     -- -----------------------------------------------------------------
 
-    -- Try server-side inventory first (for SP / listen server).
+    -- Listen server host: clean up via yardManager.
     local manager = UsedEquipmentYards.yardManager
     if manager ~= nil then
         local yard = manager.yards[self.yardId]
@@ -103,12 +100,22 @@ function EquipmentPurchasedEvent:run(connection)
             if item ~= nil then
                 local vehicle = item.vehicle
                 if vehicle ~= nil then
+                    vehicle:setOwnerFarmId(self.farmId)
                     PriceTagRenderer.removeTag(vehicle)
                     UsedEquipmentYards.restoreLicensePlate(vehicle)
                     UsedEquipmentYards.clearVehicleRestrictions(vehicle)
                 end
                 yard.inventory:removeItem(item, true)
             end
+        end
+    end
+
+    -- Remote client: assign ownership via clientItems before cleanup removes the reference.
+    local clientYardItems = UsedEquipmentYards.clientItems[self.yardId]
+    if clientYardItems ~= nil then
+        local clientItem = clientYardItems[self.itemIndex]
+        if clientItem ~= nil and clientItem.vehicle ~= nil then
+            clientItem.vehicle:setOwnerFarmId(self.farmId)
         end
     end
 

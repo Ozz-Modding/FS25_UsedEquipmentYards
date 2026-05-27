@@ -27,11 +27,12 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
 
-1.0.0.4 [WIP]:
+1.0.0.4:
 - Yard vehicles now have randomised configuration
 - Added support for Vehicle Years mod
 - Added support for Hire Purchasing mod
 - Filter out Fish Food from inventory weights to prevent it spawning
+- Fix some sporadic multiplayer issues where purchased vehicles didn't appear to be owned by the correct farm
 
 1.0.0.3:
 - Add max duplicates option. You can now set a limit on how many of the same item can be for sale at once.
@@ -64,6 +65,16 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.0.4:
+- Hoffahrzeuge haben jetzt zufällige Konfigurationen
+- Unterstützung für Vehicle Years Mod hinzugefügt
+- Unterstützung für Hire Purchasing Mod hinzugefügt
+- Fischfutter aus den Inventargewichten gefiltert, um das Spawnen zu verhindern
+- Behebung einiger sporadischer Multiplayer-Probleme, bei denen gekaufte Fahrzeuge nicht dem richtigen Betrieb zugeordnet wurden
+
+1.0.0.3:
+- Max. Duplikate-Option hinzugefügt. Du kannst jetzt ein Limit festlegen, wie viele gleiche Fahrzeuge gleichzeitig zum Verkauf stehen.
+
 1.0.0.2:
 - Überarbeitete Handhabung von Fahrzeugen, die an einen vollen Hof verkauft werden. Zuvor wurden Fahrzeuge merkwürdig platziert.
 
@@ -92,12 +103,22 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
 
+1.0.0.4 :
+- Les vehicules du parc ont desormais des configurations aleatoires
+- Ajout de la prise en charge du mod Vehicle Years
+- Ajout de la prise en charge du mod Hire Purchasing
+- Filtrage de la nourriture pour poissons des poids d'inventaire pour empecher son apparition
+- Correction de problemes sporadiques en multijoueur ou les vehicules achetes ne semblaient pas appartenir a la bonne ferme
+
+1.0.0.3 :
+- Ajout de l'option max. doublons. Vous pouvez desormais limiter le nombre de vehicules identiques en vente simultanement.
+
 1.0.0.2 :
-- Refonte de la gestion des véhicules vendus à un parc plein. Auparavant, les véhicules étaient placés de manière étrange.
+- Refonte de la gestion des vehicules vendus a un parc plein. Auparavant, les vehicules etaient places de maniere etrange.
 
 1.0.0.1 :
-- Ajout d'un bouton dans les paramètres pour réinitialiser tous les inventaires des parcs
-- Suppression de la restriction empêchant ueyResetInventory de fonctionner sans les cheats activés
+- Ajout d'un bouton dans les parametres pour reinitialiser tous les inventaires des parcs
+- Suppression de la restriction empechant ueyResetInventory de fonctionner sans les cheats actives
 - Ajout du panneau Second Hand Brand New Day avec Ross de The Farm Hand
 
 ]]>
