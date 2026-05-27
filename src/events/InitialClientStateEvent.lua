@@ -55,6 +55,9 @@ function InitialClientStateEvent:writeStream(streamId, connection)
         streamWriteInt32(streamId, cfg.avgStockHours or 96)
         streamWriteInt32(streamId, cfg.gridSpacing or 8)
         streamWriteInt32(streamId, cfg.maxDuplicates or 2)
+        streamWriteInt32(streamId, cfg.minYear or 0)
+        streamWriteInt32(streamId, cfg.maxYear or 0)
+        streamWriteBool(streamId, cfg.includeNoYear ~= false)
 
         local cats = {}
         for name, weight in pairs(cfg.categories or {}) do
@@ -149,6 +152,9 @@ function InitialClientStateEvent:readStream(streamId, connection)
             avgStockHours   = streamReadInt32(streamId),
             gridSpacing     = streamReadInt32(streamId),
             maxDuplicates   = streamReadInt32(streamId),
+            minYear         = streamReadInt32(streamId),
+            maxYear         = streamReadInt32(streamId),
+            includeNoYear   = streamReadBool(streamId),
             categories      = {},
             brands          = {},
         }

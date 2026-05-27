@@ -2,7 +2,7 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
-    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1400px 990px">
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="1780px 990px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -85,22 +85,45 @@
                 </ScrollingLayout>
             </GuiElement>
 
-            <!-- ======== RIGHT COLUMN: Brands ======== -->
-            <GuiElement position="910px -18px" size="460px 870px">
-                <Text profile="ueyColumnHeader" text="$l10n_uey_config_brands_header" position="0px 0px" size="460px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_brands_desc" position="0px -22px" size="460px 18px"/>
+            <!-- ======== RIGHT-MIDDLE COLUMN: Brands ======== -->
+            <GuiElement position="910px -18px" size="400px 870px">
+                <Text profile="ueyColumnHeader" text="$l10n_uey_config_brands_header" position="0px 0px" size="400px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_brands_desc" position="0px -22px" size="400px 18px"/>
 
-                <ScrollingLayout position="0px 46px" size="460px 760px" flowDirection="vertical" id="brandScrollLayout">
-                    <GuiElement profile="ueyWeightRow" size="460px 26px" id="brandRowTemplate" visible="false">
-                        <Text profile="ueyWeightLabel" size="230px 26px" id="brandRowLabel"/>
-                        <MultiTextOption profile="ueyMultiTextOption" position="230px 0px" size="220px 26px" id="brandRowOption" onClick="onBrandChanged"/>
+                <ScrollingLayout position="0px 46px" size="400px 760px" flowDirection="vertical" id="brandScrollLayout">
+                    <GuiElement profile="ueyWeightRow" size="400px 26px" id="brandRowTemplate" visible="false">
+                        <Text profile="ueyWeightLabel" size="200px 26px" id="brandRowLabel"/>
+                        <MultiTextOption profile="ueyMultiTextOption" position="200px 0px" size="190px 26px" id="brandRowOption" onClick="onBrandChanged"/>
                     </GuiElement>
                 </ScrollingLayout>
+            </GuiElement>
+
+            <!-- ======== RIGHT COLUMN: Mods ======== -->
+            <GuiElement position="1340px -18px" size="400px 870px">
+                <Text profile="ueyColumnHeader" text="Mods" position="0px 0px" size="400px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_mods_desc" position="0px -22px" size="400px 18px"/>
+
+                <!-- Vehicle Years section -->
+                <GuiElement profile="ueySection" position="0px -48px" size="400px 160px" id="vehicleYearsSection" visible="false">
+                    <Text profile="ueySettingLabel" text="Vehicle Years" position="0px 0px" size="400px 24px"/>
+
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_config_minYear" position="0px -30px" size="130px 26px"/>
+                    <MultiTextOption profile="ueyMultiTextOption" id="minYearOption"
+                        position="130px -28px" size="250px 32px" onClick="onMinYearChanged"/>
+
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_config_maxYear" position="0px -66px" size="130px 26px"/>
+                    <MultiTextOption profile="ueyMultiTextOption" id="maxYearOption"
+                        position="130px -64px" size="250px 32px" onClick="onMaxYearChanged"/>
+
+                    <Text profile="ueyWeightLabel" text="$l10n_uey_config_includeNoYear" position="0px -102px" size="200px 26px"/>
+                    <MultiTextOption profile="ueyMultiTextOption" id="includeNoYearOption"
+                        position="200px -100px" size="180px 32px" onClick="onIncludeNoYearChanged"/>
+                </GuiElement>
             </GuiElement>
         </GuiElement>
 
         <!-- Buttons -->
-        <BoxLayout profile="fs25_dialogButtonBox" size="1200px 60px">
+        <BoxLayout profile="fs25_dialogButtonBox" size="1580px 60px">
             <Button profile="buttonSearch" text="$l10n_uey_config_allWeights" onClick="onClickAllWeights"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="buttonExtra1" text="$l10n_uey_config_clearWeights" onClick="onClickClearWeights"/>

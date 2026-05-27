@@ -29,6 +29,7 @@ Changelog:
 
 1.0.0.4 [WIP]:
 - Yard vehicles now have randomised configuration.
+- Added support for Vehicle Years mod
 
 1.0.0.3:
 - Add max duplicates option. You can now set a limit on how many of the same item can be for sale at once.

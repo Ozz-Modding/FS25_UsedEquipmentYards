@@ -66,6 +66,15 @@
         <text name="uey_config_quality_EX_DEMO" text="Ex-Demo"/>
         <text name="uey_config_quality_NEW"     text="Neu"/>
 
+        <!-- Mod-Integrationen -->
+        <text name="uey_config_mods_desc"          text="Optionen erscheinen hier, wenn unterstuetzte Mods aktiviert sind."/>
+        <!-- Vehicle Years -->
+        <text name="uey_config_minYear"            text="Min. Jahr"/>
+        <text name="uey_config_maxYear"            text="Max. Jahr"/>
+        <text name="uey_config_includeNoYear"      text="Unbekannte einschl."/>
+        <text name="uey_config_yes"                text="Ja"/>
+        <text name="uey_config_no"                 text="Nein"/>
+
         <!-- Barter dialog -->
         <text name="uey_action_barter"              text="Verhandeln:"/>
         <text name="uey_barter_header"              text="Verhandlung"/>

@@ -20,6 +20,10 @@ YardConfigDialog.AVG_STOCK_OPTIONS    = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 1
 YardConfigDialog.GRID_SPACING_OPTIONS = { 4, 5, 6, 7, 8, 9, 10 }
 YardConfigDialog.MAX_DUPLICATES_OPTIONS = { 1, 2, 3, 4, 5, 0 }              -- 0 = unlimited
 
+-- Year options for Vehicle Years mod integration. 0 = no limit.
+YardConfigDialog.MIN_YEAR_OPTIONS = { 0, 1950, 1960, 1970, 1980, 1990, 2000, 2010, 2015, 2020, 2025 }
+YardConfigDialog.MAX_YEAR_OPTIONS = { 1960, 1970, 1980, 1990, 2000, 2010, 2015, 2020, 2025, 2030, 0 }
+
 -- Category types to exclude from the weight list.
 YardConfigDialog.SKIP_TYPES           = {
     ["OBJECTS"]   = true,
@@ -90,6 +94,7 @@ function YardConfigDialog:onOpen()
     YardConfigDialog:superClass().onOpen(self)
     self:buildRows()
     self:populateOptions()
+    self:populateModOptions()
 end
 
 function YardConfigDialog:onClose()
@@ -382,6 +387,62 @@ function YardConfigDialog:onBrandChanged(state, element)
     if brandName ~= nil then
         self.config.brands[brandName] = state - 1
     end
+end
+
+-- ---------------------------------------------------------------------------
+-- Mod integrations
+-- ---------------------------------------------------------------------------
+
+function YardConfigDialog:populateModOptions()
+    -- Vehicle Years
+    if g_modIsLoaded["FS25_Vehicle_Years"] and self.vehicleYearsSection ~= nil then
+        self.vehicleYearsSection:setVisible(true)
+
+        -- Min year
+        local minYearTexts = {}
+        for _, v in ipairs(YardConfigDialog.MIN_YEAR_OPTIONS) do
+            minYearTexts[#minYearTexts + 1] = v == 0 and g_i18n:getText("uey_config_noMinimum") or tostring(v)
+        end
+        self.minYearOption:setTexts(minYearTexts)
+        local minYearState = 1
+        for i, v in ipairs(YardConfigDialog.MIN_YEAR_OPTIONS) do
+            if v == (self.config.minYear or 0) then
+                minYearState = i; break
+            end
+        end
+        self.minYearOption:setState(minYearState)
+
+        -- Max year
+        local maxYearTexts = {}
+        for _, v in ipairs(YardConfigDialog.MAX_YEAR_OPTIONS) do
+            maxYearTexts[#maxYearTexts + 1] = v == 0 and g_i18n:getText("uey_config_noMaximum") or tostring(v)
+        end
+        self.maxYearOption:setTexts(maxYearTexts)
+        local maxYearState = #YardConfigDialog.MAX_YEAR_OPTIONS
+        for i, v in ipairs(YardConfigDialog.MAX_YEAR_OPTIONS) do
+            if v == (self.config.maxYear or 0) then
+                maxYearState = i; break
+            end
+        end
+        self.maxYearOption:setState(maxYearState)
+
+        -- Include vehicles with no year
+        self.includeNoYearOption:setTexts({ g_i18n:getText("uey_config_yes"), g_i18n:getText("uey_config_no") })
+        local includeState = (self.config.includeNoYear == false) and 2 or 1
+        self.includeNoYearOption:setState(includeState)
+    end
+end
+
+function YardConfigDialog:onMinYearChanged(state, element)
+    self.config.minYear = YardConfigDialog.MIN_YEAR_OPTIONS[state] or 0
+end
+
+function YardConfigDialog:onMaxYearChanged(state, element)
+    self.config.maxYear = YardConfigDialog.MAX_YEAR_OPTIONS[state] or 0
+end
+
+function YardConfigDialog:onIncludeNoYearChanged(state, element)
+    self.config.includeNoYear = (state == 1)
 end
 
 -- ---------------------------------------------------------------------------

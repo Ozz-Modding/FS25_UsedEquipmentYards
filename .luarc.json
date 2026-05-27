@@ -96,7 +96,8 @@
             "getParent",
             "entityExists",
             "getHasClassId",
-            "Attachable"
+            "Attachable",
+            "g_brandManager"
         ]
     }
 }
