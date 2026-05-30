@@ -226,6 +226,10 @@
         <text name="configname_plot29"          text="Parcelle 29"/>
         <text name="configname_plot30"          text="Parcelle 30"/>
 
+        <!-- Settings page -->
+        <text name="uey_settings_resetInventory_label" text="Reinitialiser tous les parcs"/>
+        <text name="uey_settings_resetInventory_text"  text="Reinitialiser l'inventaire"/>
+
         <!-- Permissions -->
         <text name="uey_warning_adminOnly"     text="Seul l'administrateur du serveur peut placer ou supprimer des parcs."/>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="108">
     <author>Ozz</author>
-    <version>1.0.0.4</version>
+    <version>1.0.0.5</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -26,6 +26,10 @@ When you first draw a yard, nothing will immediately appear for sale. It takes t
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
+
+1.0.0.5:
+- Color and wheel rim color are no longer randomised.
+- Added some missing translations.
 
 1.0.0.4:
 - Yard vehicles now have randomised configuration

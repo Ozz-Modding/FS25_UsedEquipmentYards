@@ -226,6 +226,10 @@
         <text name="configname_plot29"          text="Stellplatz 29"/>
         <text name="configname_plot30"          text="Stellplatz 30"/>
 
+        <!-- Settings page -->
+        <text name="uey_settings_resetInventory_label" text="Alle Hoefe zuruecksetzen"/>
+        <text name="uey_settings_resetInventory_text"  text="Inventar zuruecksetzen"/>
+
         <!-- Permissions -->
         <text name="uey_warning_adminOnly"     text="Nur der Serveradministrator kann Hoefe platzieren oder entfernen."/>
 

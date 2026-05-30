@@ -1134,6 +1134,8 @@ function YardInventory.randomConfiguration(storeItem)
         end
     end
 
+    local neverRandomize = { color = true, rimColor = true }
+
     -- Start from a random configuration set if available.
     if storeItem.configurations ~= nil and storeItem.configurationSets ~= nil then
         local numSets = #storeItem.configurationSets
@@ -1142,20 +1144,21 @@ function YardInventory.randomConfiguration(storeItem)
             local setConfigs = storeItem.configurationSets[chosen].configurations
             if setConfigs ~= nil then
                 for k, v in pairs(setConfigs) do
-                    result[k] = v
+                    if not neverRandomize[k] then
+                        result[k] = v
+                    end
                 end
             end
         end
     end
-
     -- Configs that should only rarely differ from default (25% chance).
-    local conservativeConfigs = { color = true, wheel = true, rimColor = true }
+    local conservativeConfigs = { wheel = true }
 
     -- Randomly pick any selectable option for configs not covered by a set.
     if storeItem.configurations ~= nil then
         local configSets = storeItem.configurationSets or {}
         for cfgName, cfgItems in pairs(storeItem.configurations) do
-            if #cfgItems > 1 then
+            if #cfgItems > 1 and not neverRandomize[cfgName] then
                 local coveredBySet = false
                 for _, set in ipairs(configSets) do
                     if set.configurations[cfgName] ~= nil then
