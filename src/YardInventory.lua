@@ -1134,7 +1134,7 @@ function YardInventory.randomConfiguration(storeItem)
         end
     end
 
-    local neverRandomize = { color = true, rimColor = true }
+    local neverRandomize = { color = true, rimColor = true, baseColor = true }
 
     -- Start from a random configuration set if available.
     if storeItem.configurations ~= nil and storeItem.configurationSets ~= nil then
