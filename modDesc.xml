@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="109">
     <author>Ozz</author>
-    <version>1.0.0.6</version>
+    <version>1.0.0.7</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -26,6 +26,10 @@ When you first draw a yard, nothing will immediately appear for sale. It takes t
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
+
+1.0.0.7:
+- Add design colors to configs excluded from randomisation.
+- Sale Zone now applies levelling and clearance to ensure it is visible and clear.
 
 1.0.0.6:
 - Add baseColor to configs excluded from randomisation.
@@ -175,6 +179,8 @@ Journal des modifications :
         </type>
         <type name="usedEquipmentYardSaleZone" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
             <specialization name="placement" />
+            <specialization name="clearAreas" />
+            <specialization name="leveling" />
             <specialization name="saleZone" />
         </type>
     </placeableTypes>

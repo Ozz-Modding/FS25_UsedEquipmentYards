@@ -14,32 +14,31 @@
 --
 -- Inventory refreshes once per in-game period (≈ month). The last-refreshed
 -- period and year are persisted so a reload mid-period does not re-roll.
-
-YardInventory                          = {}
-YardInventory._mt                      = Class(YardInventory)
+YardInventory = {}
+YardInventory._mt = Class(YardInventory)
 
 -- Safety cap to prevent runaway spawning (e.g. if collision checks fail).
-YardInventory.MAX_PLACEMENT_FAILURES   = 5 -- consecutive placement failures before giving up
+YardInventory.MAX_PLACEMENT_FAILURES = 5 -- consecutive placement failures before giving up
 
 -- Spawn mode constants.
-YardInventory.SPAWN_FILL               = 1 -- fill yard to capacity (used on reset)
-YardInventory.SPAWN_SINGLE             = 2 -- spawn one vehicle then stop (used on hourly tick)
+YardInventory.SPAWN_FILL = 1 -- fill yard to capacity (used on reset)
+YardInventory.SPAWN_SINGLE = 2 -- spawn one vehicle then stop (used on hourly tick)
 
 -- ---------------------------------------------------------------------------
 -- Quality presets — control hours, damage, and wear ranges
 -- ---------------------------------------------------------------------------
 -- Hours are engine hours (what you see on the dashboard). Age in months is
 -- derived from hours for Vehicle.calculateSellPrice (~800 hours/year average).
-YardInventory.HOURS_PER_YEAR           = 800
+YardInventory.HOURS_PER_YEAR = 800
 
-YardInventory.QUALITY                  = {
+YardInventory.QUALITY = {
     LOW = {
         hoursMin = 30,
         hoursMax = 60,
         damageMin = 0.35,
         damageMax = 0.7,
         wearMin = 0.5,
-        wearMax = 1.0,
+        wearMax = 1.0
     },
     MEDIUM = {
         hoursMin = 17,
@@ -47,7 +46,7 @@ YardInventory.QUALITY                  = {
         damageMin = 0.15,
         damageMax = 0.45,
         wearMin = 0.2,
-        wearMax = 0.65,
+        wearMax = 0.65
     },
     HIGH = {
         hoursMin = 5,
@@ -55,7 +54,7 @@ YardInventory.QUALITY                  = {
         damageMin = 0.05,
         damageMax = 0.2,
         wearMin = 0.05,
-        wearMax = 0.25,
+        wearMax = 0.25
     },
     EX_DEMO = {
         hoursMin = 1,
@@ -63,7 +62,7 @@ YardInventory.QUALITY                  = {
         damageMin = 0.0,
         damageMax = 0.05,
         wearMin = 0.0,
-        wearMax = 0.10,
+        wearMax = 0.10
     },
     NEW = {
         hoursMin = 0.2,
@@ -71,8 +70,8 @@ YardInventory.QUALITY                  = {
         damageMin = 0.0,
         damageMax = 0.0,
         wearMin = 0.0,
-        wearMax = 0.0,
-    },
+        wearMax = 0.0
+    }
 }
 
 -- ---------------------------------------------------------------------------
@@ -80,68 +79,68 @@ YardInventory.QUALITY                  = {
 -- ---------------------------------------------------------------------------
 -- Categories is a map of { CATEGORY_NAME = weight }. Weight 0 = excluded.
 -- Brands is a map of { BRAND_NAME = weight }. Empty table = all brands allowed (weight 1).
-YardInventory.DEFAULT_CONFIG           = {
-    quality         = "MEDIUM",
-    dirtiness       = 0.50, -- base dirt level (0–1)
-    categories      = {
-        TRACTORSS           = 10,
-        TRACTORSM           = 5,
-        TRACTORSL           = 1,
-        TELELOADERVEHICLES  = 4,
+YardInventory.DEFAULT_CONFIG = {
+    quality = "MEDIUM",
+    dirtiness = 0.50, -- base dirt level (0–1)
+    categories = {
+        TRACTORSS = 10,
+        TRACTORSM = 5,
+        TRACTORSL = 1,
+        TELELOADERVEHICLES = 4,
         WHEELLOADERVEHICLES = 2,
-        SKIDSTEERVEHICLES   = 2,
+        SKIDSTEERVEHICLES = 2
     },
-    brands          = {}, -- empty = all brands with weight 1
-    minWorkingWidth = 0,  -- 0 = no minimum
-    maxWorkingWidth = 0,  -- 0 = no maximum
-    maxPrice        = 0,  -- 0 = no maximum (hard cap MAX_VEHICLE_PRICE still applies)
-    avgStockHours   = 96, -- average hours a vehicle stays before TTL expiry
-    gridSpacing     = 8,  -- metres between spawn grid points
-    maxDuplicates   = 2,  -- max same vehicle (by xmlFilename) on yard; 0 = unlimited
+    brands = {}, -- empty = all brands with weight 1
+    minWorkingWidth = 0, -- 0 = no minimum
+    maxWorkingWidth = 0, -- 0 = no maximum
+    maxPrice = 0, -- 0 = no maximum (hard cap MAX_VEHICLE_PRICE still applies)
+    avgStockHours = 96, -- average hours a vehicle stays before TTL expiry
+    gridSpacing = 8, -- metres between spawn grid points
+    maxDuplicates = 2 -- max same vehicle (by xmlFilename) on yard; 0 = unlimited
 }
 
 -- Dirt jitter range applied ± around the dirtiness base
-YardInventory.DIRT_RANGE               = 0.20
-YardInventory.FUEL_BASE                = 0.15 -- target fuel level
-YardInventory.FUEL_RANGE               = 0.04 -- ± random variation
-YardInventory.FUEL_MIN                 = 0.11 -- floor: Motorized:onPostLoad charges farmId on < 10%
+YardInventory.DIRT_RANGE = 0.20
+YardInventory.FUEL_BASE = 0.15 -- target fuel level
+YardInventory.FUEL_RANGE = 0.04 -- ± random variation
+YardInventory.FUEL_MIN = 0.11 -- floor: Motorized:onPostLoad charges farmId on < 10%
 
 -- Minimum vehicle new price to be included (filters out tiny items).
-YardInventory.MIN_VEHICLE_PRICE        = 2000
+YardInventory.MIN_VEHICLE_PRICE = 2000
 -- Maximum used price — vehicles priced above this after jitter are re-rolled.
-YardInventory.MAX_VEHICLE_PRICE        = 999999
+YardInventory.MAX_VEHICLE_PRICE = 999999
 
 -- Inset from fence boundary to avoid spawning outside non-rectangular areas (metres).
-YardInventory.BOUNDS_INSET             = 3
+YardInventory.BOUNDS_INSET = 3
 
 -- ---------------------------------------------------------------------------
 -- Grid placement constants
 -- ---------------------------------------------------------------------------
 -- Spacing (metres) between spawn grid points within the yard polygon.
-YardInventory.GRID_SPACING             = 8
+YardInventory.GRID_SPACING = 8
 -- Buffer distance (metres) added around each vehicle's footprint when
 -- checking grid occupancy. Ensures clearance to drive out.
 YardInventory.VEHICLE_CLEARANCE_BUFFER = 1.0
 -- Yaw jitter range (radians). Vehicles face toward the yard entrance
 -- (anchor point) then add uniform noise within this range. ≈ ±15°.
-YardInventory.YAW_JITTER               = math.rad(15)
+YardInventory.YAW_JITTER = math.rad(15)
 -- Terrain offset (metres) when calling setPosition — lifts the vehicle
 -- slightly above the ground to avoid clipping.
-YardInventory.TERRAIN_OFFSET           = 0.5
+YardInventory.TERRAIN_OFFSET = 0.5
 -- Collision mask for overlapBox spawn checks. Detects vehicles and
 -- static objects (buildings, fences) but not triggers or terrain.
 -- DEFAULT(0x1) | DYNAMIC_OBJECT(0x20) | BUILDING(0x40) | VEHICLE(0x10000)
-YardInventory.OVERLAP_COLLISION_MASK   = 0x10061
+YardInventory.OVERLAP_COLLISION_MASK = 0x10061
 
 -- Price jitter — adds variety around the base sell-price formula.
 -- Spread scales inversely with price (sqrt curve). At the reference price (100k):
 --   normal band ≈ ±2.5%, wide band ≈ ±3.5%.
 -- Cheaper items get wider variance; expensive items tighten up.
-YardInventory.PRICE_NORMAL_CHANCE      = 0.85
-YardInventory.PRICE_REFERENCE          = 100000
-YardInventory.PRICE_NORMAL_BASE        = 0.025 -- ±2.5% at reference price
-YardInventory.PRICE_WIDE_BASE          = 0.035 -- ±3.5% at reference price
-YardInventory.PRICE_SPREAD_MAX         = 0.12  -- cap for very cheap items
+YardInventory.PRICE_NORMAL_CHANCE = 0.85
+YardInventory.PRICE_REFERENCE = 100000
+YardInventory.PRICE_NORMAL_BASE = 0.025 -- ±2.5% at reference price
+YardInventory.PRICE_WIDE_BASE = 0.035 -- ±3.5% at reference price
+YardInventory.PRICE_SPREAD_MAX = 0.12 -- cap for very cheap items
 
 function YardInventory.getPriceSpread(price, isWide)
     local base = isWide and YardInventory.PRICE_WIDE_BASE or YardInventory.PRICE_NORMAL_BASE
@@ -155,25 +154,25 @@ end
 -- Derived from config.avgStockHours: uniform random in [avg*0.5, avg*1.5].
 YardInventory.DEFAULT_AVG_STOCK_HOURS = 96
 -- Probability each in-game hour that a new vehicle is spawned (if space allows).
-YardInventory.HOURLY_SPAWN_CHANCE     = 0.35
+YardInventory.HOURLY_SPAWN_CHANCE = 0.35
 
 --- Deep-copy a config table so edits don't affect the original.
 function YardInventory.copyConfig(cfg)
     local copy = {
-        quality         = cfg.quality,
-        dirtiness       = cfg.dirtiness,
-        categories      = {},
-        brands          = {},
+        quality = cfg.quality,
+        dirtiness = cfg.dirtiness,
+        categories = {},
+        brands = {},
         minWorkingWidth = cfg.minWorkingWidth or 0,
         maxWorkingWidth = cfg.maxWorkingWidth or 0,
-        maxPrice        = cfg.maxPrice or 0,
-        avgStockHours   = cfg.avgStockHours or 96,
-        gridSpacing     = cfg.gridSpacing or 8,
-        maxDuplicates   = cfg.maxDuplicates or 2,
-        minYear         = cfg.minYear or 0,
-        maxYear         = cfg.maxYear or 0,
-        includeNoYear   = cfg.includeNoYear ~= false,
-        allowHirePurchase = cfg.allowHirePurchase ~= false,
+        maxPrice = cfg.maxPrice or 0,
+        avgStockHours = cfg.avgStockHours or 96,
+        gridSpacing = cfg.gridSpacing or 8,
+        maxDuplicates = cfg.maxDuplicates or 2,
+        minYear = cfg.minYear or 0,
+        maxYear = cfg.maxYear or 0,
+        includeNoYear = cfg.includeNoYear ~= false,
+        allowHirePurchase = cfg.allowHirePurchase ~= false
     }
     for k, v in pairs(cfg.categories) do
         copy.categories[k] = v
@@ -185,18 +184,18 @@ function YardInventory.copyConfig(cfg)
 end
 
 function YardInventory.new(yard)
-    local self             = setmetatable({}, YardInventory._mt)
-    self.yard              = yard
-    self.config            = YardInventory.copyConfig(YardInventory.DEFAULT_CONFIG)
-    self.items             = {}
-    self.vehicles          = {}      -- spawned Vehicle objects
-    self.pendingLoads      = {}      -- in-flight VehicleLoadingData
-    self.spawnGrid         = {}      -- grid points: { x, z, occupied }
-    self.filling           = false   -- true while the fill loop is running
-    self.placementFailures = 0       -- consecutive placement failures
-    self.spawnMode         = YardInventory.SPAWN_FILL
-    self.fillDelayMs       = nil     -- ms to wait before starting fill (physics cleanup)
-    self.pendingSoldItems  = {}      -- items from player sales waiting for yard space
+    local self = setmetatable({}, YardInventory._mt)
+    self.yard = yard
+    self.config = YardInventory.copyConfig(YardInventory.DEFAULT_CONFIG)
+    self.items = {}
+    self.vehicles = {} -- spawned Vehicle objects
+    self.pendingLoads = {} -- in-flight VehicleLoadingData
+    self.spawnGrid = {} -- grid points: { x, z, occupied }
+    self.filling = false -- true while the fill loop is running
+    self.placementFailures = 0 -- consecutive placement failures
+    self.spawnMode = YardInventory.SPAWN_FILL
+    self.fillDelayMs = nil -- ms to wait before starting fill (physics cleanup)
+    self.pendingSoldItems = {} -- items from player sales waiting for yard space
     return self
 end
 
@@ -237,11 +236,11 @@ function YardInventory:onHourChanged()
     for _, item in ipairs(self.items) do
         local td = item.testDrive
         if td ~= nil then
-            local overdue = (env.currentMonotonicDay > td.returnByDay)
-                or (env.currentMonotonicDay == td.returnByDay and env.currentHour >= td.returnByHour)
+            local overdue = (env.currentMonotonicDay > td.returnByDay) or
+                                (env.currentMonotonicDay == td.returnByDay and env.currentHour >= td.returnByHour)
             if overdue then
-                local fine = math.max(TestDriveEvent.FINE_MINIMUM,
-                    math.floor(item.price * TestDriveEvent.FINE_PER_HOUR))
+                local fine =
+                    math.max(TestDriveEvent.FINE_MINIMUM, math.floor(item.price * TestDriveEvent.FINE_PER_HOUR))
                 g_currentMission:addMoneyChange(-fine, td.farmId, MoneyType.OTHER, true)
                 g_farmManager:getFarmById(td.farmId):changeBalance(-fine, MoneyType.OTHER)
             end
@@ -258,9 +257,7 @@ function YardInventory:onHourChanged()
 
     -- Roll for a new spawn if not already in a spawn loop and under the cap.
     -- Skip if we're still restoring saved items.
-    if not self.filling
-        and self.fillDelayMs == nil
-        and math.random() < YardInventory.HOURLY_SPAWN_CHANCE then
+    if not self.filling and self.fillDelayMs == nil and math.random() < YardInventory.HOURLY_SPAWN_CHANCE then
         self:trySpawnOne()
     end
 end
@@ -268,7 +265,9 @@ end
 --- Called after mission start. Re-associates saved items with game-restored
 --- vehicles by uniqueId. New yards start empty — inventory builds via hourly ticks.
 function YardInventory:spawn()
-    if #self.items == 0 then return end
+    if #self.items == 0 then
+        return
+    end
 
     local associated = 0
     local orphaned = 0
@@ -298,9 +297,13 @@ function YardInventory:spawn()
                     UsedEquipmentYards.clearVehicleRestrictions(vehicle)
                 else
                     -- Lock the vehicle and add price tag.
-                    if vehicle.setIsTabbable ~= nil then vehicle:setIsTabbable(false) end
+                    if vehicle.setIsTabbable ~= nil then
+                        vehicle:setIsTabbable(false)
+                    end
                     if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
-                        vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function() return false, nil end)
+                        vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function()
+                            return false, nil
+                        end)
                     end
                     UsedEquipmentYards.setADSExcluded(vehicle, true)
                     PriceTagRenderer.addTag(vehicle, item)
@@ -315,7 +318,8 @@ function YardInventory:spawn()
                 local itemIndex = nil
                 for idx, itm in ipairs(self.items) do
                     if itm == item then
-                        itemIndex = idx; break
+                        itemIndex = idx;
+                        break
                     end
                 end
                 if itemIndex ~= nil then
@@ -426,12 +430,14 @@ function YardInventory:generateOneItem()
     if self.storePool == nil then
         self.storePool = self:buildStorePool()
     end
-    if #self.storePool == 0 then return nil end
+    if #self.storePool == 0 then
+        return nil
+    end
 
     for _ = 1, MAX_REROLLS do
         local item = self:rollItem()
-        if item ~= nil and item.price <= YardInventory.MAX_VEHICLE_PRICE
-            and not self:isDuplicateLimitReached(item.xmlFilename) then
+        if item ~= nil and item.price <= YardInventory.MAX_VEHICLE_PRICE and
+            not self:isDuplicateLimitReached(item.xmlFilename) then
             self.items[#self.items + 1] = item
             return item
         end
@@ -444,26 +450,28 @@ end
 function YardInventory:rollItem()
     -- Weighted random selection from the pool.
     local storeItem = self:pickWeightedItem()
-    if storeItem == nil then return nil end
+    if storeItem == nil then
+        return nil
+    end
 
     -- Roll hours, damage, wear from the quality preset.
-    local q               = YardInventory.QUALITY[self.config.quality] or YardInventory.QUALITY.MEDIUM
-    local hours           = q.hoursMin + math.random() * (q.hoursMax - q.hoursMin)
-    local damage          = q.damageMin + math.random() * (q.damageMax - q.damageMin)
-    local wear            = q.wearMin + math.random() * (q.wearMax - q.wearMin)
-    local operatingTime   = hours * 60 * 60 * 1000 -- hours → ms
+    local q = YardInventory.QUALITY[self.config.quality] or YardInventory.QUALITY.MEDIUM
+    local hours = q.hoursMin + math.random() * (q.hoursMax - q.hoursMin)
+    local damage = q.damageMin + math.random() * (q.damageMax - q.damageMin)
+    local wear = q.wearMin + math.random() * (q.wearMax - q.wearMin)
+    local operatingTime = hours * 60 * 60 * 1000 -- hours → ms
     -- Derive age in months from hours for the price formula.
-    local age             = math.max(1, math.floor(hours / YardInventory.HOURS_PER_YEAR * 12))
+    local age = math.max(1, math.floor(hours / YardInventory.HOURS_PER_YEAR * 12))
 
     -- Pick a random configuration set (like VehicleSaleSystem does).
-    local configs         = YardInventory.randomConfiguration(storeItem)
+    local configs = YardInventory.randomConfiguration(storeItem)
 
     -- Use the game's own pricing with the chosen configuration's price.
     local configuredPrice = StoreItemUtil.getDefaultPrice(storeItem, configs)
-    local repairPrice     = 0
-    local repaintPrice    = 0
+    local repairPrice = 0
+    local repaintPrice = 0
     if Wearable ~= nil then
-        repairPrice  = Wearable.calculateRepairPrice(configuredPrice, damage)
+        repairPrice = Wearable.calculateRepairPrice(configuredPrice, damage)
         repaintPrice = Wearable.calculateRepaintPrice(configuredPrice, wear)
     end
     local price = configuredPrice
@@ -499,17 +507,17 @@ function YardInventory:rollItem()
     local minAcceptablePrice = math.max(1, math.floor(finalPrice * (1 - maxDiscount)))
 
     return {
-        xmlFilename    = storeItem.xmlFilename,
+        xmlFilename = storeItem.xmlFilename,
         configurations = configs,
-        price          = finalPrice,
-        minPrice       = minAcceptablePrice,
-        numOwners      = numOwners,
-        age            = age,
-        damage         = damage,
-        wear           = wear,
-        operatingTime  = operatingTime,
-        ttlHours       = self:randomTTL(),
-        vehicle        = nil,
+        price = finalPrice,
+        minPrice = minAcceptablePrice,
+        numOwners = numOwners,
+        age = age,
+        damage = damage,
+        wear = wear,
+        operatingTime = operatingTime,
+        ttlHours = self:randomTTL(),
+        vehicle = nil
     }
 end
 
@@ -518,7 +526,9 @@ end
 ---@return boolean
 function YardInventory:isDuplicateLimitReached(xmlFilename)
     local maxDups = self.config.maxDuplicates or 2
-    if maxDups == 0 then return false end -- unlimited
+    if maxDups == 0 then
+        return false
+    end -- unlimited
 
     local count = 0
     for _, existingItem in ipairs(self.items) do
@@ -536,37 +546,38 @@ end
 --- Weight = category weight * brand weight. Brand weight defaults to 1 if
 --- the brands table is empty (no brand filter configured).
 function YardInventory:buildStorePool()
-    local cats              = self.config.categories -- map: CATEGORY_NAME = weight
-    local brands            = self.config.brands -- map: BRAND_NAME = weight (empty = all)
-    local hasBrandFilter    = next(brands) ~= nil
-    local minWW             = self.config.minWorkingWidth or 0
-    local maxWW             = self.config.maxWorkingWidth or 0
+    local cats = self.config.categories -- map: CATEGORY_NAME = weight
+    local brands = self.config.brands -- map: BRAND_NAME = weight (empty = all)
+    local hasBrandFilter = next(brands) ~= nil
+    local minWW = self.config.minWorkingWidth or 0
+    local maxWW = self.config.maxWorkingWidth or 0
 
-    local pool              = {} -- { storeItem, weight }
-    local totalWeight       = 0
+    local pool = {} -- { storeItem, weight }
+    local totalWeight = 0
 
-    local cfgMaxPrice       = self.config.maxPrice or 0
+    local cfgMaxPrice = self.config.maxPrice or 0
     local effectiveMaxPrice = cfgMaxPrice > 0 and math.min(cfgMaxPrice, YardInventory.MAX_VEHICLE_PRICE) or
-    YardInventory.MAX_VEHICLE_PRICE
+                                  YardInventory.MAX_VEHICLE_PRICE
 
-    local minYear           = self.config.minYear or 0
-    local maxYear           = self.config.maxYear or 0
-    local includeNoYear     = self.config.includeNoYear ~= false
-    local hasYearFilter     = minYear > 0 or maxYear > 0
+    local minYear = self.config.minYear or 0
+    local maxYear = self.config.maxYear or 0
+    local includeNoYear = self.config.includeNoYear ~= false
+    local hasYearFilter = minYear > 0 or maxYear > 0
 
     for _, si in pairs(g_storeManager:getItems()) do
-        if si.showInStore and si.extraContentId == nil
-            and si.bundleInfo == nil
-            and si.price >= YardInventory.MIN_VEHICLE_PRICE
-            and si.price <= effectiveMaxPrice
-            and StoreItemUtil.getIsVehicle(si) then
+        if si.showInStore and si.extraContentId == nil and si.bundleInfo == nil and si.price >=
+            YardInventory.MIN_VEHICLE_PRICE and si.price <= effectiveMaxPrice and StoreItemUtil.getIsVehicle(si) then
             -- Working width filter: only applies to items that HAVE a working width spec.
             local passesWW = true
             pcall(StoreItemUtil.loadSpecsFromXML, si)
             if si.specs ~= nil and si.specs.workingWidth ~= nil then
                 local ww = si.specs.workingWidth.width or 0
-                if minWW > 0 and ww < minWW then passesWW = false end
-                if maxWW > 0 and ww > maxWW then passesWW = false end
+                if minWW > 0 and ww < minWW then
+                    passesWW = false
+                end
+                if maxWW > 0 and ww > maxWW then
+                    passesWW = false
+                end
             end
 
             -- Year filter (Vehicle Years mod integration).
@@ -576,8 +587,12 @@ function YardInventory:buildStorePool()
                 if year == nil then
                     passesYear = includeNoYear
                 else
-                    if minYear > 0 and year < minYear then passesYear = false end
-                    if maxYear > 0 and year > maxYear then passesYear = false end
+                    if minYear > 0 and year < minYear then
+                        passesYear = false
+                    end
+                    if maxYear > 0 and year > maxYear then
+                        passesYear = false
+                    end
                 end
             end
 
@@ -595,7 +610,10 @@ function YardInventory:buildStorePool()
                         local catWeight = cats[catName]
                         if catWeight ~= nil and catWeight > 0 then
                             local w = catWeight * brandWeight
-                            pool[#pool + 1] = { storeItem = si, weight = w }
+                            pool[#pool + 1] = {
+                                storeItem = si,
+                                weight = w
+                            }
                             totalWeight = totalWeight + w
                             break
                         end
@@ -611,7 +629,9 @@ end
 
 --- Weighted random pick from the store pool.
 function YardInventory:pickWeightedItem()
-    if #self.storePool == 0 or self.poolTotalWeight <= 0 then return nil end
+    if #self.storePool == 0 or self.poolTotalWeight <= 0 then
+        return nil
+    end
 
     local roll = math.random() * self.poolTotalWeight
     local acc = 0
@@ -640,7 +660,9 @@ function YardInventory:buildSpawnGrid()
     local halfD = b.sizeZ * 0.5 - inset
 
     self.spawnGrid = {}
-    if halfW < 2 or halfD < 2 then return end
+    if halfW < 2 or halfD < 2 then
+        return
+    end
 
     local minX = b.cx - halfW
     local maxX = b.cx + halfW
@@ -652,7 +674,11 @@ function YardInventory:buildSpawnGrid()
         local z = minZ
         while z <= maxZ do
             if self.yard:containsPoint(x, z) then
-                self.spawnGrid[#self.spawnGrid + 1] = { x = x, z = z, occupied = false }
+                self.spawnGrid[#self.spawnGrid + 1] = {
+                    x = x,
+                    z = z,
+                    occupied = false
+                }
             end
             z = z + spacing
         end
@@ -703,7 +729,9 @@ end
 
 --- Free the grid points owned by an item.
 function YardInventory:freeGridPoints(item)
-    if item.gridIndices == nil then return end
+    if item.gridIndices == nil then
+        return
+    end
     for _, idx in ipairs(item.gridIndices) do
         if self.spawnGrid[idx] ~= nil then
             self.spawnGrid[idx].occupied = false
@@ -726,15 +754,15 @@ function YardInventory:rebuildGridOccupancy()
 
             if item.testDrive ~= nil then
                 local td = item.testDrive
-                cx, cz   = td.origX, td.origZ
-                halfW    = (item.spawnWidth or 4) * 0.5
-                halfL    = (item.spawnLength or 4) * 0.5
-                yaw      = item.spawnYaw or td.origRy or 0
+                cx, cz = td.origX, td.origZ
+                halfW = (item.spawnWidth or 4) * 0.5
+                halfL = (item.spawnLength or 4) * 0.5
+                yaw = item.spawnYaw or td.origRy or 0
             elseif item.vehicle ~= nil then
                 cx, _, cz = getWorldTranslation(item.vehicle.rootNode)
-                halfW     = (item.spawnWidth or 4) * 0.5
-                halfL     = (item.spawnLength or 4) * 0.5
-                yaw       = item.spawnYaw or 0
+                halfW = (item.spawnWidth or 4) * 0.5
+                halfL = (item.spawnLength or 4) * 0.5
+                yaw = item.spawnYaw or 0
             end
 
             if cx ~= nil then
@@ -753,7 +781,9 @@ end
 ---@return number|nil z
 ---@return number|nil yaw
 function YardInventory:findSpawnPoint(width, length)
-    if self.spawnGrid == nil or #self.spawnGrid == 0 then return nil end
+    if self.spawnGrid == nil or #self.spawnGrid == 0 then
+        return nil
+    end
 
     -- Collect available point indices and shuffle.
     local available = {}
@@ -779,8 +809,8 @@ function YardInventory:findSpawnPoint(width, length)
             local buf = YardInventory.VEHICLE_CLEARANCE_BUFFER
             local checkIndices = self:getGridPointsInRect(pt.x, pt.z, halfW + buf, halfL + buf, yaw)
             if self:areGridPointsAvailable(checkIndices) then
-                if self:isClearOfExistingVehicles(pt.x, pt.z, halfW, halfL)
-                    and self:isPositionClear(pt.x, pt.z, halfW, halfL, yaw) then
+                if self:isClearOfExistingVehicles(pt.x, pt.z, halfW, halfL) and
+                    self:isPositionClear(pt.x, pt.z, halfW, halfL, yaw) then
                     return pt.x, pt.z, yaw
                 end
             end
@@ -795,12 +825,7 @@ end
 function YardInventory:isFootprintInsideYard(cx, cz, halfW, halfL, yaw)
     local cosY = math.cos(yaw)
     local sinY = math.sin(yaw)
-    local corners = {
-        { -halfW, -halfL },
-        { halfW, -halfL },
-        { halfW, halfL },
-        { -halfW, halfL },
-    }
+    local corners = {{-halfW, -halfL}, {halfW, -halfL}, {halfW, halfL}, {-halfW, halfL}}
     for _, c in ipairs(corners) do
         local wx = cx + c[1] * cosY - c[2] * sinY
         local wz = cz + c[1] * sinY + c[2] * cosY
@@ -827,7 +852,9 @@ end
 --- Check if an item is in the hidden pending sold list.
 function YardInventory:isItemHidden(item)
     for _, pItem in ipairs(self.pendingSoldItems) do
-        if pItem == item then return true end
+        if pItem == item then
+            return true
+        end
     end
     return false
 end
@@ -877,14 +904,8 @@ function YardInventory:isPositionClear(cx, cz, halfW, halfL, yaw)
     -- Expand the check box by the clearance buffer on all sides to account
     -- for getSizeValues underreporting actual vehicle extent. Height of 3m
     -- catches tall equipment (combines, loaders with raised arms).
-    overlapBox(
-        cx, y, cz,
-        0, yaw, 0,
-        halfW + buf, 3.0, halfL + buf,
-        "onSpawnOverlapCallback", self,
-        YardInventory.OVERLAP_COLLISION_MASK,
-        true, true, true, true
-    )
+    overlapBox(cx, y, cz, 0, yaw, 0, halfW + buf, 3.0, halfL + buf, "onSpawnOverlapCallback", self,
+        YardInventory.OVERLAP_COLLISION_MASK, true, true, true, true)
     return not self._overlapFound
 end
 
@@ -901,7 +922,9 @@ end
 --- Generate one item, find a grid position, and load the vehicle. The
 --- callback will call spawnNext again in FILL mode.
 function YardInventory:spawnNext()
-    if not self.filling then return end
+    if not self.filling then
+        return
+    end
     local item = self:generateOneItem()
     if item == nil then
         self.filling = false
@@ -917,16 +940,16 @@ function YardInventory:spawnNext()
     end
 
     -- Use the configuration chosen during rollItem (or a fresh one for pending sold items).
-    local config     = item.configurations or YardInventory.randomConfiguration(storeItem)
-    local rotation   = storeItem.rotation or 0
+    local config = item.configurations or YardInventory.randomConfiguration(storeItem)
+    local rotation = storeItem.rotation or 0
     local sizeValues = StoreItemUtil.getSizeValues(storeItem.xmlFilename, "vehicle", rotation, config)
-    local width      = sizeValues.width or 3
-    local length     = sizeValues.length or 6
+    local width = sizeValues.width or 3
+    local length = sizeValues.length or 6
 
     -- Find a valid grid position.
-    local halfW      = width * 0.5
-    local halfL      = length * 0.5
-    local x, z, yaw  = self:findSpawnPoint(width, length)
+    local halfW = width * 0.5
+    local halfL = length * 0.5
+    local x, z, yaw = self:findSpawnPoint(width, length)
     if x == nil then
         -- No space for this vehicle — remove it and retry with a different item.
         self:removeItemByRef(item)
@@ -944,9 +967,9 @@ function YardInventory:spawnNext()
     self.placementFailures = 0
 
     -- Store dimensions on the item for grid rebuild after load.
-    item.spawnWidth        = width
-    item.spawnLength       = length
-    item.spawnYaw          = yaw
+    item.spawnWidth = width
+    item.spawnLength = length
+    item.spawnYaw = yaw
 
     -- Mark grid points occupied BEFORE async load so the next spawn sees them.
     -- Uses the vehicle's actual dimensions to invalidate covered points.
@@ -963,7 +986,10 @@ function YardInventory:spawnNext()
     data:setOwnerFarmId(0)
 
     self.pendingLoads[#self.pendingLoads + 1] = data
-    data:load(self.onVehicleLoaded, self, { item = item, loadingData = data })
+    data:load(self.onVehicleLoaded, self, {
+        item = item,
+        loadingData = data
+    })
 end
 
 --- Callback when a vehicle finishes loading. Applies "used" look, then
@@ -1032,22 +1058,17 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
 
             -- Limit fuel/energy fill units to ~25% so yard stock isn't full-tank.
             if vehicle.getConsumerFillUnitIndex ~= nil then
-                local fuelTypes = {
-                    FillType.DIESEL,
-                    FillType.ELECTRICCHARGE,
-                    FillType.METHANE,
-                }
+                local fuelTypes = {FillType.DIESEL, FillType.ELECTRICCHARGE, FillType.METHANE}
                 for _, fillType in ipairs(fuelTypes) do
                     local fillUnitIndex = vehicle:getConsumerFillUnitIndex(fillType)
                     if fillUnitIndex ~= nil then
                         local capacity = vehicle:getFillUnitCapacity(fillUnitIndex)
                         if capacity > 0 then
-                            local target  = YardInventory.FUEL_BASE
-                                + (math.random() * 2 - 1) * YardInventory.FUEL_RANGE
-                            target        = math.max(YardInventory.FUEL_MIN, math.min(0.35, target))
+                            local target = YardInventory.FUEL_BASE + (math.random() * 2 - 1) * YardInventory.FUEL_RANGE
+                            target = math.max(YardInventory.FUEL_MIN, math.min(0.35, target))
                             local desired = capacity * target
                             local current = vehicle:getFillUnitFillLevel(fillUnitIndex)
-                            local delta   = desired - current
+                            local delta = desired - current
                             vehicle:addFillUnitFillLevel(vehicle:getOwnerFarmId(), fillUnitIndex, delta, fillType,
                                 ToolType.UNDEFINED, nil)
                         end
@@ -1090,7 +1111,8 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             local itemIndex = nil
             for idx, itm in ipairs(self.items) do
                 if itm == item then
-                    itemIndex = idx; break
+                    itemIndex = idx;
+                    break
                 end
             end
             if itemIndex ~= nil then
@@ -1134,7 +1156,17 @@ function YardInventory.randomConfiguration(storeItem)
         end
     end
 
-    local neverRandomize = { color = true, rimColor = true, baseColor = true }
+    local neverRandomize = {
+        color = true,
+        rimColor = true,
+        baseColor = true,
+        designColor = true,
+        designColor2 = true,
+        designColor3 = true,
+        designColor4 = true,
+        designColor5 = true,
+        designColor6 = true
+    }
 
     -- Start from a random configuration set if available.
     if storeItem.configurations ~= nil and storeItem.configurationSets ~= nil then
@@ -1152,7 +1184,9 @@ function YardInventory.randomConfiguration(storeItem)
         end
     end
     -- Configs that should only rarely differ from default (25% chance).
-    local conservativeConfigs = { wheel = true }
+    local conservativeConfigs = {
+        wheel = true
+    }
 
     -- Randomly pick any selectable option for configs not covered by a set.
     if storeItem.configurations ~= nil then
@@ -1252,8 +1286,12 @@ function YardInventory:wouldBuyVehicle(vehicle)
                 return false
             end
         else
-            if minYear > 0 and year < minYear then return false end
-            if maxYear > 0 and year > maxYear then return false end
+            if minYear > 0 and year < minYear then
+                return false
+            end
+            if maxYear > 0 and year > maxYear then
+                return false
+            end
         end
     end
 
@@ -1304,7 +1342,9 @@ end
 --- If purchasePrice is provided, ensures the listing price is at least 1-2% above it.
 function YardInventory:createItemFromVehicle(vehicle, purchasePrice)
     local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-    if storeItem == nil then return nil end
+    if storeItem == nil then
+        return nil
+    end
 
     local operatingTime = vehicle.operatingTime or 0
     local damage = vehicle.getDamageAmount ~= nil and vehicle:getDamageAmount() or 0
@@ -1317,7 +1357,8 @@ function YardInventory:createItemFromVehicle(vehicle, purchasePrice)
     local repaintPrice = vehicle.getRepaintPrice ~= nil and vehicle:getRepaintPrice() or 0
     local basePrice = configuredPrice
     if Vehicle ~= nil and Vehicle.calculateSellPrice ~= nil then
-        basePrice = Vehicle.calculateSellPrice(storeItem, age, operatingTime, configuredPrice, repairPrice, repaintPrice)
+        basePrice =
+            Vehicle.calculateSellPrice(storeItem, age, operatingTime, configuredPrice, repairPrice, repaintPrice)
     end
 
     -- Apply the yard's standard price jitter.
@@ -1359,20 +1400,20 @@ function YardInventory:createItemFromVehicle(vehicle, purchasePrice)
         vehicle.configurations or {})
 
     return {
-        xmlFilename    = storeItem.xmlFilename,
+        xmlFilename = storeItem.xmlFilename,
         configurations = vehicle.configurations or {},
-        price          = finalPrice,
-        minPrice       = minPrice,
-        numOwners      = numOwners,
-        age            = age,
-        damage         = damage,
-        wear           = wear,
-        operatingTime  = operatingTime,
-        ttlHours       = self:randomTTL(),
-        vehicle        = nil,
-        spawnWidth     = sizeValues.width or 3,
-        spawnLength    = sizeValues.length or 6,
-        spawnYaw       = 0,
+        price = finalPrice,
+        minPrice = minPrice,
+        numOwners = numOwners,
+        age = age,
+        damage = damage,
+        wear = wear,
+        operatingTime = operatingTime,
+        ttlHours = self:randomTTL(),
+        vehicle = nil,
+        spawnWidth = sizeValues.width or 3,
+        spawnLength = sizeValues.length or 6,
+        spawnYaw = 0
     }
 end
 
@@ -1383,13 +1424,19 @@ end
 --- Returns the created item (or nil on failure).
 function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
     local item = self:createItemFromVehicle(vehicle, purchasePrice)
-    if item == nil then return nil end
+    if item == nil then
+        return nil
+    end
 
     -- Lock the vehicle immediately regardless of placement.
     vehicle:setOwnerFarmId(0)
-    if vehicle.setIsTabbable ~= nil then vehicle:setIsTabbable(false) end
+    if vehicle.setIsTabbable ~= nil then
+        vehicle:setIsTabbable(false)
+    end
     if vehicle.registerPlayerVehicleControlAllowedFunction ~= nil then
-        vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function() return false, nil end)
+        vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function()
+            return false, nil
+        end)
     end
     UsedEquipmentYards.setADSExcluded(vehicle, true)
 
@@ -1430,7 +1477,9 @@ end
 --- Reveal and place a hidden vehicle at a yard position.
 function YardInventory:placeVehicleInYard(item, x, z, yaw)
     local vehicle = item.vehicle
-    if vehicle == nil then return end
+    if vehicle == nil then
+        return
+    end
 
     item.spawnYaw = yaw
     local halfW = item.spawnWidth * 0.5
@@ -1456,7 +1505,8 @@ function YardInventory:placeVehicleInYard(item, x, z, yaw)
     local itemIndex = nil
     for idx, itm in ipairs(self.items) do
         if itm == item then
-            itemIndex = idx; break
+            itemIndex = idx;
+            break
         end
     end
     if itemIndex ~= nil then
@@ -1467,9 +1517,15 @@ end
 --- Try to place the next hidden pending sold vehicle. Called after a delay
 --- when space frees up. The vehicle already exists — just needs a position.
 function YardInventory:trySpawnPendingSoldItem()
-    if #self.pendingSoldItems == 0 then return end
-    if self.filling then return end
-    if #self.spawnGrid == 0 then self:buildSpawnGrid() end
+    if #self.pendingSoldItems == 0 then
+        return
+    end
+    if self.filling then
+        return
+    end
+    if #self.spawnGrid == 0 then
+        self:buildSpawnGrid()
+    end
 
     local i = 1
     while i <= #self.pendingSoldItems do
@@ -1563,8 +1619,8 @@ function YardInventory:saveToXML(xmlFile, key)
     setXMLInt(xmlFile, key .. ".config#minWorkingWidth", self.config.minWorkingWidth or 0)
     setXMLInt(xmlFile, key .. ".config#maxWorkingWidth", self.config.maxWorkingWidth or 0)
     setXMLInt(xmlFile, key .. ".config#maxPrice", self.config.maxPrice or 0)
-    setXMLInt(xmlFile, key .. ".config#avgStockHours", self.config.avgStockHours or YardInventory
-    .DEFAULT_AVG_STOCK_HOURS)
+    setXMLInt(xmlFile, key .. ".config#avgStockHours",
+        self.config.avgStockHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
     setXMLInt(xmlFile, key .. ".config#gridSpacing", self.config.gridSpacing or 8)
     setXMLInt(xmlFile, key .. ".config#maxDuplicates", self.config.maxDuplicates or 2)
     setXMLInt(xmlFile, key .. ".config#minYear", self.config.minYear or 0)
@@ -1612,7 +1668,8 @@ function YardInventory:saveToXML(xmlFile, key)
         local isHidden = false
         for _, pItem in ipairs(self.pendingSoldItems) do
             if pItem == item then
-                isHidden = true; break
+                isHidden = true;
+                break
             end
         end
         if isHidden then
@@ -1665,28 +1722,29 @@ function YardInventory:loadFromXML(xmlFile, key)
     -- Load config (fall back to defaults if not present).
     if hasXMLProperty(xmlFile, key .. ".config") then
         self.config = {
-            quality         = getXMLString(xmlFile, key .. ".config#quality") or "MEDIUM",
-            dirtiness       = getXMLFloat(xmlFile, key .. ".config#dirtiness") or 0.20,
+            quality = getXMLString(xmlFile, key .. ".config#quality") or "MEDIUM",
+            dirtiness = getXMLFloat(xmlFile, key .. ".config#dirtiness") or 0.20,
             minWorkingWidth = getXMLInt(xmlFile, key .. ".config#minWorkingWidth") or 0,
             maxWorkingWidth = getXMLInt(xmlFile, key .. ".config#maxWorkingWidth") or 0,
-            maxPrice        = getXMLInt(xmlFile, key .. ".config#maxPrice") or 0,
-            avgStockHours   = getXMLInt(xmlFile, key .. ".config#avgStockHours") or YardInventory
-            .DEFAULT_AVG_STOCK_HOURS,
-            gridSpacing     = getXMLInt(xmlFile, key .. ".config#gridSpacing") or 8,
-            maxDuplicates   = getXMLInt(xmlFile, key .. ".config#maxDuplicates") or 2,
-            minYear         = getXMLInt(xmlFile, key .. ".config#minYear") or 0,
-            maxYear         = getXMLInt(xmlFile, key .. ".config#maxYear") or 0,
-            includeNoYear   = getXMLBool(xmlFile, key .. ".config#includeNoYear") ~= false,
+            maxPrice = getXMLInt(xmlFile, key .. ".config#maxPrice") or 0,
+            avgStockHours = getXMLInt(xmlFile, key .. ".config#avgStockHours") or YardInventory.DEFAULT_AVG_STOCK_HOURS,
+            gridSpacing = getXMLInt(xmlFile, key .. ".config#gridSpacing") or 8,
+            maxDuplicates = getXMLInt(xmlFile, key .. ".config#maxDuplicates") or 2,
+            minYear = getXMLInt(xmlFile, key .. ".config#minYear") or 0,
+            maxYear = getXMLInt(xmlFile, key .. ".config#maxYear") or 0,
+            includeNoYear = getXMLBool(xmlFile, key .. ".config#includeNoYear") ~= false,
             allowHirePurchase = getXMLBool(xmlFile, key .. ".config#allowHirePurchase") ~= false,
-            categories      = {},
-            brands          = {},
+            categories = {},
+            brands = {}
         }
         local ci = 0
         while true do
             local cKey = ("%s.config.category(%d)"):format(key, ci)
-            if not hasXMLProperty(xmlFile, cKey) then break end
+            if not hasXMLProperty(xmlFile, cKey) then
+                break
+            end
             local catName = getXMLString(xmlFile, cKey .. "#name")
-            local weight  = getXMLInt(xmlFile, cKey .. "#weight") or 0
+            local weight = getXMLInt(xmlFile, cKey .. "#weight") or 0
             if catName ~= nil then
                 self.config.categories[catName] = weight
             end
@@ -1695,9 +1753,11 @@ function YardInventory:loadFromXML(xmlFile, key)
         local bi = 0
         while true do
             local bKey = ("%s.config.brand(%d)"):format(key, bi)
-            if not hasXMLProperty(xmlFile, bKey) then break end
+            if not hasXMLProperty(xmlFile, bKey) then
+                break
+            end
             local brandName = getXMLString(xmlFile, bKey .. "#name")
-            local weight    = getXMLInt(xmlFile, bKey .. "#weight") or 0
+            local weight = getXMLInt(xmlFile, bKey .. "#weight") or 0
             if brandName ~= nil then
                 self.config.brands[brandName] = weight
             end
@@ -1709,22 +1769,24 @@ function YardInventory:loadFromXML(xmlFile, key)
     local i = 0
     while true do
         local iKey = ("%s.item(%d)"):format(key, i)
-        if not hasXMLProperty(xmlFile, iKey) then break end
+        if not hasXMLProperty(xmlFile, iKey) then
+            break
+        end
         local item = {
-            xmlFilename     = getXMLString(xmlFile, iKey .. "#xmlFilename") or "",
-            price           = getXMLInt(xmlFile, iKey .. "#price") or 0,
-            age             = getXMLInt(xmlFile, iKey .. "#age") or 0,
-            damage          = getXMLFloat(xmlFile, iKey .. "#damage") or 0,
-            wear            = getXMLFloat(xmlFile, iKey .. "#wear") or 0,
-            operatingTime   = (getXMLFloat(xmlFile, iKey .. "#operatingTime") or 0) * 1000,
-            ttlHours        = getXMLInt(xmlFile, iKey .. "#ttlHours") or self:randomTTL(),
-            numOwners       = getXMLInt(xmlFile, iKey .. "#numOwners") or 1,
-            minPrice        = getXMLInt(xmlFile, iKey .. "#minPrice"),
+            xmlFilename = getXMLString(xmlFile, iKey .. "#xmlFilename") or "",
+            price = getXMLInt(xmlFile, iKey .. "#price") or 0,
+            age = getXMLInt(xmlFile, iKey .. "#age") or 0,
+            damage = getXMLFloat(xmlFile, iKey .. "#damage") or 0,
+            wear = getXMLFloat(xmlFile, iKey .. "#wear") or 0,
+            operatingTime = (getXMLFloat(xmlFile, iKey .. "#operatingTime") or 0) * 1000,
+            ttlHours = getXMLInt(xmlFile, iKey .. "#ttlHours") or self:randomTTL(),
+            numOwners = getXMLInt(xmlFile, iKey .. "#numOwners") or 1,
+            minPrice = getXMLInt(xmlFile, iKey .. "#minPrice"),
             vehicleUniqueId = getXMLString(xmlFile, iKey .. "#vehicleUniqueId"),
-            spawnWidth      = getXMLFloat(xmlFile, iKey .. "#spawnWidth") or 0,
-            spawnLength     = getXMLFloat(xmlFile, iKey .. "#spawnLength") or 0,
-            spawnYaw        = getXMLFloat(xmlFile, iKey .. "#spawnYaw") or 0,
-            vehicle         = nil,
+            spawnWidth = getXMLFloat(xmlFile, iKey .. "#spawnWidth") or 0,
+            spawnLength = getXMLFloat(xmlFile, iKey .. "#spawnLength") or 0,
+            spawnYaw = getXMLFloat(xmlFile, iKey .. "#spawnYaw") or 0,
+            vehicle = nil
         }
         -- Legacy saves: default minPrice to asking price (no discount).
         if item.minPrice == nil then
@@ -1736,8 +1798,10 @@ function YardInventory:loadFromXML(xmlFile, key)
         local cfgIdx = 0
         while true do
             local cfgKey = ("%s.vehicleConfig(%d)"):format(iKey, cfgIdx)
-            if not hasXMLProperty(xmlFile, cfgKey) then break end
-            local cfgName  = getXMLString(xmlFile, cfgKey .. "#name")
+            if not hasXMLProperty(xmlFile, cfgKey) then
+                break
+            end
+            local cfgName = getXMLString(xmlFile, cfgKey .. "#name")
             local cfgValue = getXMLInt(xmlFile, cfgKey .. "#value")
             if cfgName ~= nil and cfgValue ~= nil then
                 configs[cfgName] = cfgValue
@@ -1753,7 +1817,9 @@ function YardInventory:loadFromXML(xmlFile, key)
         local fi = 0
         while true do
             local fKey = ("%s.testDrivenByFarm(%d)"):format(iKey, fi)
-            if not hasXMLProperty(xmlFile, fKey) then break end
+            if not hasXMLProperty(xmlFile, fKey) then
+                break
+            end
             local farmId = getXMLInt(xmlFile, fKey .. "#farmId")
             if farmId ~= nil then
                 tdf[farmId] = true
@@ -1768,15 +1834,15 @@ function YardInventory:loadFromXML(xmlFile, key)
         local tdKey = iKey .. ".testDrive"
         if hasXMLProperty(xmlFile, tdKey) then
             item.testDrive = {
-                farmId       = getXMLInt(xmlFile, tdKey .. "#farmId") or 0,
-                returnByDay  = getXMLInt(xmlFile, tdKey .. "#returnByDay") or 0,
+                farmId = getXMLInt(xmlFile, tdKey .. "#farmId") or 0,
+                returnByDay = getXMLInt(xmlFile, tdKey .. "#returnByDay") or 0,
                 returnByHour = getXMLInt(xmlFile, tdKey .. "#returnByHour") or 0,
-                origX        = getXMLFloat(xmlFile, tdKey .. "#origX") or 0,
-                origY        = getXMLFloat(xmlFile, tdKey .. "#origY") or 0,
-                origZ        = getXMLFloat(xmlFile, tdKey .. "#origZ") or 0,
-                origRx       = getXMLFloat(xmlFile, tdKey .. "#origRx") or 0,
-                origRy       = getXMLFloat(xmlFile, tdKey .. "#origRy") or 0,
-                origRz       = getXMLFloat(xmlFile, tdKey .. "#origRz") or 0,
+                origX = getXMLFloat(xmlFile, tdKey .. "#origX") or 0,
+                origY = getXMLFloat(xmlFile, tdKey .. "#origY") or 0,
+                origZ = getXMLFloat(xmlFile, tdKey .. "#origZ") or 0,
+                origRx = getXMLFloat(xmlFile, tdKey .. "#origRx") or 0,
+                origRy = getXMLFloat(xmlFile, tdKey .. "#origRy") or 0,
+                origRz = getXMLFloat(xmlFile, tdKey .. "#origRz") or 0
             }
         end
 
