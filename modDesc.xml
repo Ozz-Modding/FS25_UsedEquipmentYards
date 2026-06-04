@@ -76,6 +76,17 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.0.7:
+- Designfarben zu ausgeschlossenen Konfigurationen hinzugefügt.
+- Sales Zone wendet jetzt Nivellierung und Freiräumung an, um sicherzustellen, dass sie sichtbar ist.
+
+1.0.0.6:
+- BaseColor zu ausgeschlossenen Konfigurationen hinzugefügt.
+
+1.0.0.5:
+- Farbe und Felgenfarbe werden nicht mehr zufällig bestimmt.
+- Einige fehlende Übersetzungen hinzugefügt.
+
 1.0.0.4:
 - Hoffahrzeuge haben jetzt zufällige Konfigurationen
 - Unterstützung für Vehicle Years Mod hinzugefügt
@@ -113,6 +124,17 @@ Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiat
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
+
+1.0.0.7 :
+- Ajout des couleurs de conception aux configurations exclues de la randomisation.
+- La zone de vente applique désormais le nivellement et le dégagement pour assurer la visibilité.
+
+1.0.0.6 :
+- Ajout de baseColor aux configurations exclues de la randomisation.
+
+1.0.0.5 :
+- La couleur et la couleur des jantes ne sont plus aléatoires.
+- Ajout de traductions manquantes.
 
 1.0.0.4 :
 - Les vehicules du parc ont desormais des configurations aleatoires
