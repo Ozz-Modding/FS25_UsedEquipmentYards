@@ -28,6 +28,7 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 Changelog:
 
 1.0.0.8:
+- Sold equipment is now correctly disconnected from any equipment or implements.
 - Fix to allow SellZone placement when a yard is very large.
 - Add Italian translation, thank you @omarlocci2-ita.
 
