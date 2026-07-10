@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+    <translationContributors>CAYMANN_LO_RE</translationContributors>
+    <texts>
+        <text name="uey_modTitle"              text="Rivenditori macchine usate"/>
+        <text name="uey_yardLabel"             text="Rivenditore macchine usate"/>
+        <text name="uey_function"              text="Punto vendita per macchine usate"/>
+        <text name="uey_fenceSegment"          text="Recinzione perimetrale"/>
+        <text name="uey_noItems"               text="Al momento non ci sono macchine disponibili in questo piazzale."/>
+
+        <!-- Purchase flow -->
+        <text name="uey_purchaseConfirm"       text="Acquistare %s per $%s?"/>
+        <text name="uey_purchaseSuccess"       text="Acquistato %s per $%s."/>
+        <text name="uey_purchaseFailed_funds"  text="Fondi insufficienti per questo acquisto."/>
+
+        <!-- HUD info when looking at a yard vehicle -->
+        <text name="uey_hud_forSale"          text="In vendita"/>
+        <text name="uey_hud_damage"           text="Danno"/>
+        <text name="uey_hud_wear"             text="Usura"/>
+        <text name="uey_hud_hours"            text="Ore"/>
+
+
+        <!-- Vehicle purchase -->
+        <text name="uey_action_buyVehicle"           text="Acquista"/>
+        <text name="uey_purchase_title"              text="Acquista veicolo"/>
+        <text name="uey_purchase_confirm"            text="Acquistare %s per %s?"/>
+        <text name="uey_purchase_insufficient_funds" text="Fondi insufficienti."/>
+
+        <!-- Yard config dialog -->
+        <text name="uey_action_configureYard"    text="Configura piazzale"/>
+        <text name="uey_config_title"            text="Configurazione piazzale"/>
+        <text name="uey_config_settings_header"  text="Configurazione"/>
+        <text name="uey_config_yardName"          text="Nome piazzale"/>
+        <text name="uey_config_quality"          text="Qualità"/>
+        <text name="uey_config_quality_desc"     text="Determina le ore, i danni e l'usura delle macchine. Una qualità inferiore costa meno."/>
+        <text name="uey_config_dirtiness"        text="Livello di sporco"/>
+        <text name="uey_config_dirtiness_desc"   text="Grado medio di sporco. Non utilizzato per Ex-Demo e Nuovo."/>
+        <text name="uey_config_workingWidth"      text="Larghezza di lavoro"/>
+        <text name="uey_config_workingWidth_desc" text="Filtra le macchine per larghezza di lavoro."/>
+        <text name="uey_config_minWorkingWidth"  text="Larghezza min."/>
+        <text name="uey_config_maxWorkingWidth"  text="Larghezza max."/>
+        <text name="uey_config_noMinimum"        text="Nessun minimo"/>
+        <text name="uey_config_noMaximum"        text="Nessun massimo"/>
+        <text name="uey_config_maxPrice"         text="Prezzo massimo"/>
+        <text name="uey_config_maxPrice_desc"    text="Limita l'inventario del piazzale a un prezzo massimo."/>
+        <text name="uey_config_weights_header"   text="Peso categorie"/>
+        <text name="uey_config_weights_desc"     text="Imposta la probabilità di generazione per categoria (0 = disattivato)."/>
+        <text name="uey_config_avgStockHours"     text="Tempo di permanenza medio"/>
+        <text name="uey_config_avgStockHours_desc" text="Quanto tempo rimangono i veicoli prima di sparire."/>
+        <text name="uey_config_gridSpacing"      text="Spaziatura griglia"/>
+        <text name="uey_config_gridSpacing_desc" text="Distanza tra i punti di generazione. Minore = più veicoli."/>
+        <text name="uey_config_maxDuplicates"      text="Duplicati max."/>
+        <text name="uey_config_maxDuplicates_desc" text="Numero massimo di veicoli identici contemporaneamente nel piazzale."/>
+        <text name="uey_config_unlimited"          text="Illimitato"/>
+        <text name="uey_config_allWeights"       text="Tutti i pesi"/>
+        <text name="uey_config_clearWeights"     text="Cancella pesi"/>
+        <text name="uey_config_brands_header"    text="Marche"/>
+        <text name="uey_config_brands_desc"      text="Imposta la probabilità di generazione per marca (0 = disattivato)."/>
+        <text name="uey_config_allBrands"        text="Tutte le marche"/>
+        <text name="uey_config_clearBrands"      text="Cancella marche"/>
+        <text name="uey_config_close"            text="Chiudi"/>
+        <text name="uey_config_apply"            text="Applica"/>
+        <text name="uey_config_quality_LOW"      text="Bassa"/>
+        <text name="uey_config_quality_MEDIUM"   text="Media"/>
+        <text name="uey_config_quality_HIGH"     text="Alta"/>
+        <text name="uey_config_quality_EX_DEMO" text="Ex-Demo"/>
+        <text name="uey_config_quality_NEW"     text="Nuovo"/>
+
+        <!-- Mod integrations -->
+        <text name="uey_config_mods_desc"          text="Le opzioni appariranno qui se le mod supportate sono attive."/>
+        <!-- Vehicle Years -->
+        <text name="uey_config_minYear"            text="Anno min."/>
+        <text name="uey_config_maxYear"            text="Anno max."/>
+        <text name="uey_config_includeNoYear"      text="Includi sconosciuti"/>
+        <text name="uey_config_yes"                text="Sì"/>
+        <text name="uey_config_no"                 text="No"/>
+        <!-- Hire Purchasing -->
+        <text name="uey_config_allowHirePurchase"  text="Consenti"/>
+        <text name="uey_barter_hirePurchase"       text="Vendita a rate"/>
+        <text name="uey_hp_title"                  text="Vendita a rate"/>
+        <text name="uey_hp_vehiclePrice"           text="Prezzo del veicolo"/>
+        <text name="uey_hp_creditApplied"          text="Credito"/>
+        <text name="uey_hp_amountToFinance"        text="Importo da finanziare"/>
+        <text name="uey_hp_deposit"                text="Acconto"/>
+        <text name="uey_hp_duration"               text="Durata"/>
+        <text name="uey_hp_offer"                  text="Offerta"/>
+        <text name="uey_hp_interest"               text="Interessi"/>
+        <text name="uey_hp_monthly"                text="Mensile"/>
+        <text name="uey_hp_final"                  text="Rata finale"/>
+        <text name="uey_hp_total"                  text="Costo totale"/>
+        <text name="uey_hp_selectOffer"            text="Seleziona offerta"/>
+        <text name="uey_hp_confirm"                text="Conferma"/>
+        <text name="uey_hp_year"                   text="Anno"/>
+        <text name="uey_hp_years"                  text="Anni"/>
+        <text name="uey_hp_notEnoughDeposit"       text="Non puoi permetterti l'acconto minimo di %s."/>
+        <text name="uey_hp_creditCoversAll"        text="Il tuo credito copre l'intero prezzo. Usa invece l'acquisto immediato."/>
+
+        <!-- Barter dialog -->
+        <text name="uey_action_barter"              text="Tratta:"/>
+        <text name="uey_barter_header"              text="Trattativa"/>
+        <text name="uey_barter_askingPrice"         text="Prezzo richiesto"/>
+        <text name="uey_barter_yourOffer"           text="La tua offerta"/>
+        <text name="uey_barter_makeOffer"           text="Fai un'offerta"/>
+        <text name="uey_barter_buyNow"              text="Compra ora"/>
+        <text name="uey_barter_vehicleInfo"         text="Info veicolo"/>
+        <text name="uey_barter_specs"               text="Specifiche"/>
+        <text name="uey_barter_brand"               text="Marca"/>
+        <text name="uey_barter_owners"              text="Precedenti proprietari"/>
+        <text name="uey_barter_hours"               text="Ore"/>
+        <text name="uey_barter_damage"              text="Danno"/>
+        <text name="uey_barter_wear"                text="Usura"/>
+        <text name="uey_barter_chancesRemaining"    text="Tentativi di trattativa rimasti oggi: %d"/>
+        <text name="uey_barter_rejected"            text="Offerta rifiutata. Prova con un importo più alto."/>
+        <text name="uey_barter_noChances"           text="Nessun tentativo di trattativa rimasto per oggi."/>
+        <text name="uey_barter_noFarm"             text="Devi fare parte di una fattoria per poter trattare."/>
+        <text name="uey_barter_invalid"            text="Questa offerta non può essere elaborata."/>
+        <text name="uey_barter_purchased"          text="Acquistato %s per %s."/>
+        <text name="uey_barter_testDrive"          text="Giro di prova"/>
+        <text name="uey_barter_testDriveTitle"     text="Giro di prova"/>
+        <text name="uey_barter_testDriveConfirm"   text="Prendere %s per un giro di prova di 2 ore? Restituzione entro le %d:00 o verranno applicate penali orarie."/>
+        <text name="uey_barter_returnVehicle"      text="Restituisci veicolo"/>
+        <text name="uey_barter_returnTitle"        text="Restituisci veicolo"/>
+        <text name="uey_barter_returnConfirm"      text="Riportare questo veicolo al piazzale?"/>
+
+        <!-- Sale Zone -->
+        <text name="uey_saleZoneLabel"             text="Zona vendita piazzale"/>
+        <text name="uey_saleZone_function"          text="Zona vendita drive-in per un rivenditore di macchine usate"/>
+        <text name="uey_saleZone_action"            text="Vendi veicoli"/>
+        <text name="uey_saleZone_dialogTitle"       text="Seleziona veicolo da vendere"/>
+        <text name="uey_saleZone_notNearYard"       text="Deve essere posizionato vicino a un rivenditore di macchine usate."/>
+
+        <!-- Sell flow -->
+        <text name="uey_sell_tryOtherYard"       text="Non siamo interessati a questo, ma penso che %s lo sarebbe."/>
+        <text name="uey_sell_nobodyInterested"   text="Questo rivenditore non è interessato al veicolo e non conosce altri piazzali che lo sarebbero."/>
+        <text name="uey_sell_noFarm"             text="Devi fare parte di una fattoria per poter vendere veicoli."/>
+        <text name="uey_sell_offersHeader"       text="Offerte di vendita"/>
+        <text name="uey_sell_cashOffer"          text="Offerta in contanti"/>
+        <text name="uey_sell_creditOffer"        text="Offerta di credito"/>
+        <text name="uey_sell_hybridOffer"        text="Offerta mista"/>
+        <text name="uey_sell_cashLabel"          text="Contanti"/>
+        <text name="uey_sell_creditLabel"        text="Credito"/>
+        <text name="uey_sell_totalLabel"         text="Totale"/>
+        <text name="uey_sell_selectOffer"        text="Accetta"/>
+        <text name="uey_sell_success"            text="Venduto %s. Contanti: %s, Credito: %s."/>
+
+        <!-- Yard Credit -->
+        <text name="uey_credit_label"            text="Credito del piazzale"/>
+        <text name="uey_credit_none"             text="Nessuno"/>
+
+        <!-- Signs: Large Ad Board -->
+        <text name="largeAdSign"                text="Insegna pubblicitaria grande"/>
+        <text name="function_largeAdSign"       text="Questa insegna pubblicizza marche e offerte"/>
+        <text name="config_Board"               text="Selezione insegna"/>
+        <text name="configname_soldHere"        text="Pubblicità - Venduto qui"/>
+        <text name="configname_lowPrices"       text="Pubblicità - Prezzi convenienti"/>
+        <text name="configname_weBuy"           text="Pubblicità - Tu vendi, noi compriamo"/>
+        <text name="configname_testDrives"      text="Pubblicità - Giri di prova"/>
+        <text name="configname_massey"          text="Rivenditore - Massey"/>
+        <text name="configname_newHolland"      text="Rivenditore - New Holland"/>
+        <text name="configname_claas"           text="Rivenditore - Claas"/>
+        <text name="configname_johnDeere"       text="Rivenditore - John Deere"/>
+        <text name="configname_fendt"           text="Rivenditore - Fendt"/>
+        <text name="configname_jcb"             text="Rivenditore - JCB"/>
+        <text name="configname_rossAgri"        text="Piazzale Ross Agri"/>
+
+        <!-- Signs: Small Ad Board -->
+        <text name="smallAdSign"                text="Insegna pubblicitaria piccola"/>
+        <text name="function_smallAdSign"       text="Questa insegna pubblicizza i prezzi delle offerte"/>
+        <text name="configname_10000"           text="Sotto 10000"/>
+        <text name="configname_10000p"          text="Sotto 10000 (Palo)"/>
+        <text name="configname_75000"           text="Sotto 75000"/>
+        <text name="configname_75000p"          text="Sotto 75000 (Palo)"/>
+        <text name="configname_100000"          text="Sotto 100000"/>
+        <text name="configname_100000p"         text="Sotto 100000 (Palo)"/>
+        <text name="configname_250000"          text="Sotto 250000"/>
+        <text name="configname_250000p"         text="Sotto 250000 (Palo)"/>
+        <text name="configname_500000"          text="Sotto 500000"/>
+        <text name="configname_500000p"         text="Sotto 500000 (Palo)"/>
+        <text name="configname_750000"          text="Sotto 750000"/>
+        <text name="configname_750000p"         text="Sotto 750000 (Palo)"/>
+        <text name="configname_999999"          text="Sotto 999999"/>
+        <text name="configname_999999p"         text="Sotto 999999 (Palo)"/>
+        <text name="configname_PoleOnly"        text="Solo palo"/>
+        <text name="configname_KeepOff"         text="Non calpestare l'erba"/>
+        <text name="configname_KeepOffp"        text="Non calpestare l'erba (Palo)"/>
+        <text name="configname_Lunch"           text="Pausa pranzo"/>
+        <text name="configname_Lunchp"          text="Pausa pranzo (Palo)"/>
+        <text name="configname_NoParking"       text="Divieto di sosta"/>
+        <text name="configname_NoParkingp"      text="Divieto di sosta (Palo)"/>
+        <text name="configname_ToiletsLeft"     text="Servizi igienici (Sinistra)"/>
+        <text name="configname_ToiletsLeftp"    text="Servizi igienici (Sinistra) (Palo)"/>
+        <text name="configname_ToiletsRight"    text="Servizi igienici (Destra)"/>
+        <text name="configname_ToiletsRightp"   text="Servizi igienici (Destra) (Palo)"/>
+
+        <!-- Signs: Plot Board -->
+        <text name="plotSign"                   text="Insegne piazzole"/>
+        <text name="function_plotSign"          text="Assegna piazzole per veicoli e macchinari"/>
+        <text name="configname_plot01"          text="Piazzola 01"/>
+        <text name="configname_plot02"          text="Piazzola 02"/>
+        <text name="configname_plot03"          text="Piazzola 03"/>
+        <text name="configname_plot04"          text="Piazzola 04"/>
+        <text name="configname_plot05"          text="Piazzola 05"/>
+        <text name="configname_plot06"          text="Piazzola 06"/>
+        <text name="configname_plot07"          text="Piazzola 07"/>
+        <text name="configname_plot08"          text="Piazzola 08"/>
+        <text name="configname_plot09"          text="Piazzola 09"/>
+        <text name="configname_plot10"          text="Piazzola 10"/>
+        <text name="configname_plot11"          text="Piazzola 11"/>
+        <text name="configname_plot12"          text="Piazzola 12"/>
+        <text name="configname_plot13"          text="Piazzola 13"/>
+        <text name="configname_plot14"          text="Piazzola 14"/>
+        <text name="configname_plot15"          text="Piazzola 15"/>
+        <text name="configname_plot16"          text="Piazzola 16"/>
+        <text name="configname_plot17"          text="Piazzola 17"/>
+        <text name="configname_plot18"          text="Piazzola 18"/>
+        <text name="configname_plot19"          text="Piazzola 19"/>
+        <text name="configname_plot20"          text="Piazzola 20"/>
+        <text name="configname_plot21"          text="Piazzola 21"/>
+        <text name="configname_plot22"          text="Piazzola 22"/>
+        <text name="configname_plot23"          text="Piazzola 23"/>
+        <text name="configname_plot24"          text="Piazzola 24"/>
+        <text name="configname_plot25"          text="Piazzola 25"/>
+        <text name="configname_plot26"          text="Piazzola 26"/>
+        <text name="configname_plot27"          text="Piazzola 27"/>
+        <text name="configname_plot28"          text="Piazzola 28"/>
+        <text name="configname_plot29"          text="Piazzola 29"/>
+        <text name="configname_plot30"          text="Piazzola 30"/>
+
+        <!-- Settings page -->
+        <text name="uey_settings_resetInventory_label" text="Reimposta tutti i piazzali"/>
+        <text name="uey_settings_resetInventory_text"  text="Reimposta inventario"/>
+
+        <!-- Permissions -->
+        <text name="uey_warning_adminOnly"     text="Solo l'amministratore del server può posizionare o rimuovere i piazzali."/>
+
+        <!-- Console / status messages -->
+        <text name="uey_yardCreated"           text="Piazzale '%s' creato."/>
+        <text name="uey_yardRemoved"           text="Piazzale '%s' rimosso."/>
+        <text name="uey_inventoryReset"        text="Inventario per '%s' reimpostato."/>
+        <text name="uey_allInventoriesReset"   text="Tutti gli inventari dei piazzali sono stati reimpostati."/>
+    </texts>
+</l10n>

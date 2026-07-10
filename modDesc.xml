@@ -29,6 +29,7 @@ Changelog:
 
 1.0.0.8:
 - Fix to allow SellZone placement when a yard is very large.
+- Add Italian translation, thank you @omarlocci2-ita.
 
 1.0.0.7:
 - Add design colors to configs excluded from randomisation.
