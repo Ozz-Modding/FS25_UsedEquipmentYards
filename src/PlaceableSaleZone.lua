@@ -81,6 +81,40 @@ end
 -- Find nearest yard (works on both server and client)
 -- ---------------------------------------------------------------------------
 
+-- Returns 0 if (px, pz) is inside the yard polygon, otherwise the distance
+-- to the nearest point on the polygon boundary.  Falls back to centre distance
+-- when no polygon is available (legacy saves).
+local function yardDistanceFromPoint(yard, px, pz)
+    local poly = yard.bounds.polygon
+    if poly == nil or #poly < 3 then
+        local dx = yard.bounds.cx - px
+        local dz = yard.bounds.cz - pz
+        return math.sqrt(dx * dx + dz * dz)
+    end
+
+    -- Inside the polygon → distance is zero.
+    if yard:containsPoint(px, pz) then
+        return 0
+    end
+
+    -- Distance to the nearest edge of the polygon.
+    local minDist = math.huge
+    local n = #poly
+    for i = 1, n do
+        local ax, az = poly[i].x, poly[i].z
+        local bx, bz = poly[(i % n) + 1].x, poly[(i % n) + 1].z
+        local abx, abz = bx - ax, bz - az
+        local apx, apz = px - ax, pz - az
+        local lenSq = abx * abx + abz * abz
+        local t = lenSq > 0 and math.max(0, math.min(1, (apx * abx + apz * abz) / lenSq)) or 0
+        local ex, ez = ax + t * abx, az + t * abz
+        local dx, dz = px - ex, pz - ez
+        local d = math.sqrt(dx * dx + dz * dz)
+        if d < minDist then minDist = d end
+    end
+    return minDist
+end
+
 function PlaceableSaleZone.findNearestYard(x, z)
     local nearestYard = nil
     local nearestDist = math.huge
@@ -88,9 +122,7 @@ function PlaceableSaleZone.findNearestYard(x, z)
     -- Server: use YardManager.
     if UsedEquipmentYards.yardManager ~= nil then
         for _, yard in pairs(UsedEquipmentYards.yardManager.yards) do
-            local dx = yard.bounds.cx - x
-            local dz = yard.bounds.cz - z
-            local dist = math.sqrt(dx * dx + dz * dz)
+            local dist = yardDistanceFromPoint(yard, x, z)
             if dist < nearestDist then
                 nearestDist = dist
                 nearestYard = yard
@@ -100,9 +132,7 @@ function PlaceableSaleZone.findNearestYard(x, z)
 
     -- Client: use clientYards.
     for _, yard in pairs(UsedEquipmentYards.clientYards) do
-        local dx = yard.bounds.cx - x
-        local dz = yard.bounds.cz - z
-        local dist = math.sqrt(dx * dx + dz * dz)
+        local dist = yardDistanceFromPoint(yard, x, z)
         if dist < nearestDist then
             nearestDist = dist
             nearestYard = yard

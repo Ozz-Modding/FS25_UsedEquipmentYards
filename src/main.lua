@@ -2,7 +2,7 @@
 -- Author: Ozz
 -- Entry point: registered as a mod event listener
 
-UsedEquipmentYards = {}
+UsedEquipmentYards         = {}
 UsedEquipmentYards.dir     = g_currentModDirectory
 UsedEquipmentYards.modName = g_currentModName
 
@@ -117,7 +117,7 @@ end
 -- ---------------------------------------------------------------------------
 
 function UsedEquipmentYards:registerConsoleCommands()
-    addConsoleCommand("ueyResetInventory", "Reset inventory: ueyResetInventory [id|all]",  "consoleResetInventory", self)
+    addConsoleCommand("ueyResetInventory", "Reset inventory: ueyResetInventory [id|all]", "consoleResetInventory", self)
 end
 
 function UsedEquipmentYards:unregisterConsoleCommands()
@@ -166,6 +166,9 @@ FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMissi
     if UsedEquipmentYards.yardManager ~= nil then
         UsedEquipmentYards.yardManager:spawnAllYards()
     end
+    -- local xmlFile = loadXMLFile("Temp", "dataS/gui/InGameMenuSettingsFrame.xml")
+    -- saveXMLFileTo(xmlFile, g_currentMission.missionInfo.savegameDirectory .. "/InGameMenuSettingsFrame.xml")
+    -- delete(xmlFile);
 end)
 
 FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState,
@@ -204,12 +207,12 @@ end
 
 local function isYardFenceBrush(brush)
     return brush.fenceParentObject ~= nil
-       and brush.fenceParentObject[PlaceableUsedEquipmentYard.KEY] ~= nil
+        and brush.fenceParentObject[PlaceableUsedEquipmentYard.KEY] ~= nil
 end
 
 --- Install fence construction patches. Called with a delay so we wrap
 --- whatever version exists AFTER all other mods have had time to patch.
-UsedEquipmentYards.fencePatchDelay = 5000  -- ms
+UsedEquipmentYards.fencePatchDelay = 5000 -- ms
 UsedEquipmentYards.fencePatchTimer = nil
 
 function UsedEquipmentYards.installFencePatches()
@@ -256,7 +259,8 @@ function UsedEquipmentYards.installFencePatches()
                     if sx == nil then return false end
                     local price = self.currentSegment:getPrice()
                     if g_currentMission:getMoney(g_localPlayer.farmId) < price then
-                        self.cursor:setErrorMessage(g_i18n:getText(ConstructionBrushNewFence.ERROR_MESSAGES[ConstructionBrushNewFence.ERROR.NOT_ENOUGH_MONEY]))
+                        self.cursor:setErrorMessage(g_i18n:getText(ConstructionBrushNewFence.ERROR_MESSAGES
+                            [ConstructionBrushNewFence.ERROR.NOT_ENOUGH_MONEY]))
                         return false
                     end
                     if price > 0 then
@@ -440,9 +444,9 @@ function UsedEquipmentYards.registerClientItem(yardId, itemIndex, item)
         -- Update existing item data (e.g. test drive state change).
         local existingItem = UsedEquipmentYards.clientItems[yardId][itemIndex]
         if existingItem ~= nil then
-            existingItem.price            = item.price
-            existingItem.minPrice         = item.minPrice
-            existingItem.testDrive        = item.testDrive
+            existingItem.price             = item.price
+            existingItem.minPrice          = item.minPrice
+            existingItem.testDrive         = item.testDrive
             existingItem.testDrivenByFarms = item.testDrivenByFarms
         end
     end
@@ -505,12 +509,12 @@ if PlayerHUDUpdater ~= nil then
         box:addLine(g_i18n:getText("uey_hud_forSale"), g_i18n:formatMoney(item.price))
 
         local damagePercent = (item.damage or 0) * 100
-        local wearPercent   = (item.wear   or 0) * 100
+        local wearPercent   = (item.wear or 0) * 100
         local hours         = (item.operatingTime or 0) / 3600000
 
         box:addLine(g_i18n:getText("uey_hud_damage"), ("%.2f %%"):format(damagePercent))
-        box:addLine(g_i18n:getText("uey_hud_wear"),   ("%.2f %%"):format(wearPercent))
-        box:addLine(g_i18n:getText("uey_hud_hours"),   ("%.2f"):format(hours))
+        box:addLine(g_i18n:getText("uey_hud_wear"), ("%.2f %%"):format(wearPercent))
+        box:addLine(g_i18n:getText("uey_hud_hours"), ("%.2f"):format(hours))
         box:showNextFrame()
     end)
 end
