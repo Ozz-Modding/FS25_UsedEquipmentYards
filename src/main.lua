@@ -508,6 +508,14 @@ if PlayerHUDUpdater ~= nil then
         box:setTitle(vehicle:getFullName())
         box:addLine(g_i18n:getText("uey_hud_forSale"), g_i18n:formatMoney(item.price))
 
+        local si = g_storeManager:getItemByXMLFilename(item.xmlFilename)
+        if si ~= nil and si.categoryNames ~= nil and si.categoryNames[1] ~= nil then
+            local cat = g_storeManager.categoryByName[si.categoryNames[1]]
+            if cat ~= nil then
+                box:addLine(g_i18n:getText("uey_hud_category"), cat.title)
+            end
+        end
+
         local damagePercent = (item.damage or 0) * 100
         local wearPercent   = (item.wear or 0) * 100
         local hours         = (item.operatingTime or 0) / 3600000

@@ -29,6 +29,7 @@ Changelog:
 
 1.0.0.8:
 - Sold equipment is now correctly disconnected from any equipment or implements.
+- The yard vehicle HUD infobox now lists the category of the equipment, e.g. Small Tractors.
 - Fix to allow SellZone placement when a yard is very large.
 - Add Italian translation, thank you @omarlocci2-ita.
 

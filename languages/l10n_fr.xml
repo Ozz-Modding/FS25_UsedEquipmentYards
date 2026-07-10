@@ -15,6 +15,7 @@
 
         <!-- HUD info when looking at a yard vehicle -->
         <text name="uey_hud_forSale"          text="A vendre"/>
+        <text name="uey_hud_category"         text="Categorie"/>
         <text name="uey_hud_damage"           text="Dommages"/>
         <text name="uey_hud_wear"             text="Usure"/>
         <text name="uey_hud_hours"            text="Heures"/>
