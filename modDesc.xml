@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="109">
     <author>Ozz</author>
-    <version>1.0.0.7</version>
+    <version>1.0.0.8</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -27,8 +27,12 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
 
-1.0.0.7:
+1.0.0.8:
 - Fix to allow SellZone placement when a yard is very large.
+
+1.0.0.7:
+- Add design colors to configs excluded from randomisation.
+- Sale Zone now applies levelling and clearance to ensure it is visible and clear.
 
 1.0.0.6:
 - Add baseColor to configs excluded from randomisation.
@@ -75,6 +79,17 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.0.7:
+- Designfarben zu ausgeschlossenen Konfigurationen hinzugefügt.
+- Sales Zone wendet jetzt Nivellierung und Freiräumung an, um sicherzustellen, dass sie sichtbar ist.
+
+1.0.0.6:
+- BaseColor zu ausgeschlossenen Konfigurationen hinzugefügt.
+
+1.0.0.5:
+- Farbe und Felgenfarbe werden nicht mehr zufällig bestimmt.
+- Einige fehlende Übersetzungen hinzugefügt.
+
 1.0.0.4:
 - Hoffahrzeuge haben jetzt zufällige Konfigurationen
 - Unterstützung für Vehicle Years Mod hinzugefügt
@@ -112,6 +127,17 @@ Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiat
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
+
+1.0.0.7 :
+- Ajout des couleurs de conception aux configurations exclues de la randomisation.
+- La zone de vente applique désormais le nivellement et le dégagement pour assurer la visibilité.
+
+1.0.0.6 :
+- Ajout de baseColor aux configurations exclues de la randomisation.
+
+1.0.0.5 :
+- La couleur et la couleur des jantes ne sont plus aléatoires.
+- Ajout de traductions manquantes.
 
 1.0.0.4 :
 - Les vehicules du parc ont desormais des configurations aleatoires
@@ -178,6 +204,8 @@ Journal des modifications :
         </type>
         <type name="usedEquipmentYardSaleZone" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
             <specialization name="placement" />
+            <specialization name="clearAreas" />
+            <specialization name="leveling" />
             <specialization name="saleZone" />
         </type>
     </placeableTypes>
