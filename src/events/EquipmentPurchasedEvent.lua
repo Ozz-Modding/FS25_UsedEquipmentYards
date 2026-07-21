@@ -70,17 +70,7 @@ function EquipmentPurchasedEvent:run(connection)
         local purchasePrice = item.price
 
         if vehicle ~= nil then
-            -- Detach from parent (e.g. tanker hitched to a tractor in the yard).
-            if vehicle.spec_attachable ~= nil and vehicle.spec_attachable.attacherVehicle ~= nil then
-                vehicle.spec_attachable.attacherVehicle:detachImplementByObject(vehicle)
-            end
-            -- Detach any implements attached to this vehicle.
-            if vehicle.spec_attacherJoints ~= nil then
-                local implements = vehicle:getAttachedImplements()
-                for i = #implements, 1, -1 do
-                    vehicle:detachImplement(i)
-                end
-            end
+            YardInventory.detachVehicle(vehicle)
 
             vehicle:setOwnerFarmId(self.farmId)
             PriceTagRenderer.removeTag(vehicle)

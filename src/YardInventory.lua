@@ -1440,6 +1440,8 @@ function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
     end
     UsedEquipmentYards.setADSExcluded(vehicle, true)
 
+    YardInventory.detachVehicle(vehicle)
+
     if vehicle.stopMotor ~= nil then
         vehicle:stopMotor()
     end
@@ -1469,6 +1471,23 @@ function YardInventory:acceptSoldVehicle(vehicle, purchasePrice)
 end
 
 --- Hide a vehicle: remove from physics and disable rendering.
+--- Detach a vehicle from its parent and detach all implements from it.
+--- Mirrors AttacherJoints:onPreDelete — skips additional attachments.
+function YardInventory.detachVehicle(vehicle)
+    if vehicle.spec_attachable ~= nil and vehicle.spec_attachable.attacherVehicle ~= nil then
+        vehicle.spec_attachable.attacherVehicle:detachImplementByObject(vehicle, true)
+    end
+    if vehicle.spec_attacherJoints ~= nil and vehicle.spec_attacherJoints.attachedImplements ~= nil then
+        local attachedImplements = vehicle.spec_attacherJoints.attachedImplements
+        for i = #attachedImplements, 1, -1 do
+            local implement = attachedImplements[i]
+            if not implement.object:getIsAdditionalAttachment() then
+                vehicle:detachImplementByObject(implement.object, true)
+            end
+        end
+    end
+end
+
 function YardInventory:hideVehicle(vehicle)
     vehicle:removeFromPhysics()
     vehicle:setVisibility(false)

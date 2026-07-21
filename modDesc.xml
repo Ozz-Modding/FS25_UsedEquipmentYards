@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="110">
     <author>Ozz</author>
-    <version>1.0.0.8</version>
+    <version>1.0.0.9</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -27,7 +27,8 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
 
-1.0.0.8:
+1.0.0.9:
+- Fix a bug where players could not delete yards in multiplayer.
 - Sold equipment is now correctly disconnected from any equipment or implements.
 - The yard vehicle HUD infobox now lists the category of the equipment, e.g. Small Tractors.
 - Fix to allow SellZone placement when a yard is very large.
@@ -82,6 +83,13 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.0.9:
+- Behebung eines Fehlers, bei dem Spieler im Multiplayer keine Höfe löschen konnten.
+- Verkaufte Ausrüstung wird nun korrekt von Geräten oder Anbaugeräten getrennt.
+- Das HUD-Infofeld für Hoffahrzeuge zeigt jetzt die Kategorie der Ausrüstung an, z.B. Kleine Traktoren.
+- Behebung, um die Platzierung der Verkaufszone bei sehr großen Höfen zu ermöglichen.
+- Italienische Übersetzung hinzugefügt, Dank an @omarlocci2-ita.
+
 1.0.0.7:
 - Designfarben zu ausgeschlossenen Konfigurationen hinzugefügt.
 - Sales Zone wendet jetzt Nivellierung und Freiräumung an, um sicherzustellen, dass sie sichtbar ist.
@@ -130,6 +138,13 @@ Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiat
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
+
+1.0.0.9 :
+- Correction d'un bug empêchant les joueurs de supprimer des parcs en multijoueur.
+- L'équipement vendu est désormais correctement déconnecté de tout équipement ou outil attelé.
+- L'infobulle HUD des véhicules du parc affiche maintenant la catégorie de l'équipement, par ex. Petits Tracteurs.
+- Correction pour permettre le placement de la zone de vente lorsqu'un parc est très grand.
+- Ajout de la traduction italienne, merci à @omarlocci2-ita.
 
 1.0.0.7 :
 - Ajout des couleurs de conception aux configurations exclues de la randomisation.

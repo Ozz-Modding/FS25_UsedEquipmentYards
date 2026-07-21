@@ -104,7 +104,10 @@ function PlaceableUsedEquipmentYard:canBeSold(superFunc)
             return false
         end
     end
-    return superFunc(self)
+    -- Don't call superFunc: PlaceableHusbandryFence:canBeSold blocks when the
+    -- fence area is occupied, which it always is when vehicles are spawned.
+    -- onDelete handles full cleanup, so we own this decision entirely.
+    return true
 end
 
 --- Count how many placed sale zones are linked to the given yard id.

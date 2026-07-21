@@ -115,18 +115,7 @@ function TestDriveEvent:serverReturnTestDrive(item, yard)
         vehicle:leaveVehicle()
     end
 
-    -- Detach from parent vehicle (e.g. trailer attached to a tractor).
-    if vehicle.spec_attachable ~= nil and vehicle.spec_attachable.attacherVehicle ~= nil then
-        vehicle.spec_attachable.attacherVehicle:detachImplementByObject(vehicle)
-    end
-
-    -- Detach any implements attached to this vehicle.
-    if vehicle.spec_attacherJoints ~= nil then
-        local implements = vehicle:getAttachedImplements()
-        for i = #implements, 1, -1 do
-            vehicle:detachImplement(i)
-        end
-    end
+    YardInventory.detachVehicle(vehicle)
 
     -- Stop engine and turn off lights before teleporting back.
     if vehicle.stopMotor ~= nil then
