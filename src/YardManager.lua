@@ -64,6 +64,9 @@ function YardManager:load()
         end
     end
 
+    Logging.info("[UsedEquipmentYards] load: loaded %d yard(s)", i)
+    self.loaded = true
+
     -- Don't spawn vehicles here — g_terrainNode may not be ready yet.
     -- Spawning is deferred to spawnAllYards(), called from onMissionStarted.
 end
@@ -72,6 +75,13 @@ end
 --- Also subscribes to HOUR_CHANGED here (not in load) so it works even
 --- when no save file existed.
 function YardManager:spawnAllYards()
+    if not self.loaded then
+        local filePath = (self:getSavePath() or "") .. YardManager.SAVE_FILENAME
+        if fileExists(filePath) then
+            Logging.warning("[UsedEquipmentYards] spawnAllYards: load had not completed — retrying")
+            self:load()
+        end
+    end
     g_messageCenter:subscribe(MessageType.HOUR_CHANGED, self.onHourChanged, self)
     for _, yard in pairs(self.yards) do
         yard.inventory:spawn()
@@ -80,18 +90,27 @@ end
 
 function YardManager:save()
     local savePath = self:getSavePath()
-    if savePath == nil then return end
+    if savePath == nil then
+        Logging.warning("[UsedEquipmentYards] save: could not determine save path")
+        return
+    end
 
     local xmlFile = createXMLFile("UsedEquipmentYards", savePath .. YardManager.SAVE_FILENAME, "UsedEquipmentYards")
     if xmlFile == nil then
+        Logging.warning("[UsedEquipmentYards] save: createXMLFile failed")
         return
     end
 
     local i = 0
     for _, yard in pairs(self.yards) do
         local key = ("UsedEquipmentYards.yards.yard(%d)"):format(i)
-        yard:saveToXML(xmlFile, key)
-        i = i + 1
+        local ok, err = pcall(yard.saveToXML, yard, xmlFile, key)
+        if ok then
+            i = i + 1
+        else
+            Logging.warning("[UsedEquipmentYards] save: skipping yard %d ('%s') due to error: %s",
+                yard.id, tostring(yard.name), tostring(err))
+        end
     end
 
     BarterState.saveToXML(xmlFile, "UsedEquipmentYards")
@@ -99,7 +118,13 @@ function YardManager:save()
     SellBarterDialog.saveOffersToXML(xmlFile, "UsedEquipmentYards")
     UsedEquipmentYards.saveRecentSalesToXML(xmlFile, "UsedEquipmentYards")
 
-    saveXMLFile(xmlFile)
+    Logging.info("[UsedEquipmentYards] save: writing %d yard(s)", i)
+    local saved = saveXMLFile(xmlFile)
+    if not saved then
+        Logging.warning("[UsedEquipmentYards] save: saveXMLFile returned false")
+    else
+        Logging.info("[UsedEquipmentYards] save: complete")
+    end
     delete(xmlFile)
 end
 

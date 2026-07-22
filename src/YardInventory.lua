@@ -1667,72 +1667,82 @@ function YardInventory:saveToXML(xmlFile, key)
         end
     end
 
-    -- Save items.
-    for i, item in ipairs(self.items) do
-        local iKey = ("%s.item(%d)"):format(key, i - 1)
-        setXMLString(xmlFile, iKey .. "#xmlFilename", item.xmlFilename or "")
-        setXMLInt(xmlFile, iKey .. "#price", item.price or 0)
-        setXMLInt(xmlFile, iKey .. "#age", item.age or 0)
-        setXMLFloat(xmlFile, iKey .. "#damage", item.damage or 0)
-        setXMLFloat(xmlFile, iKey .. "#wear", item.wear or 0)
-        setXMLFloat(xmlFile, iKey .. "#operatingTime", (item.operatingTime or 0) / 1000)
-        setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
-        setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
-        setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
-        setXMLFloat(xmlFile, iKey .. "#spawnWidth", item.spawnWidth or 0)
-        setXMLFloat(xmlFile, iKey .. "#spawnLength", item.spawnLength or 0)
-        setXMLFloat(xmlFile, iKey .. "#spawnYaw", item.spawnYaw or 0)
+    -- Save items. Use a separate write index so a skipped item never creates
+    -- a gap in the sequence (the load loop stops at the first missing index).
+    local writeIdx = 0
+    for _, item in ipairs(self.items) do
+        local iKey = ("%s.item(%d)"):format(key, writeIdx)
+        local ok, err = pcall(function()
+            setXMLString(xmlFile, iKey .. "#xmlFilename", item.xmlFilename or "")
+            setXMLInt(xmlFile, iKey .. "#price", item.price or 0)
+            setXMLInt(xmlFile, iKey .. "#age", item.age or 0)
+            setXMLFloat(xmlFile, iKey .. "#damage", item.damage or 0)
+            setXMLFloat(xmlFile, iKey .. "#wear", item.wear or 0)
+            setXMLFloat(xmlFile, iKey .. "#operatingTime", (item.operatingTime or 0) / 1000)
+            setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
+            setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
+            setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
+            setXMLFloat(xmlFile, iKey .. "#spawnWidth", item.spawnWidth or 0)
+            setXMLFloat(xmlFile, iKey .. "#spawnLength", item.spawnLength or 0)
+            setXMLFloat(xmlFile, iKey .. "#spawnYaw", item.spawnYaw or 0)
 
-        -- Mark hidden items (pending sold vehicles waiting for yard space).
-        local isHidden = false
-        for _, pItem in ipairs(self.pendingSoldItems) do
-            if pItem == item then
-                isHidden = true;
-                break
+            -- Mark hidden items (pending sold vehicles waiting for yard space).
+            local isHidden = false
+            for _, pItem in ipairs(self.pendingSoldItems) do
+                if pItem == item then
+                    isHidden = true;
+                    break
+                end
             end
-        end
-        if isHidden then
-            setXMLBool(xmlFile, iKey .. "#hidden", true)
-        end
-
-        -- Save vehicle configurations so the correct config is used if re-spawned.
-        if item.configurations ~= nil then
-            local cfgIdx = 0
-            for cfgName, cfgValue in pairs(item.configurations) do
-                local cfgKey = ("%s.vehicleConfig(%d)"):format(iKey, cfgIdx)
-                setXMLString(xmlFile, cfgKey .. "#name", cfgName)
-                setXMLInt(xmlFile, cfgKey .. "#value", tonumber(cfgValue) or 0)
-                cfgIdx = cfgIdx + 1
+            if isHidden then
+                setXMLBool(xmlFile, iKey .. "#hidden", true)
             end
-        end
 
-        -- Save vehicle uniqueId so we can re-associate on load.
-        if item.vehicle ~= nil and item.vehicle.uniqueId ~= nil then
-            setXMLString(xmlFile, iKey .. "#vehicleUniqueId", item.vehicle.uniqueId)
-        end
-
-        -- Test driven history (which farms have already test-driven this item).
-        local tdf = item.testDrivenByFarms
-        if tdf ~= nil then
-            local fi = 0
-            for farmId, _ in pairs(tdf) do
-                setXMLInt(xmlFile, ("%s.testDrivenByFarm(%d)#farmId"):format(iKey, fi), farmId)
-                fi = fi + 1
+            -- Save vehicle configurations so the correct config is used if re-spawned.
+            if item.configurations ~= nil then
+                local cfgIdx = 0
+                for cfgName, cfgValue in pairs(item.configurations) do
+                    local cfgKey = ("%s.vehicleConfig(%d)"):format(iKey, cfgIdx)
+                    setXMLString(xmlFile, cfgKey .. "#name", cfgName)
+                    setXMLInt(xmlFile, cfgKey .. "#value", tonumber(cfgValue) or 0)
+                    cfgIdx = cfgIdx + 1
+                end
             end
-        end
 
-        -- Test drive state.
-        local td = item.testDrive
-        if td ~= nil then
-            setXMLInt(xmlFile, iKey .. ".testDrive#farmId", td.farmId)
-            setXMLInt(xmlFile, iKey .. ".testDrive#returnByDay", td.returnByDay)
-            setXMLInt(xmlFile, iKey .. ".testDrive#returnByHour", td.returnByHour)
-            setXMLFloat(xmlFile, iKey .. ".testDrive#origX", td.origX)
-            setXMLFloat(xmlFile, iKey .. ".testDrive#origY", td.origY)
-            setXMLFloat(xmlFile, iKey .. ".testDrive#origZ", td.origZ)
-            setXMLFloat(xmlFile, iKey .. ".testDrive#origRx", td.origRx)
-            setXMLFloat(xmlFile, iKey .. ".testDrive#origRy", td.origRy)
-            setXMLFloat(xmlFile, iKey .. ".testDrive#origRz", td.origRz)
+            -- Save vehicle uniqueId so we can re-associate on load.
+            if item.vehicle ~= nil and item.vehicle.uniqueId ~= nil then
+                setXMLString(xmlFile, iKey .. "#vehicleUniqueId", item.vehicle.uniqueId)
+            end
+
+            -- Test driven history (which farms have already test-driven this item).
+            local tdf = item.testDrivenByFarms
+            if tdf ~= nil then
+                local fi = 0
+                for farmId, _ in pairs(tdf) do
+                    setXMLInt(xmlFile, ("%s.testDrivenByFarm(%d)#farmId"):format(iKey, fi), farmId)
+                    fi = fi + 1
+                end
+            end
+
+            -- Test drive state.
+            local td = item.testDrive
+            if td ~= nil then
+                setXMLInt(xmlFile, iKey .. ".testDrive#farmId", td.farmId)
+                setXMLInt(xmlFile, iKey .. ".testDrive#returnByDay", td.returnByDay)
+                setXMLInt(xmlFile, iKey .. ".testDrive#returnByHour", td.returnByHour)
+                setXMLFloat(xmlFile, iKey .. ".testDrive#origX", td.origX)
+                setXMLFloat(xmlFile, iKey .. ".testDrive#origY", td.origY)
+                setXMLFloat(xmlFile, iKey .. ".testDrive#origZ", td.origZ)
+                setXMLFloat(xmlFile, iKey .. ".testDrive#origRx", td.origRx)
+                setXMLFloat(xmlFile, iKey .. ".testDrive#origRy", td.origRy)
+                setXMLFloat(xmlFile, iKey .. ".testDrive#origRz", td.origRz)
+            end
+        end)
+        if ok then
+            writeIdx = writeIdx + 1
+        else
+            Logging.warning("[UsedEquipmentYards] saveToXML: skipping item '%s' due to error: %s",
+                tostring(item.xmlFilename), tostring(err))
         end
     end
 end
