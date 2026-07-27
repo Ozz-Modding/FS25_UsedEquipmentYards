@@ -43,7 +43,21 @@ function YardVehicleActivatable:run()
 end
 
 function YardVehicleActivatable:activate()
+    local vehicle = self.item and self.item.vehicle
+    local ic = vehicle and vehicle.spec_interactiveControl
+    if ic and #ic.interactiveControllers > 0 and g_currentMission.interactiveControl ~= nil then
+        ic.isPlayerInRange = true
+        vehicle:raiseActive()
+        g_currentMission.interactiveControl:setPlayerInRange(true)
+    end
 end
 
 function YardVehicleActivatable:deactivate()
+    local vehicle = self.item and self.item.vehicle
+    local ic = vehicle and vehicle.spec_interactiveControl
+    if ic and #ic.interactiveControllers > 0 and g_currentMission.interactiveControl ~= nil then
+        ic.isPlayerInRange = false
+        vehicle:setVehicleMaxUpdateTime(g_currentMission.time + 1500)
+        g_currentMission.interactiveControl:setPlayerInRange(false)
+    end
 end
