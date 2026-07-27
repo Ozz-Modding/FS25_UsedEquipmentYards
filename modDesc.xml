@@ -29,6 +29,8 @@ Changelog:
 
 1.0.1.1:
 - Interactive controls are now active for yard vehicles before the player enters the vehicle.
+- Additional protections on saving to reduce mod conflicts.
+- BR-PT translation provided thanks to Myiamoto86.
 
 1.0.1.0:
 - Added safety checks and logging around save and load to limit impact of modded yard vehicles with errors.

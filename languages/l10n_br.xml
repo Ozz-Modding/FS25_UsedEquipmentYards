@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+    <translationContributors>Miyamoto86</translationContributors>
+    <texts>
+        <text name="uey_modTitle" text="Pátios de Equipamentos Usados" />
+        <text name="uey_yardLabel" text="Pátio de Equipamentos Usados" />
+        <text name="uey_function" text="Pátio de venda de equipamentos usados" />
+        <text name="uey_fenceSegment" text="Cerca de Limite do Pátio" />
+        <text name="uey_noItems" text="Nenhum equipamento disponível neste pátio no momento." />
+        <!-- Purchase flow -->
+        <text name="uey_purchaseConfirm" text="Comprar %s por $%s?" />
+        <text name="uey_purchaseSuccess" text="%s comprado por $%s." />
+        <text name="uey_purchaseFailed_funds" text="Saldo insuficiente para comprar este item." />
+        <!-- HUD info when looking at a yard vehicle -->
+        <text name="uey_hud_forSale" text="À Venda" />
+        <text name="uey_hud_category" text="Categoria" />
+        <text name="uey_hud_damage" text="Dano" />
+        <text name="uey_hud_wear" text="Desgaste" />
+        <text name="uey_hud_hours" text="Horas" />
+        <!-- Vehicle purchase -->
+        <text name="uey_action_buyVehicle" text="Comprar" />
+        <text name="uey_purchase_title" text="Comprar Veículo" />
+        <text name="uey_purchase_confirm" text="Comprar %s por %s?" />
+        <text name="uey_purchase_insufficient_funds" text="Saldo insuficiente." />
+        <!-- Yard config dialog -->
+        <text name="uey_action_configureYard" text="Configurar Pátio" />
+        <text name="uey_config_title" text="Configuração do Pátio" />
+        <text name="uey_config_settings_header" text="Configuração" />
+        <text name="uey_config_yardName" text="Nome do Pátio" />
+        <text name="uey_config_quality" text="Qualidade" />
+        <text name="uey_config_quality_desc"
+            text="Controla as horas, dano e desgaste dos equipamentos. Equipamentos de qualidade inferior custarão menos que os de qualidade superior." />
+        <text name="uey_config_dirtiness" text="Sujeira" />
+        <text name="uey_config_dirtiness_desc"
+            text="Nível médio de sujeira. Não usado para qualidade Ex-Demonstração e Novo." />
+        <text name="uey_config_workingWidth" text="Largura de Trabalho" />
+        <text name="uey_config_workingWidth_desc"
+            text="Filtrar equipamentos por largura de trabalho." />
+        <text name="uey_config_minWorkingWidth" text="Largura Mínima" />
+        <text name="uey_config_maxWorkingWidth" text="Largura Máxima" />
+        <text name="uey_config_noMinimum" text="Sem mínimo" />
+        <text name="uey_config_noMaximum" text="Sem máximo" />
+        <text name="uey_config_maxPrice" text="Preço Máximo" />
+        <text name="uey_config_maxPrice_desc"
+            text="Limitar o inventário do pátio a um preço máximo." />
+        <text name="uey_config_weights_header" text="Pesos por Categoria" />
+        <text name="uey_config_weights_desc"
+            text="Definir probabilidade de aparição por categoria (0 = desativado)." />
+        <text name="uey_config_avgStockHours" text="Média de Horas em Estoque" />
+        <text name="uey_config_avgStockHours_desc"
+            text="Quanto tempo os veículos permanecem antes de sair." />
+        <text name="uey_config_gridSpacing" text="Espaçamento da Grade" />
+        <text name="uey_config_gridSpacing_desc"
+            text="Distância entre pontos de aparição. Menor = mais veículos." />
+        <text name="uey_config_maxDuplicates" text="Máx. Duplicados" />
+        <text name="uey_config_maxDuplicates_desc"
+            text="Máximo de veículos idênticos permitidos no pátio ao mesmo tempo." />
+        <text name="uey_config_unlimited" text="Ilimitado" />
+        <text name="uey_config_allWeights" text="Todos os Pesos" />
+        <text name="uey_config_clearWeights" text="Limpar Pesos" />
+        <text name="uey_config_brands_header" text="Marcas" />
+        <text name="uey_config_brands_desc"
+            text="Definir probabilidade de aparição por marca (0 = desativado)." />
+        <text name="uey_config_allBrands" text="Todas as Marcas" />
+        <text name="uey_config_clearBrands" text="Limpar Marcas" />
+        <text name="uey_config_close" text="Fechar" />
+        <text name="uey_config_apply" text="Aplicar" />
+        <text name="uey_config_quality_LOW" text="Baixa" />
+        <text name="uey_config_quality_MEDIUM" text="Média" />
+        <text name="uey_config_quality_HIGH" text="Alta" />
+        <text name="uey_config_quality_EX_DEMO" text="Ex-Demonstração" />
+        <text name="uey_config_quality_NEW" text="Novo" />
+        <!-- Mod integrations -->
+        <text name="uey_config_mods_desc"
+            text="Opções aparecerão aqui quando mods compatíveis estiverem ativados." />
+        <!-- Vehicle Years -->
+        <text name="uey_config_minYear" text="Ano Mínimo" />
+        <text name="uey_config_maxYear" text="Ano Máximo" />
+        <text name="uey_config_includeNoYear" text="Incluir desconhecidos" />
+        <text name="uey_config_yes" text="Sim" />
+        <text name="uey_config_no" text="Não" />
+        <!-- Hire Purchasing -->
+        <text name="uey_config_allowHirePurchase" text="Permitir" />
+        <text name="uey_barter_hirePurchase" text="Compra Parcelada" />
+        <text name="uey_hp_title" text="Compra Parcelada" />
+        <text name="uey_hp_vehiclePrice" text="Preço do Veículo" />
+        <text name="uey_hp_creditApplied" text="Crédito Aplicado" />
+        <text name="uey_hp_amountToFinance" text="Valor a Financiar" />
+        <text name="uey_hp_deposit" text="Entrada" />
+        <text name="uey_hp_duration" text="Prazo" />
+        <text name="uey_hp_offer" text="Oferta" />
+        <text name="uey_hp_interest" text="Juros" />
+        <text name="uey_hp_monthly" text="Mensal" />
+        <text name="uey_hp_final" text="Taxa Final" />
+        <text name="uey_hp_total" text="Custo Total" />
+        <text name="uey_hp_selectOffer" text="Selecionar Oferta" />
+        <text name="uey_hp_confirm" text="Confirmar" />
+        <text name="uey_hp_year" text="ano" />
+        <text name="uey_hp_years" text="anos" />
+        <text name="uey_hp_notEnoughDeposit" text="Você não pode pagar a entrada mínima de %s." />
+        <text name="uey_hp_creditCoversAll"
+            text="Seu crédito da loja cobre o preço total. Use Comprar Agora." />
+        <!-- Barter dialog -->
+        <text name="uey_action_barter" text="Negociar:" />
+        <text name="uey_barter_header" text="Negociação" />
+        <text name="uey_barter_askingPrice" text="Preço Solicitado" />
+        <text name="uey_barter_yourOffer" text="Sua Oferta" />
+        <text name="uey_barter_makeOffer" text="Fazer Oferta" />
+        <text name="uey_barter_buyNow" text="Comprar Agora" />
+        <text name="uey_barter_vehicleInfo" text="Informações do Veículo" />
+        <text name="uey_barter_specs" text="Especificações" />
+        <text name="uey_barter_brand" text="Marca" />
+        <text name="uey_barter_owners" text="Proprietários" />
+        <text name="uey_barter_hours" text="Horas" />
+        <text name="uey_barter_damage" text="Dano" />
+        <text name="uey_barter_wear" text="Desgaste" />
+        <text name="uey_barter_chancesRemaining" text="Tentativas de negociação restantes hoje: %d" />
+        <text name="uey_barter_rejected" text="Oferta recusada. Tente um valor maior." />
+        <text name="uey_barter_noChances" text="Não há mais tentativas de negociação hoje." />
+        <text name="uey_barter_noFarm" text="Você precisa pertencer a uma fazenda para negociar." />
+        <text name="uey_barter_invalid" text="Não foi possível processar esta oferta." />
+        <text name="uey_barter_purchased" text="%s comprado por %s." />
+        <text name="uey_barter_testDrive" text="Test Drive" />
+        <text name="uey_barter_testDriveTitle" text="Test Drive" />
+        <text name="uey_barter_testDriveConfirm"
+            text="Fazer um test drive de 2 horas com %s? Devolver até %d:00 ou incorrer em multas por hora." />
+        <text name="uey_barter_returnVehicle" text="Devolver Veículo" />
+        <text name="uey_barter_returnTitle" text="Devolver Veículo" />
+        <text name="uey_barter_returnConfirm" text="Devolver este veículo ao pátio?" />
+        <!-- Sale Zone -->
+        <text name="uey_saleZoneLabel" text="Zona de Venda do Pátio" />
+        <text name="uey_saleZone_function"
+            text="Zona de venda drive-in para um pátio de equipamentos usados" />
+        <text name="uey_saleZone_action" text="Vender Veículos" />
+        <text name="uey_saleZone_dialogTitle" text="Escolha um veículo para vender" />
+        <text name="uey_saleZone_notNearYard"
+            text="Deve ser colocado perto de um Pátio de Equipamentos Usados." />
+        <!-- Sell flow -->
+        <text name="uey_sell_tryOtherYard"
+            text="Não estamos interessados em comprar isto, mas acho que %s estaria." />
+        <text name="uey_sell_nobodyInterested"
+            text="Este revendedor não está interessado neste veículo e não conhece outro pátio que estaria." />
+        <text name="uey_sell_noFarm"
+            text="Você precisa pertencer a uma fazenda para vender veículos." />
+        <text name="uey_sell_offersHeader" text="Ofertas de Venda" />
+        <text name="uey_sell_cashOffer" text="Oferta à Vista" />
+        <text name="uey_sell_creditOffer" text="Oferta de Crédito" />
+        <text name="uey_sell_hybridOffer" text="Oferta Mista" />
+        <text name="uey_sell_cashLabel" text="Dinheiro" />
+        <text name="uey_sell_creditLabel" text="Crédito" />
+        <text name="uey_sell_totalLabel" text="Total" />
+        <text name="uey_sell_selectOffer" text="Aceitar" />
+        <text name="uey_sell_success" text="%s vendido. Dinheiro: %s, Crédito: %s." />
+        <!-- Yard Credit -->
+        <text name="uey_credit_label" text="Crédito do Pátio" />
+        <text name="uey_credit_none" text="Nenhum" />
+        <!-- Signs: Large Ad Board -->
+        <text name="largeAdSign" text="Placa de Anúncio Grande" />
+        <text name="function_largeAdSign" text="Esta Placa Anuncia Marcas e Ofertas" />
+        <text name="config_Board" text="Seleção de Placa" />
+        <text name="configname_soldHere" text="Anúncio - Vendido Aqui" />
+        <text name="configname_lowPrices" text="Anúncio - Preços Baixos" />
+        <text name="configname_weBuy" text="Anúncio - Você Vende, Nós Compramos" />
+        <text name="configname_testDrives" text="Anúncio - Test Drive" />
+        <text name="configname_massey" text="Revendedor - Massey" />
+        <text name="configname_newHolland" text="Revendedor - New Holland" />
+        <text name="configname_claas" text="Revendedor - Claas" />
+        <text name="configname_johnDeere" text="Revendedor - John Deere" />
+        <text name="configname_fendt" text="Revendedor - Fendt" />
+        <text name="configname_jcb" text="Revendedor - JCB" />
+        <text name="configname_rossAgri" text="Pátio Ross Agri" />
+        <!-- Signs: Small Ad Board -->
+        <text name="smallAdSign" text="Placa de Anúncio Pequena" />
+        <text name="function_smallAdSign" text="Esta placa anuncia Preços de Oferta" />
+        <text name="configname_10000" text="Abaixo de 10000" />
+        <text name="configname_10000p" text="Abaixo de 10000 (Poste)" />
+        <text name="configname_75000" text="Abaixo de 75000" />
+        <text name="configname_75000p" text="Abaixo de 75000 (Poste)" />
+        <text name="configname_100000" text="Abaixo de 100000" />
+        <text name="configname_100000p" text="Abaixo de 100000 (Poste)" />
+        <text name="configname_250000" text="Abaixo de 250000" />
+        <text name="configname_250000p" text="Abaixo de 250000 (Poste)" />
+        <text name="configname_500000" text="Abaixo de 500000" />
+        <text name="configname_500000p" text="Abaixo de 500000 (Poste)" />
+        <text name="configname_750000" text="Abaixo de 750000" />
+        <text name="configname_750000p" text="Abaixo de 750000 (Poste)" />
+        <text name="configname_999999" text="Abaixo de 999999" />
+        <text name="configname_999999p" text="Abaixo de 999999 (Poste)" />
+        <text name="configname_PoleOnly" text="Apenas Poste" />
+        <text name="configname_KeepOff" text="Não Pise na Grama" />
+        <text name="configname_KeepOffp" text="Não Pise na Grama (Poste)" />
+        <text name="configname_Lunch" text="Almoço" />
+        <text name="configname_Lunchp" text="Almoço (Poste)" />
+        <text name="configname_NoParking" text="Proibido Estacionar" />
+        <text name="configname_NoParkingp" text="Proibido Estacionar (Poste)" />
+        <text name="configname_ToiletsLeft" text="Banheiros (Esquerda)" />
+        <text name="configname_ToiletsLeftp" text="Banheiros (Esquerda) (Poste)" />
+        <text name="configname_ToiletsRight" text="Banheiros (Direita)" />
+        <text name="configname_ToiletsRightp" text="Banheiros (Direita) (Poste)" />
+        <!-- Signs: Plot Board -->
+        <text name="plotSign" text="Placas de Lote" />
+        <text name="function_plotSign" text="Atribuir Lotes para Veículos e Equipamentos" />
+        <text name="configname_plot01" text="Lote 01" />
+        <text name="configname_plot02" text="Lote 02" />
+        <text name="configname_plot03" text="Lote 03" />
+        <text name="configname_plot04" text="Lote 04" />
+        <text name="configname_plot05" text="Lote 05" />
+        <text name="configname_plot06" text="Lote 06" />
+        <text name="configname_plot07" text="Lote 07" />
+        <text name="configname_plot08" text="Lote 08" />
+        <text name="configname_plot09" text="Lote 09" />
+        <text name="configname_plot10" text="Lote 10" />
+        <text name="configname_plot11" text="Lote 11" />
+        <text name="configname_plot12" text="Lote 12" />
+        <text name="configname_plot13" text="Lote 13" />
+        <text name="configname_plot14" text="Lote 14" />
+        <text name="configname_plot15" text="Lote 15" />
+        <text name="configname_plot16" text="Lote 16" />
+        <text name="configname_plot17" text="Lote 17" />
+        <text name="configname_plot18" text="Lote 18" />
+        <text name="configname_plot19" text="Lote 19" />
+        <text name="configname_plot20" text="Lote 20" />
+        <text name="configname_plot21" text="Lote 21" />
+        <text name="configname_plot22" text="Lote 22" />
+        <text name="configname_plot23" text="Lote 23" />
+        <text name="configname_plot24" text="Lote 24" />
+        <text name="configname_plot25" text="Lote 25" />
+        <text name="configname_plot26" text="Lote 26" />
+        <text name="configname_plot27" text="Lote 27" />
+        <text name="configname_plot28" text="Lote 28" />
+        <text name="configname_plot29" text="Lote 29" />
+        <text name="configname_plot30" text="Lote 30" />
+        <!-- Settings page -->
+        <text name="uey_settings_resetInventory_label" text="Redefinir Todos os Pátios" />
+        <text name="uey_settings_resetInventory_text" text="Redefinir Inventário" />
+        <!-- Permissions -->
+        <text name="uey_warning_adminOnly"
+            text="Apenas o administrador do servidor pode colocar ou remover pátios." />
+        <!-- Console / status messages -->
+        <text name="uey_yardCreated" text="Pátio '%s' criado." />
+        <text name="uey_yardRemoved" text="Pátio '%s' removido." />
+        <text name="uey_inventoryReset" text="Inventário redefinido para '%s'." />
+        <text name="uey_allInventoriesReset"
+            text="Todos os inventários dos pátios foram redefinidos." />
+    </texts>
+</l10n>

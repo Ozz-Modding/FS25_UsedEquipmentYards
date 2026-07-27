@@ -150,25 +150,17 @@ function UsedEquipmentYards:consoleResetInventory(id)
     return "Only the server host or admin can reset inventories."
 end
 
--- ---------------------------------------------------------------------------
--- Save hook
--- ---------------------------------------------------------------------------
-
-FSBaseMission.saveSavegame = Utils.appendedFunction(FSBaseMission.saveSavegame, function()
-    if UsedEquipmentYards.yardManager ~= nil then
-        UsedEquipmentYards.yardManager:save()
-    end
-end)
-
--- After mission start: start fence patch timer and spawn vehicles.
+-- After mission start: start fence patch timer, spawn vehicles, and install save hook.
 FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMission, function()
     UsedEquipmentYards.fencePatchTimer = UsedEquipmentYards.fencePatchDelay
     if UsedEquipmentYards.yardManager ~= nil then
         UsedEquipmentYards.yardManager:spawnAllYards()
     end
-    -- local xmlFile = loadXMLFile("Temp", "dataS/gui/InGameMenuSettingsFrame.xml")
-    -- saveXMLFileTo(xmlFile, g_currentMission.missionInfo.savegameDirectory .. "/InGameMenuSettingsFrame.xml")
-    -- delete(xmlFile);
+    FSBaseMission.saveSavegame = Utils.prependedFunction(FSBaseMission.saveSavegame, function()
+        if UsedEquipmentYards.yardManager ~= nil then
+            UsedEquipmentYards.yardManager:save()
+        end
+    end)
 end)
 
 FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState,
