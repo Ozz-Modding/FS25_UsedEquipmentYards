@@ -156,11 +156,13 @@ FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMissi
     if UsedEquipmentYards.yardManager ~= nil then
         UsedEquipmentYards.yardManager:spawnAllYards()
     end
-    FSBaseMission.saveSavegame = Utils.prependedFunction(FSBaseMission.saveSavegame, function()
-        if UsedEquipmentYards.yardManager ~= nil then
-            UsedEquipmentYards.yardManager:save()
-        end
-    end)
+    FSBaseMission.saveSavegame = Utils.overwrittenFunction(FSBaseMission.saveSavegame,
+        function(self, superFunc, ...)
+            pcall(superFunc, self, ...)
+            if UsedEquipmentYards.yardManager ~= nil then
+                UsedEquipmentYards.yardManager:save()
+            end
+        end)
 end)
 
 FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState,
