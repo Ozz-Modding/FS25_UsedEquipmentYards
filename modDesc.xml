@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="110">
+<modDesc descVersion="111">
     <author>Ozz</author>
-    <version>1.0.1.1</version>
+    <version>1.0.1.2</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -27,9 +27,9 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
 
-1.0.1.1:
+1.0.1.2:
 - Interactive controls are now active for yard vehicles before the player enters the vehicle.
-- Additional protections on saving to reduce mod conflicts.
+- Additional protections on saving to reduce mod conflicts. Big thanks to xorne-git for helping on this.
 - BR-PT translation provided thanks to Myiamoto86.
 
 1.0.1.0:

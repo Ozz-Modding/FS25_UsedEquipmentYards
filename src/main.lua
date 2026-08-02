@@ -150,19 +150,35 @@ function UsedEquipmentYards:consoleResetInventory(id)
     return "Only the server host or admin can reset inventories."
 end
 
--- After mission start: start fence patch timer, spawn vehicles, and install save hook.
-FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMission, function()
-    UsedEquipmentYards.fencePatchTimer = UsedEquipmentYards.fencePatchDelay
-    if UsedEquipmentYards.yardManager ~= nil then
-        UsedEquipmentYards.yardManager:spawnAllYards()
+function UsedEquipmentYards.installSaveHook()
+    if UsedEquipmentYards.saveHookInstalled then
+        return
     end
-    FSBaseMission.saveSavegame = Utils.overwrittenFunction(FSBaseMission.saveSavegame,
+
+    local target = FSBaseMission
+    if Mission00 ~= nil and Mission00.saveSavegame ~= nil then
+        target = Mission00
+    end
+
+    target.saveSavegame = Utils.overwrittenFunction(target.saveSavegame,
         function(self, superFunc, ...)
             pcall(superFunc, self, ...)
             if UsedEquipmentYards.yardManager ~= nil then
                 UsedEquipmentYards.yardManager:save()
             end
         end)
+
+    UsedEquipmentYards.saveHookInstalled = true
+end
+
+UsedEquipmentYards.installSaveHook()
+
+-- After mission start: start fence patch timer and spawn vehicles.
+FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMission, function()
+    UsedEquipmentYards.fencePatchTimer = UsedEquipmentYards.fencePatchDelay
+    if UsedEquipmentYards.yardManager ~= nil then
+        UsedEquipmentYards.yardManager:spawnAllYards()
+    end
 end)
 
 FSBaseMission.sendInitialClientState = Utils.appendedFunction(FSBaseMission.sendInitialClientState,
