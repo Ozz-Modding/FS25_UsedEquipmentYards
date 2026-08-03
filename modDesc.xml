@@ -91,6 +91,11 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.1.2:
+- Interaktive Steuerelemente für Hoffahrzeuge sind jetzt aktiv, bevor der Spieler in das Fahrzeug einsteigt.
+- Zusätzliche Schutzmaßnahmen beim Speichern, um Mod-Konflikte zu reduzieren. Vielen Dank an xorne-git für die Hilfe.
+- BR-PT-Übersetzung bereitgestellt von Myiamoto86.
+
 1.0.1.0:
 - Sicherheitsprüfungen und Protokollierung beim Speichern und Laden hinzugefügt, um Fehler durch modifizierte Hoffahrzeuge abzufangen.
 
@@ -149,6 +154,11 @@ Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiat
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
+
+1.0.1.2 :
+- Les commandes interactives sont désormais actives pour les véhicules du parc avant que le joueur n'entre dans le véhicule.
+- Protections supplémentaires lors de la sauvegarde pour réduire les conflits de mods. Un grand merci à xorne-git pour son aide.
+- Traduction BR-PT fournie grâce à Myiamoto86.
 
 1.0.1.0 :
 - Ajout de vérifications de sécurité et de journalisation lors de la sauvegarde et du chargement pour limiter l'impact des véhicules de parc modifiés en cas d'erreur.
