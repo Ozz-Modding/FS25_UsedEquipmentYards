@@ -315,16 +315,7 @@ function YardInventory:spawn()
                 g_currentMission.activatableObjectsSystem:addActivatable(activatable)
 
                 -- Sync to remote MP clients.
-                local itemIndex = nil
-                for idx, itm in ipairs(self.items) do
-                    if itm == item then
-                        itemIndex = idx;
-                        break
-                    end
-                end
-                if itemIndex ~= nil then
-                    g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, itemIndex, item))
-                end
+                g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, item))
             end
 
             associated = associated + 1
@@ -1108,16 +1099,7 @@ function YardInventory:onVehicleLoaded(loadedVehicles, loadState, args)
             g_currentMission.activatableObjectsSystem:addActivatable(activatable)
 
             -- Sync item data to remote MP clients so they can interact too.
-            local itemIndex = nil
-            for idx, itm in ipairs(self.items) do
-                if itm == item then
-                    itemIndex = idx;
-                    break
-                end
-            end
-            if itemIndex ~= nil then
-                g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, itemIndex, item))
-            end
+            g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, item))
         end
     end
 
@@ -1521,16 +1503,7 @@ function YardInventory:placeVehicleInYard(item, x, z, yaw)
     item.activatable = activatable
     g_currentMission.activatableObjectsSystem:addActivatable(activatable)
 
-    local itemIndex = nil
-    for idx, itm in ipairs(self.items) do
-        if itm == item then
-            itemIndex = idx;
-            break
-        end
-    end
-    if itemIndex ~= nil then
-        g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, itemIndex, item))
-    end
+    g_server:broadcastEvent(VehicleItemSyncEvent.new(self.yard.id, item))
 end
 
 --- Try to place the next hidden pending sold vehicle. Called after a delay
@@ -1582,7 +1555,6 @@ function YardInventory:removeItem(item, keepVehicle)
     -- Free grid points so the space can be reused.
     self:freeGridPoints(item)
 
-    -- Find the item index before removing so we can notify clients.
     local itemIndex = nil
     for i, v in ipairs(self.items) do
         if v == item then
@@ -1591,7 +1563,11 @@ function YardInventory:removeItem(item, keepVehicle)
         end
     end
 
+    local vehicleObjectId = nil
     if item.vehicle ~= nil then
+        -- Capture the network id before the vehicle is deleted — clients key items by it.
+        vehicleObjectId = NetworkUtil.getObjectId(item.vehicle)
+
         for i, v in ipairs(self.vehicles) do
             if v == item.vehicle then
                 table.remove(self.vehicles, i)
@@ -1612,8 +1588,8 @@ function YardInventory:removeItem(item, keepVehicle)
 
     -- Notify remote clients so they clean up stale item data.
     -- Skip when keepVehicle=true (purchases) — EquipmentPurchasedEvent handles that.
-    if not keepVehicle and itemIndex ~= nil and g_server ~= nil then
-        g_server:broadcastEvent(VehicleItemRemovedEvent.new(self.yard.id, itemIndex))
+    if not keepVehicle and vehicleObjectId ~= nil and g_server ~= nil then
+        g_server:broadcastEvent(VehicleItemRemovedEvent.new(self.yard.id, vehicleObjectId))
     end
 
     -- Space freed up — schedule pending sold items after a delay so the

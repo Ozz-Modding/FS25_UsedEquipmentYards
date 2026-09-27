@@ -105,10 +105,10 @@ function InitialClientStateEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, totalItems)
 
     for _, yard in pairs(yards) do
-        for idx, item in ipairs(yard.inventory.items) do
+        for _, item in ipairs(yard.inventory.items) do
             if item.vehicle ~= nil then
                 -- Reuse VehicleItemSyncEvent's write format.
-                local syncEvent = VehicleItemSyncEvent.new(yard.id, idx, item)
+                local syncEvent = VehicleItemSyncEvent.new(yard.id, item)
                 syncEvent:writeStream(streamId, connection)
             end
         end

@@ -7,26 +7,26 @@ function HirePurchaseYardEvent.emptyNew()
     return Event.new(HirePurchaseYardEvent_mt)
 end
 
-function HirePurchaseYardEvent.new(yardId, itemIndex, farmId, leaseDeal)
+function HirePurchaseYardEvent.new(yardId, vehicleObjectId, farmId, leaseDeal)
     local self = HirePurchaseYardEvent.emptyNew()
-    self.yardId    = yardId
-    self.itemIndex = itemIndex
-    self.farmId    = farmId
-    self.leaseDeal = leaseDeal
+    self.yardId          = yardId
+    self.vehicleObjectId = vehicleObjectId
+    self.farmId          = farmId
+    self.leaseDeal       = leaseDeal
     return self
 end
 
 function HirePurchaseYardEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, self.yardId)
-    streamWriteInt32(streamId, self.itemIndex)
+    streamWriteInt32(streamId, self.vehicleObjectId)
     streamWriteInt32(streamId, self.farmId)
     self.leaseDeal:writeStream(streamId, connection)
 end
 
 function HirePurchaseYardEvent:readStream(streamId, connection)
-    self.yardId    = streamReadInt32(streamId)
-    self.itemIndex = streamReadInt32(streamId)
-    self.farmId    = streamReadInt32(streamId)
+    self.yardId          = streamReadInt32(streamId)
+    self.vehicleObjectId = streamReadInt32(streamId)
+    self.farmId          = streamReadInt32(streamId)
     local env = UsedEquipmentYards.getHirePurchaseEnv()
     self.leaseDeal = env.LeaseDeal.new()
     self.leaseDeal:readStream(streamId, connection)
@@ -42,7 +42,7 @@ function HirePurchaseYardEvent:run(connection)
         local yard = manager.yards[self.yardId]
         if yard == nil then return end
 
-        local item = yard.inventory.items[self.itemIndex]
+        local item = UsedEquipmentYards.findServerItem(yard, self.vehicleObjectId)
         if item == nil then return end
 
         local farm = g_farmManager:getFarmById(self.farmId)
@@ -88,7 +88,7 @@ function HirePurchaseYardEvent:run(connection)
 
         -- Broadcast to all clients.
         g_server:broadcastEvent(HirePurchaseYardEvent.new(
-            self.yardId, self.itemIndex, self.farmId, self.leaseDeal))
+            self.yardId, self.vehicleObjectId, self.farmId, self.leaseDeal))
 
         -- Also broadcast the lease deal to HirePurchasing clients.
         local env = UsedEquipmentYards.getHirePurchaseEnv()
@@ -103,7 +103,7 @@ function HirePurchaseYardEvent:run(connection)
     if manager ~= nil then
         local yard = manager.yards[self.yardId]
         if yard ~= nil then
-            local item = yard.inventory.items[self.itemIndex]
+            local item = UsedEquipmentYards.findServerItem(yard, self.vehicleObjectId)
             if item ~= nil then
                 local vehicle = item.vehicle
                 if vehicle ~= nil then
@@ -123,5 +123,5 @@ function HirePurchaseYardEvent:run(connection)
     end
 
     -- Clean up client item registry.
-    UsedEquipmentYards.removeClientItem(self.yardId, self.itemIndex)
+    UsedEquipmentYards.removeClientItem(self.yardId, self.vehicleObjectId)
 end

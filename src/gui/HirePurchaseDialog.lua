@@ -12,7 +12,6 @@ function HirePurchaseDialog.new()
     local self = MessageDialog.new(nil, HirePurchaseDialog_mt, g_messageCenter, g_i18n, g_inputBinding)
     self.yard = nil
     self.item = nil
-    self.itemIndex = nil
     self.financeAmount = 0
     self.creditUsed = 0
     self.depositOptions = nil
@@ -23,18 +22,17 @@ function HirePurchaseDialog.new()
     return self
 end
 
-function HirePurchaseDialog.show(yard, item, itemIndex, financeAmount, creditUsed)
+function HirePurchaseDialog.show(yard, item, financeAmount, creditUsed)
     local dialog = g_gui.guis["HirePurchaseDialog"]
     if dialog == nil then return end
     local ctrl = dialog.target
-    ctrl:setData(yard, item, itemIndex, financeAmount, creditUsed)
+    ctrl:setData(yard, item, financeAmount, creditUsed)
     g_gui:showDialog("HirePurchaseDialog")
 end
 
-function HirePurchaseDialog:setData(yard, item, itemIndex, financeAmount, creditUsed)
+function HirePurchaseDialog:setData(yard, item, financeAmount, creditUsed)
     self.yard = yard
     self.item = item
-    self.itemIndex = itemIndex
     self.financeAmount = financeAmount
     self.creditUsed = creditUsed or 0
 
@@ -77,7 +75,6 @@ function HirePurchaseDialog:onClose()
     HirePurchaseDialog:superClass().onClose(self)
     self.yard = nil
     self.item = nil
-    self.itemIndex = nil
     self.offerings = nil
 end
 
@@ -198,7 +195,7 @@ function HirePurchaseDialog:onClickConfirm()
     leaseDeal.farmId = farmId
 
     g_client:getServerConnection():sendEvent(
-        HirePurchaseYardEvent.new(self.yard.id, self.itemIndex, farmId, leaseDeal))
+        HirePurchaseYardEvent.new(self.yard.id, NetworkUtil.getObjectId(self.item.vehicle), farmId, leaseDeal))
 
     HirePurchaseDialog:superClass().close(self)
 end

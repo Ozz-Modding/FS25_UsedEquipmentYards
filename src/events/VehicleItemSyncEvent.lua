@@ -14,10 +14,9 @@ function VehicleItemSyncEvent.emptyNew()
     return Event.new(VehicleItemSyncEvent_mt)
 end
 
-function VehicleItemSyncEvent.new(yardId, itemIndex, item)
+function VehicleItemSyncEvent.new(yardId, item)
     local self = VehicleItemSyncEvent.emptyNew()
     self.yardId    = yardId
-    self.itemIndex = itemIndex
     self.item      = item
     return self
 end
@@ -25,14 +24,14 @@ end
 function VehicleItemSyncEvent:writeStream(streamId, connection)
     local item = self.item
     streamWriteInt32(streamId, self.yardId)
-    streamWriteInt32(streamId, self.itemIndex)
 
     -- Vehicle network object ID (resolved by client later).
     local objectId = item.vehicle ~= nil and NetworkUtil.getObjectId(item.vehicle) or 0
     streamWriteInt32(streamId, objectId)
 
-    -- Item data needed by clients.
-    streamWriteString(streamId, item.xmlFilename or "")
+    -- Item data needed by clients. The mod directory can differ between
+    -- server and client, so send a network filename.
+    streamWriteString(streamId, NetworkUtil.convertToNetworkFilename(item.xmlFilename or ""))
     streamWriteInt32(streamId, item.price or 0)
     streamWriteInt32(streamId, item.minPrice or item.price)
     streamWriteInt32(streamId, item.numOwners or 1)
@@ -67,11 +66,10 @@ end
 
 function VehicleItemSyncEvent:readStream(streamId, connection)
     local yardId    = streamReadInt32(streamId)
-    local itemIndex = streamReadInt32(streamId)
     local vehicleObjectId = streamReadInt32(streamId)
 
     local clientItem = {
-        xmlFilename   = streamReadString(streamId),
+        xmlFilename   = NetworkUtil.convertFromNetworkFilename(streamReadString(streamId)),
         price         = streamReadInt32(streamId),
         minPrice      = streamReadInt32(streamId),
         numOwners     = streamReadInt32(streamId),
@@ -109,9 +107,9 @@ function VehicleItemSyncEvent:readStream(streamId, connection)
     local vehicle = NetworkUtil.getObject(vehicleObjectId)
     if vehicle ~= nil then
         clientItem.vehicle = vehicle
-        UsedEquipmentYards.registerClientItem(yardId, itemIndex, clientItem)
+        UsedEquipmentYards.registerClientItem(yardId, vehicleObjectId, clientItem)
     else
         -- Vehicle not available yet — add to pending list for update-loop resolution.
-        UsedEquipmentYards.addPendingClientItem(yardId, itemIndex, vehicleObjectId, clientItem)
+        UsedEquipmentYards.addPendingClientItem(yardId, vehicleObjectId, clientItem)
     end
 end

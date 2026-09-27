@@ -39,7 +39,10 @@ equipment spawns and despawns dynamically within those areas via TTL and hourly 
 - **Server-authoritative**: `YardManager`, `YardInventory`, vehicle spawning, purchases, test drives all run on server.
 - **Client-side registry**: Remote clients receive lightweight item data via `VehicleItemSyncEvent` (broadcast after each spawn and in `InitialClientStateEvent`).
 - **Deferred vehicle resolution**: During initial client state, vehicle network objects may not be resolved yet. Items are stored in `UsedEquipmentYards.pendingClientItems` and resolved in the `update(dt)` loop via `NetworkUtil.getObject(objectId)`. **Never send node objects in initial client state** — always send the object ID as an int and resolve later.
-- **Client item registry**: `UsedEquipmentYards.clientItems[yardId][itemIndex]` stores item data on remote clients. `UsedEquipmentYards.clientVehicleActivatables[vehicle]` tracks activatables.
+- **Client item registry**: `UsedEquipmentYards.clientItems[yardId][vehicleObjectId]` stores item data on remote clients.
+  All item-targeting events (purchase, test drive, hire purchase, item removed) identify the item by the
+  vehicle's network object id — never by array index, which shifts on the server when items are removed.
+  The server resolves it with `UsedEquipmentYards.findServerItem(yard, vehicleObjectId)`. `UsedEquipmentYards.clientVehicleActivatables[vehicle]` tracks activatables.
 - **Event pattern**: Follow RedTape style — `local _mt`, `emptyNew()` passes `_mt` to `Event.new`, `run()` checks `connection:getIsServer()` (false = we are the server receiving from client), broadcasts a NEW event (not `self`).
 - **SP broadcast**: `g_server:broadcastEvent()` does NOT loop back to the local client in SP. Do all server+client work in the server branch.
 

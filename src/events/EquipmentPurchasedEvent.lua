@@ -7,10 +7,13 @@ function EquipmentPurchasedEvent.emptyNew()
     return Event.new(EquipmentPurchasedEvent_mt)
 end
 
-function EquipmentPurchasedEvent.new(yardId, itemIndex, farmId, creditUsed, vehicleUniqueId, purchasePrice)
+--- vehicleObjectId: network object id of the yard vehicle being bought.
+--- purchasePrice: client → server, an accepted barter offer (0 = asking price);
+--- server → clients, the price actually paid.
+function EquipmentPurchasedEvent.new(yardId, vehicleObjectId, farmId, creditUsed, vehicleUniqueId, purchasePrice)
     local self = EquipmentPurchasedEvent.emptyNew()
     self.yardId          = yardId
-    self.itemIndex       = itemIndex
+    self.vehicleObjectId = vehicleObjectId
     self.farmId          = farmId
     self.creditUsed      = creditUsed or 0
     self.vehicleUniqueId = vehicleUniqueId or ""
@@ -20,7 +23,7 @@ end
 
 function EquipmentPurchasedEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, self.yardId)
-    streamWriteInt32(streamId, self.itemIndex)
+    streamWriteInt32(streamId, self.vehicleObjectId)
     streamWriteInt32(streamId, self.farmId)
     streamWriteInt32(streamId, self.creditUsed)
     streamWriteString(streamId, self.vehicleUniqueId)
@@ -29,7 +32,7 @@ end
 
 function EquipmentPurchasedEvent:readStream(streamId, connection)
     self.yardId          = streamReadInt32(streamId)
-    self.itemIndex       = streamReadInt32(streamId)
+    self.vehicleObjectId = streamReadInt32(streamId)
     self.farmId          = streamReadInt32(streamId)
     self.creditUsed      = streamReadInt32(streamId)
     self.vehicleUniqueId = streamReadString(streamId)
@@ -48,18 +51,28 @@ function EquipmentPurchasedEvent:run(connection)
         local yard = manager.yards[self.yardId]
         if yard == nil then return end
 
-        local item = yard.inventory.items[self.itemIndex]
+        local item = UsedEquipmentYards.findServerItem(yard, self.vehicleObjectId)
         if item == nil then return end
+
+        -- A non-zero purchasePrice is an accepted barter offer: it must meet
+        -- the yard's minimum and can't exceed the asking price.
+        local price = item.price
+        if self.purchasePrice > 0 then
+            if self.purchasePrice < (item.minPrice or item.price) then
+                return
+            end
+            price = math.min(self.purchasePrice, item.price)
+        end
 
         local farm = g_farmManager:getFarmById(self.farmId)
         local creditAvailable = YardCredit.getBalance(self.farmId, self.yardId)
-        if farm == nil or (farm:getBalance() + creditAvailable) < item.price then
+        if farm == nil or (farm:getBalance() + creditAvailable) < price then
             return
         end
 
         -- Deduct credit first, remainder from cash.
-        local creditUsed = YardCredit.deductCredit(self.farmId, self.yardId, item.price)
-        local cashCost = item.price - creditUsed
+        local creditUsed = YardCredit.deductCredit(self.farmId, self.yardId, price)
+        local cashCost = price - creditUsed
         if cashCost > 0 then
             g_currentMission:addMoneyChange(-cashCost, self.farmId, MoneyType.SHOP_VEHICLE_BUY, true)
             g_farmManager:getFarmById(self.farmId):changeBalance(-cashCost, MoneyType.SHOP_VEHICLE_BUY)
@@ -67,7 +80,7 @@ function EquipmentPurchasedEvent:run(connection)
 
         local vehicle = item.vehicle
         local vehicleUniqueId = (vehicle ~= nil) and vehicle.uniqueId or ""
-        local purchasePrice = item.price
+        local purchasePrice = price
 
         if vehicle ~= nil then
             YardInventory.detachVehicle(vehicle)
@@ -85,7 +98,7 @@ function EquipmentPurchasedEvent:run(connection)
         yard.inventory:removeItem(item, true)
 
         -- Broadcast so remote multiplayer clients also clean up their state.
-        g_server:broadcastEvent(EquipmentPurchasedEvent.new(self.yardId, self.itemIndex, self.farmId, creditUsed, vehicleUniqueId, purchasePrice))
+        g_server:broadcastEvent(EquipmentPurchasedEvent.new(self.yardId, self.vehicleObjectId, self.farmId, creditUsed, vehicleUniqueId, purchasePrice))
         return
     end
 
@@ -98,7 +111,7 @@ function EquipmentPurchasedEvent:run(connection)
     if manager ~= nil then
         local yard = manager.yards[self.yardId]
         if yard ~= nil then
-            local item = yard.inventory.items[self.itemIndex]
+            local item = UsedEquipmentYards.findServerItem(yard, self.vehicleObjectId)
             if item ~= nil then
                 local vehicle = item.vehicle
                 if vehicle ~= nil then
@@ -115,7 +128,7 @@ function EquipmentPurchasedEvent:run(connection)
     -- Remote client: assign ownership via clientItems before cleanup removes the reference.
     local clientYardItems = UsedEquipmentYards.clientItems[self.yardId]
     if clientYardItems ~= nil then
-        local clientItem = clientYardItems[self.itemIndex]
+        local clientItem = clientYardItems[self.vehicleObjectId]
         if clientItem ~= nil and clientItem.vehicle ~= nil then
             clientItem.vehicle:setOwnerFarmId(self.farmId)
         end
@@ -136,6 +149,6 @@ function EquipmentPurchasedEvent:run(connection)
     end
 
     -- Clean up client-side item registry (remote MP clients).
-    UsedEquipmentYards.removeClientItem(self.yardId, self.itemIndex)
+    UsedEquipmentYards.removeClientItem(self.yardId, self.vehicleObjectId)
 end
 

@@ -43,7 +43,6 @@ function BarterDialog.new()
     local self = MessageDialog.new(nil, BarterDialog_mt, g_messageCenter, g_i18n, g_inputBinding)
     self.yard = nil
     self.item = nil
-    self.itemIndex = nil
     self.currentOffer = 0
     self.attrElements = {}
     return self
@@ -71,29 +70,24 @@ function BarterDialog.show(yard, item)
     -- DEV: hot-reload XML on every open for faster iteration.
     -- BarterDialog.register()
 
-    local itemIndex = item.itemIndex
-    if itemIndex == nil then
-        for i, itm in pairs(yard.inventory.items) do
-            if itm == item then
-                itemIndex = i
-                break
-            end
-        end
-    end
-    if itemIndex == nil then return end
+    if item.vehicle == nil then return end
 
     local dialog = g_gui.guis["BarterDialog"]
     if dialog == nil then return end
     local ctrl = dialog.target
-    ctrl:setItem(yard, item, itemIndex)
+    ctrl:setItem(yard, item)
     g_gui:showDialog("BarterDialog")
 end
 
-function BarterDialog:setItem(yard, item, itemIndex)
+function BarterDialog:setItem(yard, item)
     self.yard = yard
     self.item = item
-    self.itemIndex = itemIndex
     self.currentOffer = item.price
+end
+
+--- Network object id of the vehicle on sale — identifies the item to the server.
+function BarterDialog:getVehicleObjectId()
+    return NetworkUtil.getObjectId(self.item.vehicle)
 end
 
 function BarterDialog:onOpen()
@@ -105,7 +99,6 @@ function BarterDialog:onClose()
     BarterDialog:superClass().onClose(self)
     self.yard = nil
     self.item = nil
-    self.itemIndex = nil
 end
 
 function BarterDialog:onCreate()
@@ -320,12 +313,12 @@ function BarterDialog:onClickMakeOffer()
 
     -- Client-side accept/reject.
     if self.currentOffer >= (self.item.minPrice or self.item.price) then
-        -- Accepted — set item price to the offer and purchase.
+        -- Accepted — send the offer as the purchase price; the server
+        -- re-checks it against the minimum before charging.
         local vehicleName = self.item.vehicle:getFullName()
         local paidPrice = self.currentOffer
-        self.item.price = paidPrice
         g_client:getServerConnection():sendEvent(
-            EquipmentPurchasedEvent.new(self.yard.id, self.itemIndex, farmId))
+            EquipmentPurchasedEvent.new(self.yard.id, self:getVehicleObjectId(), farmId, 0, "", paidPrice))
         BarterDialog:superClass().close(self)
         InfoDialog.show(string.format(g_i18n:getText("uey_barter_purchased"), vehicleName, g_i18n:formatMoney(paidPrice)))
     else
@@ -363,7 +356,7 @@ function BarterDialog:onBuyNowConfirm(confirmed)
     if farmId == nil then return end
 
     g_client:getServerConnection():sendEvent(
-        EquipmentPurchasedEvent.new(self.yard.id, self.itemIndex, farmId))
+        EquipmentPurchasedEvent.new(self.yard.id, self:getVehicleObjectId(), farmId))
     BarterDialog:superClass().close(self)
 end
 
@@ -400,7 +393,7 @@ function BarterDialog:onTestDriveConfirm(confirmed)
     if farmId == nil then return end
 
     g_client:getServerConnection():sendEvent(
-        TestDriveEvent.new(self.yard.id, self.itemIndex, farmId, TestDriveEvent.ACTION_START))
+        TestDriveEvent.new(self.yard.id, self:getVehicleObjectId(), farmId, TestDriveEvent.ACTION_START))
     BarterDialog:superClass().close(self)
 end
 
@@ -411,7 +404,7 @@ function BarterDialog:onReturnConfirm(confirmed)
     if farmId == nil then return end
 
     g_client:getServerConnection():sendEvent(
-        TestDriveEvent.new(self.yard.id, self.itemIndex, farmId, TestDriveEvent.ACTION_RETURN))
+        TestDriveEvent.new(self.yard.id, self:getVehicleObjectId(), farmId, TestDriveEvent.ACTION_RETURN))
     BarterDialog:superClass().close(self)
 end
 
@@ -433,9 +426,8 @@ function BarterDialog:onClickHirePurchase()
 
     local yard = self.yard
     local item = self.item
-    local itemIndex = self.itemIndex
     BarterDialog:superClass().close(self)
-    HirePurchaseDialog.show(yard, item, itemIndex, remainder, credit)
+    HirePurchaseDialog.show(yard, item, remainder, credit)
 end
 
 function BarterDialog:onClickClose()

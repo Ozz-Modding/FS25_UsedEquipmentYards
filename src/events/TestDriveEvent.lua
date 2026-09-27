@@ -19,27 +19,27 @@ function TestDriveEvent.emptyNew()
     return Event.new(TestDriveEvent_mt)
 end
 
-function TestDriveEvent.new(yardId, itemIndex, farmId, action)
+function TestDriveEvent.new(yardId, vehicleObjectId, farmId, action)
     local self = TestDriveEvent.emptyNew()
-    self.yardId    = yardId
-    self.itemIndex = itemIndex
-    self.farmId    = farmId
-    self.action    = action
+    self.yardId          = yardId
+    self.vehicleObjectId = vehicleObjectId
+    self.farmId          = farmId
+    self.action          = action
     return self
 end
 
 function TestDriveEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, self.yardId)
-    streamWriteInt32(streamId, self.itemIndex)
+    streamWriteInt32(streamId, self.vehicleObjectId)
     streamWriteInt32(streamId, self.farmId)
     streamWriteInt32(streamId, self.action)
 end
 
 function TestDriveEvent:readStream(streamId, connection)
-    self.yardId    = streamReadInt32(streamId)
-    self.itemIndex = streamReadInt32(streamId)
-    self.farmId    = streamReadInt32(streamId)
-    self.action    = streamReadInt32(streamId)
+    self.yardId          = streamReadInt32(streamId)
+    self.vehicleObjectId = streamReadInt32(streamId)
+    self.farmId          = streamReadInt32(streamId)
+    self.action          = streamReadInt32(streamId)
     self:run(connection)
 end
 
@@ -50,8 +50,8 @@ function TestDriveEvent:run(connection)
         if manager == nil then return end
         local yard = manager.yards[self.yardId]
         if yard == nil then return end
-        local item = yard.inventory.items[self.itemIndex]
-        if item == nil or item.vehicle == nil then return end
+        local item = UsedEquipmentYards.findServerItem(yard, self.vehicleObjectId)
+        if item == nil then return end
 
         if self.action == TestDriveEvent.ACTION_START then
             self:serverStartTestDrive(item, yard)
@@ -59,7 +59,7 @@ function TestDriveEvent:run(connection)
             self:serverReturnTestDrive(item, yard)
         end
 
-        g_server:broadcastEvent(TestDriveEvent.new(self.yardId, self.itemIndex, self.farmId, self.action))
+        g_server:broadcastEvent(TestDriveEvent.new(self.yardId, self.vehicleObjectId, self.farmId, self.action))
         return
     end
 
@@ -70,13 +70,13 @@ function TestDriveEvent:run(connection)
     if manager ~= nil then
         local yard = manager.yards[self.yardId]
         if yard ~= nil then
-            item = yard.inventory.items[self.itemIndex]
+            item = UsedEquipmentYards.findServerItem(yard, self.vehicleObjectId)
         end
     end
     if item == nil then
         local clientItems = UsedEquipmentYards.clientItems[self.yardId]
         if clientItems ~= nil then
-            item = clientItems[self.itemIndex]
+            item = clientItems[self.vehicleObjectId]
         end
     end
     if item == nil or item.vehicle == nil then return end
