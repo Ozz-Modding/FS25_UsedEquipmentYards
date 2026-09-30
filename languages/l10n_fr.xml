@@ -247,6 +247,9 @@
         <!-- Settings page -->
         <text name="uey_settings_resetInventory_label" text="Reinitialiser tous les parcs" />
         <text name="uey_settings_resetInventory_text" text="Reinitialiser l'inventaire" />
+        <text name="uey_settings_viewDistance_label" text="Distance d'affichage des vehicules du parc" />
+        <text name="uey_settings_viewDistance_tooltip" text="Masque les vehicules en vente au-dela de cette distance de votre camera pour ameliorer les performances. N'affecte que votre propre vue." />
+        <text name="uey_settings_off" text="Desactive" />
 
         <!-- Permissions -->
         <text name="uey_warning_adminOnly"

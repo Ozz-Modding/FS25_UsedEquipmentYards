@@ -560,7 +560,7 @@ function YardInventory:buildStorePool()
             YardInventory.MIN_VEHICLE_PRICE and si.price <= effectiveMaxPrice and StoreItemUtil.getIsVehicle(si) then
             -- Working width filter: only applies to items that HAVE a working width spec.
             local passesWW = true
-            pcall(StoreItemUtil.loadSpecsFromXML, si)
+            UeyUtils.loadStoreItemSpecs(si)
             if si.specs ~= nil and si.specs.workingWidth ~= nil then
                 local ww = si.specs.workingWidth.width or 0
                 if minWW > 0 and ww < minWW then
@@ -1130,7 +1130,7 @@ end
 --- Pick random vehicle configurations (colour sets, etc.).
 function YardInventory.randomConfiguration(storeItem)
     local result = {}
-    StoreItemUtil.loadSpecsFromXML(storeItem)
+    UeyUtils.loadStoreItemSpecs(storeItem)
 
     if storeItem.defaultConfigurationIds ~= nil then
         for k, v in pairs(storeItem.defaultConfigurationIds) do
@@ -1245,7 +1245,7 @@ function YardInventory:wouldBuyVehicle(vehicle)
     local minWW = self.config.minWorkingWidth or 0
     local maxWW = self.config.maxWorkingWidth or 0
     if minWW > 0 or maxWW > 0 then
-        pcall(StoreItemUtil.loadSpecsFromXML, si)
+        UeyUtils.loadStoreItemSpecs(si)
         if si.specs ~= nil and si.specs.workingWidth ~= nil then
             local ww = si.specs.workingWidth.width or 0
             if minWW > 0 and ww < minWW then
@@ -1261,7 +1261,7 @@ function YardInventory:wouldBuyVehicle(vehicle)
     local minYear = self.config.minYear or 0
     local maxYear = self.config.maxYear or 0
     if minYear > 0 or maxYear > 0 then
-        pcall(StoreItemUtil.loadSpecsFromXML, si)
+        UeyUtils.loadStoreItemSpecs(si)
         local year = si.specs ~= nil and tonumber(si.specs.year) or nil
         if year == nil then
             if not (self.config.includeNoYear ~= false) then
@@ -1607,100 +1607,135 @@ end
 -- XML persistence
 -- ---------------------------------------------------------------------------
 
-function YardInventory:saveToXML(xmlFile, key)
-    -- Save config.
-    setXMLString(xmlFile, key .. ".config#quality", self.config.quality or "MEDIUM")
-    setXMLFloat(xmlFile, key .. ".config#dirtiness", self.config.dirtiness or 0.20)
-    setXMLInt(xmlFile, key .. ".config#minWorkingWidth", self.config.minWorkingWidth or 0)
-    setXMLInt(xmlFile, key .. ".config#maxWorkingWidth", self.config.maxWorkingWidth or 0)
-    setXMLInt(xmlFile, key .. ".config#maxPrice", self.config.maxPrice or 0)
-    setXMLInt(xmlFile, key .. ".config#avgStockHours",
-        self.config.avgStockHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
-    setXMLInt(xmlFile, key .. ".config#gridSpacing", self.config.gridSpacing or 8)
-    setXMLInt(xmlFile, key .. ".config#maxDuplicates", self.config.maxDuplicates or 2)
-    setXMLInt(xmlFile, key .. ".config#minYear", self.config.minYear or 0)
-    setXMLInt(xmlFile, key .. ".config#maxYear", self.config.maxYear or 0)
-    setXMLBool(xmlFile, key .. ".config#includeNoYear", self.config.includeNoYear ~= false)
-    setXMLBool(xmlFile, key .. ".config#allowHirePurchase", self.config.allowHirePurchase ~= false)
+-- Numeric testDrive fields that must all be present for a test drive to be saved.
+YardInventory.TEST_DRIVE_SAVE_FIELDS = { "farmId", "returnByDay", "returnByHour",
+    "origX", "origY", "origZ", "origRx", "origRy", "origRz" }
 
-    local ci = 0
-    for catName, weight in pairs(self.config.categories) do
-        if weight > 0 then
-            local cKey = ("%s.config.category(%d)"):format(key, ci)
-            setXMLString(xmlFile, cKey .. "#name", catName)
-            setXMLInt(xmlFile, cKey .. "#weight", weight)
-            ci = ci + 1
+--- Check an item up front so a bad one is skipped whole rather than leaving a
+--- partially written entry. Returns false plus a reason when it can't be saved.
+function YardInventory.validateItemForSave(item)
+    if type(item) ~= "table" then
+        return false, "item is not a table"
+    end
+    if not UeyUtils.isNonEmptyString(item.xmlFilename) then
+        return false, "missing xmlFilename"
+    end
+    local td = item.testDrive
+    if td ~= nil then
+        if type(td) ~= "table" then
+            return false, "testDrive is not a table"
+        end
+        for _, field in ipairs(YardInventory.TEST_DRIVE_SAVE_FIELDS) do
+            if not UeyUtils.isNumber(td[field]) then
+                return false, ("testDrive.%s is not a number"):format(field)
+            end
         end
     end
+    return true
+end
 
-    local bi = 0
-    for brandName, weight in pairs(self.config.brands or {}) do
-        if weight > 0 then
-            local bKey = ("%s.config.brand(%d)"):format(key, bi)
-            setXMLString(xmlFile, bKey .. "#name", brandName)
-            setXMLInt(xmlFile, bKey .. "#weight", weight)
-            bi = bi + 1
+--- Write a name -> weight map, skipping entries that aren't a string name with a positive weight.
+local function saveWeightMap(xmlFile, baseKey, map)
+    if type(map) ~= "table" then return end
+    local idx = 0
+    for name, weight in pairs(map) do
+        if type(name) == "string" and UeyUtils.isNumber(weight) and weight > 0 then
+            local wKey = ("%s(%d)"):format(baseKey, idx)
+            setXMLString(xmlFile, wKey .. "#name", name)
+            setXMLInt(xmlFile, wKey .. "#weight", weight)
+            idx = idx + 1
         end
+    end
+end
+
+function YardInventory:saveToXML(xmlFile, key)
+    local toNumber = UeyUtils.toNumber
+    local config = self.config or {}
+
+    -- Save config.
+    local quality = UeyUtils.isNonEmptyString(config.quality) and config.quality or "MEDIUM"
+    setXMLString(xmlFile, key .. ".config#quality", quality)
+    setXMLFloat(xmlFile, key .. ".config#dirtiness", toNumber(config.dirtiness, 0.20))
+    setXMLInt(xmlFile, key .. ".config#minWorkingWidth", toNumber(config.minWorkingWidth, 0))
+    setXMLInt(xmlFile, key .. ".config#maxWorkingWidth", toNumber(config.maxWorkingWidth, 0))
+    setXMLInt(xmlFile, key .. ".config#maxPrice", toNumber(config.maxPrice, 0))
+    setXMLInt(xmlFile, key .. ".config#avgStockHours",
+        toNumber(config.avgStockHours, YardInventory.DEFAULT_AVG_STOCK_HOURS))
+    setXMLInt(xmlFile, key .. ".config#gridSpacing", toNumber(config.gridSpacing, 8))
+    setXMLInt(xmlFile, key .. ".config#maxDuplicates", toNumber(config.maxDuplicates, 2))
+    setXMLInt(xmlFile, key .. ".config#minYear", toNumber(config.minYear, 0))
+    setXMLInt(xmlFile, key .. ".config#maxYear", toNumber(config.maxYear, 0))
+    setXMLBool(xmlFile, key .. ".config#includeNoYear", config.includeNoYear ~= false)
+    setXMLBool(xmlFile, key .. ".config#allowHirePurchase", config.allowHirePurchase ~= false)
+
+    saveWeightMap(xmlFile, key .. ".config.category", config.categories)
+    saveWeightMap(xmlFile, key .. ".config.brand", config.brands)
+
+    -- Hidden items (pending sold vehicles waiting for yard space).
+    local hiddenItems = {}
+    for _, pItem in ipairs(self.pendingSoldItems or {}) do
+        hiddenItems[pItem] = true
     end
 
     -- Save items. Use a separate write index so a skipped item never creates
     -- a gap in the sequence (the load loop stops at the first missing index).
     local writeIdx = 0
-    for _, item in ipairs(self.items) do
-        local iKey = ("%s.item(%d)"):format(key, writeIdx)
-        local ok, err = pcall(function()
-            setXMLString(xmlFile, iKey .. "#xmlFilename", item.xmlFilename or "")
-            setXMLInt(xmlFile, iKey .. "#price", item.price or 0)
-            setXMLInt(xmlFile, iKey .. "#age", item.age or 0)
-            setXMLFloat(xmlFile, iKey .. "#damage", item.damage or 0)
-            setXMLFloat(xmlFile, iKey .. "#wear", item.wear or 0)
-            setXMLFloat(xmlFile, iKey .. "#operatingTime", (item.operatingTime or 0) / 1000)
-            setXMLInt(xmlFile, iKey .. "#ttlHours", item.ttlHours or YardInventory.DEFAULT_AVG_STOCK_HOURS)
-            setXMLInt(xmlFile, iKey .. "#numOwners", item.numOwners or 1)
-            setXMLInt(xmlFile, iKey .. "#minPrice", item.minPrice or item.price)
-            setXMLFloat(xmlFile, iKey .. "#spawnWidth", item.spawnWidth or 0)
-            setXMLFloat(xmlFile, iKey .. "#spawnLength", item.spawnLength or 0)
-            setXMLFloat(xmlFile, iKey .. "#spawnYaw", item.spawnYaw or 0)
+    for _, item in ipairs(self.items or {}) do
+        local valid, reason = YardInventory.validateItemForSave(item)
+        if not valid then
+            Logging.warning("[UsedEquipmentYards] saveToXML: skipping item '%s': %s",
+                type(item) == "table" and tostring(item.xmlFilename) or "?", reason)
+        else
+            local iKey = ("%s.item(%d)"):format(key, writeIdx)
+            local price = toNumber(item.price, 0)
+            setXMLString(xmlFile, iKey .. "#xmlFilename", item.xmlFilename)
+            setXMLInt(xmlFile, iKey .. "#price", price)
+            setXMLInt(xmlFile, iKey .. "#age", toNumber(item.age, 0))
+            setXMLFloat(xmlFile, iKey .. "#damage", toNumber(item.damage, 0))
+            setXMLFloat(xmlFile, iKey .. "#wear", toNumber(item.wear, 0))
+            setXMLFloat(xmlFile, iKey .. "#operatingTime", toNumber(item.operatingTime, 0) / 1000)
+            setXMLInt(xmlFile, iKey .. "#ttlHours", toNumber(item.ttlHours, YardInventory.DEFAULT_AVG_STOCK_HOURS))
+            setXMLInt(xmlFile, iKey .. "#numOwners", toNumber(item.numOwners, 1))
+            setXMLInt(xmlFile, iKey .. "#minPrice", toNumber(item.minPrice, price))
+            setXMLFloat(xmlFile, iKey .. "#spawnWidth", toNumber(item.spawnWidth, 0))
+            setXMLFloat(xmlFile, iKey .. "#spawnLength", toNumber(item.spawnLength, 0))
+            setXMLFloat(xmlFile, iKey .. "#spawnYaw", toNumber(item.spawnYaw, 0))
 
-            -- Mark hidden items (pending sold vehicles waiting for yard space).
-            local isHidden = false
-            for _, pItem in ipairs(self.pendingSoldItems) do
-                if pItem == item then
-                    isHidden = true;
-                    break
-                end
-            end
-            if isHidden then
+            if hiddenItems[item] then
                 setXMLBool(xmlFile, iKey .. "#hidden", true)
             end
 
             -- Save vehicle configurations so the correct config is used if re-spawned.
-            if item.configurations ~= nil then
+            if type(item.configurations) == "table" then
                 local cfgIdx = 0
                 for cfgName, cfgValue in pairs(item.configurations) do
-                    local cfgKey = ("%s.vehicleConfig(%d)"):format(iKey, cfgIdx)
-                    setXMLString(xmlFile, cfgKey .. "#name", cfgName)
-                    setXMLInt(xmlFile, cfgKey .. "#value", tonumber(cfgValue) or 0)
-                    cfgIdx = cfgIdx + 1
+                    if type(cfgName) == "string" then
+                        local cfgKey = ("%s.vehicleConfig(%d)"):format(iKey, cfgIdx)
+                        setXMLString(xmlFile, cfgKey .. "#name", cfgName)
+                        setXMLInt(xmlFile, cfgKey .. "#value", toNumber(cfgValue, 0))
+                        cfgIdx = cfgIdx + 1
+                    end
                 end
             end
 
             -- Save vehicle uniqueId so we can re-associate on load.
-            if item.vehicle ~= nil and item.vehicle.uniqueId ~= nil then
+            if item.vehicle ~= nil and UeyUtils.isNonEmptyString(item.vehicle.uniqueId) then
                 setXMLString(xmlFile, iKey .. "#vehicleUniqueId", item.vehicle.uniqueId)
             end
 
             -- Test driven history (which farms have already test-driven this item).
-            local tdf = item.testDrivenByFarms
-            if tdf ~= nil then
+            if type(item.testDrivenByFarms) == "table" then
                 local fi = 0
-                for farmId, _ in pairs(tdf) do
-                    setXMLInt(xmlFile, ("%s.testDrivenByFarm(%d)#farmId"):format(iKey, fi), farmId)
-                    fi = fi + 1
+                for farmId, _ in pairs(item.testDrivenByFarms) do
+                    local id = toNumber(farmId, nil)
+                    if id ~= nil then
+                        setXMLInt(xmlFile, ("%s.testDrivenByFarm(%d)#farmId"):format(iKey, fi), id)
+                        fi = fi + 1
+                    end
                 end
             end
 
-            -- Test drive state.
+            -- Test drive state (fields already validated as numbers).
             local td = item.testDrive
             if td ~= nil then
                 setXMLInt(xmlFile, iKey .. ".testDrive#farmId", td.farmId)
@@ -1713,12 +1748,8 @@ function YardInventory:saveToXML(xmlFile, key)
                 setXMLFloat(xmlFile, iKey .. ".testDrive#origRy", td.origRy)
                 setXMLFloat(xmlFile, iKey .. ".testDrive#origRz", td.origRz)
             end
-        end)
-        if ok then
+
             writeIdx = writeIdx + 1
-        else
-            Logging.warning("[UsedEquipmentYards] saveToXML: skipping item '%s' due to error: %s",
-                tostring(item.xmlFilename), tostring(err))
         end
     end
 end

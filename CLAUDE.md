@@ -12,11 +12,13 @@ equipment spawns and despawns dynamically within those areas via TTL and hourly 
 | Class | File | Role |
 |---|---|---|
 | `UsedEquipmentYards` | `src/main.lua` | Mod entry point, console commands, save hook, client item registry, pending resolution loop |
+| `UeyUtils` | `src/UeyUtils.lua` | Defensive helpers (type checks, safe store-item spec loading) — used instead of `pcall`, which the mod does not use |
 | `YardManager` | `src/YardManager.lua` | Server-only singleton; manages all yards, save/load, hour-changed hook |
 | `UsedEquipmentYard` | `src/UsedEquipmentYard.lua` | Data class: bounds (AABB + polygon + anchor), name, id, inventory |
 | `YardInventory` | `src/YardInventory.lua` | Per-yard spawn/despawn/refresh; item list; scatter placement; TTL; test drive fines |
 | `PlaceableUsedEquipmentYard` | `src/PlaceableUsedEquipmentYard.lua` | Custom specialization: links placeable fence to YardManager |
 | `PriceTagRenderer` | `src/PriceTagRenderer.lua` | Replaces vehicle license plates with "For Sale" price plates |
+| `YardVisibility` | `src/YardVisibility.lua` | Client-local render culling of yard vehicles beyond a per-machine distance setting (modSettings XML) |
 | `BarterState` | `src/BarterState.lua` | Per-farm per-yard daily barter chance tracking (all clients) |
 | `YardConfigActivatable` | `src/YardConfigActivatable.lua` | "Configure Yard" prompt when inside yard bounds |
 | `YardVehicleActivatable` | `src/YardVehicleActivatable.lua` | "Barter: [name]" prompt near yard vehicles |

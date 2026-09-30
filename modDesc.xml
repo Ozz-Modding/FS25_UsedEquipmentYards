@@ -27,8 +27,10 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
 
-1.0.1.4 [WIP]:
-- Fix some multiplayer issues which occasionally cause
+1.0.1.4:
+- Fix some occasional multiplayer issues. Thanks to @jeaboswell.
+- New setting: Yard Vehicle View Distance (default Off). Hides yard vehicles beyond 200-1000m from your camera to improve FPS on large yards.
+- Reworked save and error handling to be more defensive, improving compatibility with other mods. Removed pcall usage.
 
 1.0.1.3:
 - Interactive controls are now active for yard vehicles before the player enters the vehicle.
@@ -94,6 +96,11 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.1.4:
+- Behebung einiger gelegentlich auftretender Multiplayer-Probleme. Vielen Dank an @jeaboswell.
+- Neue Einstellung: Sichtweite Hof-Fahrzeuge (Standard: Aus). Blendet Hoffahrzeuge ab 200-1000 m Entfernung zur Kamera aus, um die FPS auf großen Höfen zu verbessern.
+- Speicher- und Fehlerbehandlung überarbeitet und robuster gestaltet, um die Kompatibilität mit anderen Mods zu verbessern.
+
 1.0.1.3:
 - Interaktive Steuerelemente für Hoffahrzeuge sind jetzt aktiv, bevor der Spieler in das Fahrzeug einsteigt.
 - Zusätzliche Schutzmaßnahmen beim Speichern, um Mod-Konflikte zu reduzieren. Vielen Dank an xorne-git für die Hilfe.
@@ -158,6 +165,11 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
 
+1.0.1.4 :
+- Correction de certains problèmes survenant occasionnellement en multijoueur. Merci à @jeaboswell.
+- Nouveau paramètre : Distance d'affichage des véhicules du parc (désactivé par défaut). Masque les véhicules du parc au-delà de 200 à 1000 m de la caméra pour améliorer les FPS sur les grands parcs.
+- Refonte de la gestion de la sauvegarde et des erreurs pour la rendre plus robuste et améliorer la compatibilité avec les autres mods.
+
 1.0.1.3 :
 - Les commandes interactives sont désormais actives pour les véhicules du parc avant que le joueur n'entre dans le véhicule.
 - Protections supplémentaires lors de la sauvegarde pour réduire les conflits de mods. Un grand merci à xorne-git pour son aide.
@@ -206,6 +218,7 @@ Journal des modifications :
         </fr>
     </description>
     <extraSourceFiles>
+        <sourceFile filename="src/UeyUtils.lua"/>
         <sourceFile filename="src/events/YardCreatedEvent.lua"/>
         <sourceFile filename="src/events/YardRemovedEvent.lua"/>
         <sourceFile filename="src/events/EquipmentPurchasedEvent.lua"/>
@@ -234,6 +247,7 @@ Journal des modifications :
         <sourceFile filename="src/YardVehicleActivatable.lua"/>
         <sourceFile filename="src/SaleZoneActivatable.lua"/>
         <sourceFile filename="src/gui/SaleZoneDialog.lua"/>
+        <sourceFile filename="src/YardVisibility.lua"/>
         <sourceFile filename="src/UeySettings.lua"/>
         <sourceFile filename="src/main.lua"/>
     </extraSourceFiles>

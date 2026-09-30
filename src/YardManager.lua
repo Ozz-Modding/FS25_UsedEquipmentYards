@@ -104,12 +104,13 @@ function YardManager:save()
     local i = 0
     for _, yard in pairs(self.yards) do
         local key = ("UsedEquipmentYards.yards.yard(%d)"):format(i)
-        local ok, err = pcall(yard.saveToXML, yard, xmlFile, key)
-        if ok then
+        local valid, reason = yard:validateForSave()
+        if valid then
+            yard:saveToXML(xmlFile, key)
             i = i + 1
         else
-            Logging.warning("[UsedEquipmentYards] save: skipping yard %d ('%s') due to error: %s",
-                yard.id, tostring(yard.name), tostring(err))
+            Logging.warning("[UsedEquipmentYards] save: skipping yard %s ('%s'): %s",
+                tostring(yard.id), tostring(yard.name), reason)
         end
     end
 

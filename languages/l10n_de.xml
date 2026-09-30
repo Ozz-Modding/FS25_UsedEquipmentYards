@@ -247,6 +247,9 @@
         <!-- Settings page -->
         <text name="uey_settings_resetInventory_label" text="Alle Hoefe zuruecksetzen" />
         <text name="uey_settings_resetInventory_text" text="Inventar zuruecksetzen" />
+        <text name="uey_settings_viewDistance_label" text="Sichtweite Hof-Fahrzeuge" />
+        <text name="uey_settings_viewDistance_tooltip" text="Blendet Verkaufsfahrzeuge auf Hoefen jenseits dieser Entfernung zur Kamera aus, um die Leistung zu verbessern. Betrifft nur deine eigene Ansicht." />
+        <text name="uey_settings_off" text="Aus" />
 
         <!-- Permissions -->
         <text name="uey_warning_adminOnly"

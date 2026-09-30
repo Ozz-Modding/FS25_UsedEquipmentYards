@@ -233,6 +233,9 @@
         <!-- Settings page -->
         <text name="uey_settings_resetInventory_label" text="Redefinir Todos os Pátios" />
         <text name="uey_settings_resetInventory_text" text="Redefinir Inventário" />
+        <text name="uey_settings_viewDistance_label" text="Distância de Visão dos Veículos do Pátio" />
+        <text name="uey_settings_viewDistance_tooltip" text="Oculta os veículos à venda além desta distância da sua câmera para melhorar o desempenho. Afeta apenas a sua visão." />
+        <text name="uey_settings_off" text="Desligado" />
         <!-- Permissions -->
         <text name="uey_warning_adminOnly"
             text="Apenas o administrador do servidor pode colocar ou remover pátios." />

@@ -43,12 +43,63 @@ function UeySettings.initialize()
             UeySettings.resetButton = element
         end
     end
+
+    UeySettings.addViewDistanceOption(settingsPage, scrollPanel)
+end
+
+--- Per-machine option: hide yard vehicles beyond a distance from the camera.
+function UeySettings.addViewDistanceOption(settingsPage, scrollPanel)
+    local originalBox = settingsPage.multiVolumeVoiceBox
+    if originalBox == nil then return end
+
+    local box = originalBox:clone(scrollPanel)
+    box.id = "uey_viewDistanceBox"
+
+    local option = box.elements[1]
+    option.id = "uey_viewDistance"
+    option.target = UeySettings
+    option:setCallback("onClickCallback", "onViewDistanceChanged")
+    option:setDisabled(false)
+
+    option.elements[1]:setText(g_i18n:getText("uey_settings_viewDistance_tooltip"))
+    box.elements[2]:setText(g_i18n:getText("uey_settings_viewDistance_label"))
+
+    local texts = {}
+    for i, distance in ipairs(YardVisibility.DISTANCES) do
+        if distance == 0 then
+            texts[i] = g_i18n:getText("uey_settings_off")
+        else
+            texts[i] = ("%d m"):format(distance)
+        end
+    end
+    option:setTexts(texts)
+    option:setState(YardVisibility.getStateIndex())
+
+    local function updateFocusIds(element)
+        element.focusId = FocusManager:serveAutoFocusId()
+        for _, child in pairs(element.elements) do
+            updateFocusIds(child)
+        end
+    end
+    updateFocusIds(box)
+    table.insert(settingsPage.controlsList, box)
+
+    UeySettings.viewDistanceOption = option
+    scrollPanel:invalidateLayout()
+end
+
+function UeySettings:onViewDistanceChanged(state)
+    YardVisibility.setMaxDistance(YardVisibility.DISTANCES[state] or 0)
 end
 
 function UeySettings.onFrameOpen()
     local isAdmin = g_currentMission.isMasterUser or g_server ~= nil
     if UeySettings.resetButton ~= nil then
         UeySettings.resetButton:setDisabled(not isAdmin)
+    end
+    -- Local preference: always editable, including for MP clients.
+    if UeySettings.viewDistanceOption ~= nil then
+        UeySettings.viewDistanceOption:setState(YardVisibility.getStateIndex())
     end
 end
 

@@ -61,6 +61,43 @@ end
 -- XML persistence
 -- ---------------------------------------------------------------------------
 
+UsedEquipmentYard.BOUNDS_SAVE_FIELDS = { "cx", "cy", "cz", "sizeX", "sizeZ" }
+
+--- Check the yard up front so a bad one is skipped whole rather than leaving a
+--- partially written entry. Returns false plus a reason when it can't be saved.
+function UsedEquipmentYard:validateForSave()
+    if not UeyUtils.isNumber(self.id) then
+        return false, "id is not a number"
+    end
+    if type(self.name) ~= "string" then
+        return false, "name is not a string"
+    end
+    if type(self.bounds) ~= "table" then
+        return false, "bounds is not a table"
+    end
+    for _, field in ipairs(UsedEquipmentYard.BOUNDS_SAVE_FIELDS) do
+        if not UeyUtils.isNumber(self.bounds[field]) then
+            return false, ("bounds.%s is not a number"):format(field)
+        end
+    end
+    if self.inventory == nil then
+        return false, "missing inventory"
+    end
+    return true
+end
+
+--- True if the polygon has at least 3 vertices and every one has numeric x/z.
+local function isPolygonSavable(poly)
+    if type(poly) ~= "table" or #poly < 3 then return false end
+    for _, pt in ipairs(poly) do
+        if type(pt) ~= "table" or not UeyUtils.isNumber(pt.x) or not UeyUtils.isNumber(pt.z) then
+            return false
+        end
+    end
+    return true
+end
+
+--- Caller must check validateForSave() first.
 function UsedEquipmentYard:saveToXML(xmlFile, key)
     setXMLInt(xmlFile,    key .. "#id",          self.id)
     setXMLString(xmlFile, key .. "#name",        self.name)
@@ -69,14 +106,17 @@ function UsedEquipmentYard:saveToXML(xmlFile, key)
     setXMLFloat(xmlFile,  key .. ".bounds#cz",   self.bounds.cz)
     setXMLFloat(xmlFile,  key .. ".bounds#sizeX", self.bounds.sizeX)
     setXMLFloat(xmlFile,  key .. ".bounds#sizeZ", self.bounds.sizeZ)
-    if self.bounds.anchorX ~= nil then
+    if UeyUtils.isNumber(self.bounds.anchorX) and UeyUtils.isNumber(self.bounds.anchorZ) then
         setXMLFloat(xmlFile, key .. ".bounds#anchorX", self.bounds.anchorX)
         setXMLFloat(xmlFile, key .. ".bounds#anchorZ", self.bounds.anchorZ)
     end
 
-    -- Persist fence polygon so containsPoint works after load.
+    -- Persist fence polygon so containsPoint works after load. A corrupt polygon is
+    -- dropped whole (load falls back to the AABB) rather than saved with holes.
     local poly = self.bounds.polygon
-    if poly ~= nil then
+    if poly ~= nil and not isPolygonSavable(poly) then
+        Logging.warning("[UsedEquipmentYards] save: yard %d polygon is invalid — saving AABB only", self.id)
+    elseif poly ~= nil then
         for i, pt in ipairs(poly) do
             local pKey = ("%s.bounds.vertex(%d)"):format(key, i - 1)
             setXMLFloat(xmlFile, pKey .. "#x", pt.x)

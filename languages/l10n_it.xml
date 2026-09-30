@@ -247,6 +247,9 @@
         <!-- Settings page -->
         <text name="uey_settings_resetInventory_label" text="Reimposta tutti i piazzali" />
         <text name="uey_settings_resetInventory_text" text="Reimposta inventario" />
+        <text name="uey_settings_viewDistance_label" text="Distanza visibilita veicoli piazzale" />
+        <text name="uey_settings_viewDistance_tooltip" text="Nasconde i veicoli in vendita oltre questa distanza dalla telecamera per migliorare le prestazioni. Influisce solo sulla tua visuale." />
+        <text name="uey_settings_off" text="Disattivato" />
 
         <!-- Permissions -->
         <text name="uey_warning_adminOnly"

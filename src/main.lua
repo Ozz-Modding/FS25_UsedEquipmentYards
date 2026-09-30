@@ -74,6 +74,7 @@ function UsedEquipmentYards:loadMap(filename)
     end
     BarterState.init()
     YardCredit.init()
+    YardVisibility.loadSettings()
     UeySettings.initialize()
 
     if g_currentMission:getIsServer() then
@@ -92,6 +93,7 @@ end
 function UsedEquipmentYards:delete()
     self:unregisterConsoleCommands()
     UsedEquipmentYards.removeAllActivatables()
+    YardVisibility.showAll()
     -- Clean up client vehicle activatables.
     for vehicle, activatable in pairs(UsedEquipmentYards.clientVehicleActivatables) do
         g_currentMission.activatableObjectsSystem:removeActivatable(activatable)
@@ -150,6 +152,12 @@ function UsedEquipmentYards:consoleResetInventory(id)
     return "Only the server host or admin can reset inventories."
 end
 
+function UsedEquipmentYards.saveToXmlFile()
+    if UsedEquipmentYards.yardManager ~= nil then
+        UsedEquipmentYards.yardManager:save()
+    end
+end
+
 function UsedEquipmentYards.installSaveHook()
     if UsedEquipmentYards.saveHookInstalled then
         return
@@ -167,14 +175,7 @@ function UsedEquipmentYards.installSaveHook()
         target = Mission00
     end
 
-    target.saveSavegame = Utils.overwrittenFunction(target.saveSavegame,
-        function(self, superFunc, ...)
-            pcall(superFunc, self, ...)
-            if UsedEquipmentYards.yardManager ~= nil then
-                UsedEquipmentYards.yardManager:save()
-            end
-        end)
-
+    target.saveSavegame = Utils.appendedFunction(target.saveSavegame, UsedEquipmentYards.saveToXmlFile)
     UsedEquipmentYards.saveHookInstalled = true
 end
 
@@ -366,13 +367,16 @@ UsedEquipmentYards.pendingClientRestrictions = {}
 --- Apply yard vehicle restrictions on the client. Returns true if successful,
 --- false if the vehicle isn't fully loaded yet (retry later).
 function UsedEquipmentYards.applyClientRestrictions(vehicle, item)
-    if vehicle.spec_drivable == nil then return false end
+    -- Drivable:registerPlayerVehicleControlAllowedFunction indexes
+    -- spec.playerControlAllowedFunctions (created in Drivable:onLoad) and silently does
+    -- nothing if the vehicle has no network object id yet — check both so we retry
+    -- instead of believing the restriction is in place.
+    local spec = vehicle.spec_drivable
+    if spec == nil or spec.playerControlAllowedFunctions == nil then return false end
+    if vehicle.registerPlayerVehicleControlAllowedFunction == nil then return false end
+    if NetworkUtil.getObjectId(vehicle) == nil then return false end
 
-    local ok, err = pcall(vehicle.registerPlayerVehicleControlAllowedFunction,
-        vehicle, vehicle, function() return false, nil end)
-    if not ok then
-        return false
-    end
+    vehicle:registerPlayerVehicleControlAllowedFunction(vehicle, function() return false, nil end)
 
     PriceTagRenderer.addTag(vehicle, item)
     if vehicle.setIsTabbable ~= nil then vehicle:setIsTabbable(false) end
@@ -585,6 +589,11 @@ function UsedEquipmentYards:update(dt)
         for _, yard in pairs(UsedEquipmentYards.yardManager.yards) do
             yard.inventory:update(dt)
         end
+    end
+
+    -- Distance-based render culling of yard vehicles (local camera only).
+    if g_currentMission:getIsClient() then
+        YardVisibility.update(dt)
     end
 
     -- Resolve pending offer cache entries from network.
