@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="113">
+<modDesc descVersion="115">
     <author>Ozz</author>
-    <version>1.0.1.4</version>
+    <version>1.0.1.5</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -26,6 +26,9 @@ When you first draw a yard, nothing will immediately appear for sale. It takes t
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
+
+1.0.1.5:
+- Rework how vehicles are hidden when selling to a yard that is full - resolves some multiplayer issues.
 
 1.0.1.4:
 - Fix some occasional multiplayer issues. Thanks to @jeaboswell.
@@ -96,6 +99,9 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.1.5:
+- Überarbeitung, wie Fahrzeuge beim Verkauf an einen vollen Hof ausgeblendet werden - behebt einige Multiplayer-Probleme.
+
 1.0.1.4:
 - Behebung einiger gelegentlich auftretender Multiplayer-Probleme. Vielen Dank an @jeaboswell.
 - Neue Einstellung: Sichtweite Hof-Fahrzeuge (Standard: Aus). Blendet Hoffahrzeuge ab 200-1000 m Entfernung zur Kamera aus, um die FPS auf großen Höfen zu verbessern.
@@ -164,6 +170,9 @@ Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiat
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
+
+1.0.1.5 :
+- Refonte de la façon dont les véhicules sont masqués lors de la vente à un parc plein - résout certains problèmes en multijoueur.
 
 1.0.1.4 :
 - Correction de certains problèmes survenant occasionnellement en multijoueur. Merci à @jeaboswell.

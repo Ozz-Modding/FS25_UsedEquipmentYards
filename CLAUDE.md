@@ -204,5 +204,9 @@ See `~/.claude/skills/fs25-modding/SKILL.md` for the full reference.
 - **Never use `NetworkUtil.writeNodeObject` in initial client state** — the vehicle may not
   be resolved yet on the client. Write the object ID as an int, store as pending, resolve
   in the `update()` loop via `NetworkUtil.getObject()`.
+- `vehicle:setVisibility()` and `vehicle:removeFromPhysics()` are **local only** — never use them
+  on the server to "hide" a vehicle in MP (clients keep seeing/entering it). Sold vehicles with no
+  yard space are deleted and stored as data-only `pendingSoldItems`, re-spawned via
+  `loadItemVehicle` when space opens (issue #33). Deletion/spawn sync natively.
 - `FSBaseMission.sendInitialClientState` — append via `Utils.appendedFunction`. Called once
   per connecting client with `(self, connection, user, farm)`.

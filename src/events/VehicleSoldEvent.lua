@@ -64,15 +64,18 @@ function VehicleSoldEvent:run(connection)
         end
 
         -- Validate amounts are reasonable (within 10% of expected base value).
+        -- No store item means the yard can't create an item from it
+        -- (acceptSoldVehicle would fail) — reject before paying anything.
         local storeItem = g_storeManager:getItemByXMLFilename(vehicle.configFileName)
-        if storeItem ~= nil then
-            local baseValue = Vehicle.calculateSellPrice(
-                storeItem, vehicle.age, vehicle.operatingTime,
-                vehicle:getPrice(), vehicle:getRepairPrice(), vehicle:getRepaintPrice())
-            local totalOffered = self.cashAmount + self.creditAmount
-            if totalOffered > baseValue * 1.10 then
-                return
-            end
+        if storeItem == nil then
+            return
+        end
+        local baseValue = Vehicle.calculateSellPrice(
+            storeItem, vehicle.age, vehicle.operatingTime,
+            vehicle:getPrice(), vehicle:getRepairPrice(), vehicle:getRepaintPrice())
+        local totalOffered = self.cashAmount + self.creditAmount
+        if totalOffered > baseValue * 1.10 then
+            return
         end
 
         -- Pay cash (server: stat tracking + balance).
