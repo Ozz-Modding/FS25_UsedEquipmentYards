@@ -52,9 +52,9 @@
         <text name="uey_config_avgStockHours" text="Heures moyennes en stock" />
         <text name="uey_config_avgStockHours_desc"
             text="Duree de presence des vehicules avant leur depart." />
-        <text name="uey_config_gridSpacing" text="Espacement de la grille" />
-        <text name="uey_config_gridSpacing_desc"
-            text="Distance entre les points d'apparition. Plus petit = plus de vehicules." />
+        <text name="uey_config_aisleWidth" text="Largeur des allees" />
+        <text name="uey_config_aisleWidth_desc"
+            text="Espace de circulation entre les rangees. Plus large = moins de vehicules." />
         <text name="uey_config_maxDuplicates" text="Max. doublons" />
         <text name="uey_config_maxDuplicates_desc"
             text="Nombre max. de vehicules identiques sur le parc." />
@@ -115,6 +115,8 @@
         <text name="uey_barter_buyNow" text="Acheter maintenant" />
         <text name="uey_barter_vehicleInfo" text="Info vehicule" />
         <text name="uey_barter_specs" text="Specifications" />
+        <text name="uey_barter_equipment" text="Configuration" />
+        <text name="uey_barter_equipmentNone" text="Aucune option de configuration" />
         <text name="uey_barter_brand" text="Marque" />
         <text name="uey_barter_owners" text="Proprietaires" />
         <text name="uey_barter_hours" text="Heures" />
@@ -261,5 +263,34 @@
         <text name="uey_inventoryReset" text="Inventaire reinitialise pour '%s'." />
         <text name="uey_allInventoriesReset"
             text="Tous les inventaires des parcs ont ete reinitialises." />
+        <!-- Yard tool (build menu) -->
+        <text name="uey_tool_zone" text="Parc de materiel d'occasion" />
+        <text name="uey_tool_zone_function" text="Dessinez le contour d'un parc. Les vehicules a vendre y sont gares en rangees. Cliquez sur un parc existant pour le modifier." />
+        <text name="uey_tool_remove" text="Supprimer un parc de materiel d'occasion" />
+        <text name="uey_tool_remove_function" text="Cliquez sur un parc pour le supprimer avec les vehicules qui y sont en vente." />
+        <text name="uey_zone_startYard" text="Commencer un parc" />
+        <text name="uey_zone_editYard" text="Modifier le parc" />
+        <text name="uey_zone_addCorner" text="Ajouter un coin" />
+        <text name="uey_zone_removeLastCorner" text="Retirer le dernier coin" />
+        <text name="uey_zone_moveCorner" text="Deplacer le coin" />
+        <text name="uey_zone_insertCorner" text="Ajouter un coin ici" />
+        <text name="uey_zone_deleteCorner" text="Supprimer le coin" />
+        <text name="uey_zone_createYard" text="Creer le parc" />
+        <text name="uey_zone_applyChanges" text="Appliquer" />
+        <text name="uey_zone_undo" text="Annuler la derniere action" />
+        <text name="uey_zone_removeYard" text="Supprimer le parc" />
+        <text name="uey_zone_removeConfirm" text="Supprimer '%s' ? Tous les vehicules en vente seront retires." />
+        <text name="uey_zone_info" text="%d m² · environ %d vehicules" />
+        <text name="uey_zone_infoDrawing" text="%d coins" />
+        <text name="uey_zone_unsaved" text="Appliquez ou annulez d'abord les modifications de ce parc." />
+        <text name="uey_zone_error_tooFewPoints" text="Un parc doit avoir au moins 3 coins." />
+        <text name="uey_zone_error_tooManyPoints" text="Trop de coins (64 maximum)." />
+        <text name="uey_zone_error_edgeTooShort" text="Les coins sont trop rapproches." />
+        <text name="uey_zone_error_selfIntersecting" text="Le contour se croise." />
+        <text name="uey_zone_error_tooSmall" text="Le parc est trop petit." />
+        <text name="uey_zone_error_overlapsYard" text="Le parc chevauche un autre parc." />
+        <text name="uey_zone_error_hasSaleZones" text="Supprimez d'abord les zones de vente de ce parc." />
+        <text name="uey_zone_error_noRows" text="Trop petit pour des rangees de vehicules." />
+        <text name="uey_zone_error_cornerRefused" text="Impossible de placer un coin ici." />
     </texts>
 </l10n>

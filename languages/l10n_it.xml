@@ -54,9 +54,9 @@
         <text name="uey_config_avgStockHours" text="Tempo di permanenza medio" />
         <text name="uey_config_avgStockHours_desc"
             text="Quanto tempo rimangono i veicoli prima di sparire." />
-        <text name="uey_config_gridSpacing" text="Spaziatura griglia" />
-        <text name="uey_config_gridSpacing_desc"
-            text="Distanza tra i punti di generazione. Minore = più veicoli." />
+        <text name="uey_config_aisleWidth" text="Larghezza corsie" />
+        <text name="uey_config_aisleWidth_desc"
+            text="Spazio di manovra tra le file. Più larga = meno veicoli." />
         <text name="uey_config_maxDuplicates" text="Duplicati max." />
         <text name="uey_config_maxDuplicates_desc"
             text="Numero massimo di veicoli identici contemporaneamente nel piazzale." />
@@ -116,6 +116,8 @@
         <text name="uey_barter_buyNow" text="Compra ora" />
         <text name="uey_barter_vehicleInfo" text="Info veicolo" />
         <text name="uey_barter_specs" text="Specifiche" />
+        <text name="uey_barter_equipment" text="Configurazione" />
+        <text name="uey_barter_equipmentNone" text="Nessuna opzione di configurazione" />
         <text name="uey_barter_brand" text="Marca" />
         <text name="uey_barter_owners" text="Precedenti proprietari" />
         <text name="uey_barter_hours" text="Ore" />
@@ -261,5 +263,34 @@
         <text name="uey_inventoryReset" text="Inventario per '%s' reimpostato." />
         <text name="uey_allInventoriesReset"
             text="Tutti gli inventari dei piazzali sono stati reimpostati." />
+        <!-- Yard tool (build menu) -->
+        <text name="uey_tool_zone" text="Piazzale usato" />
+        <text name="uey_tool_zone_function" text="Disegna il perimetro di un piazzale. I veicoli in vendita vi sono parcheggiati in file. Clicca su un piazzale esistente per modificarlo." />
+        <text name="uey_tool_remove" text="Rimuovi piazzale usato" />
+        <text name="uey_tool_remove_function" text="Clicca su un piazzale per rimuoverlo insieme ai veicoli in vendita." />
+        <text name="uey_zone_startYard" text="Nuovo piazzale" />
+        <text name="uey_zone_editYard" text="Modifica piazzale" />
+        <text name="uey_zone_addCorner" text="Aggiungi angolo" />
+        <text name="uey_zone_removeLastCorner" text="Rimuovi ultimo angolo" />
+        <text name="uey_zone_moveCorner" text="Sposta angolo" />
+        <text name="uey_zone_insertCorner" text="Aggiungi angolo qui" />
+        <text name="uey_zone_deleteCorner" text="Elimina angolo" />
+        <text name="uey_zone_createYard" text="Crea piazzale" />
+        <text name="uey_zone_applyChanges" text="Applica modifiche" />
+        <text name="uey_zone_undo" text="Annulla" />
+        <text name="uey_zone_removeYard" text="Rimuovi piazzale" />
+        <text name="uey_zone_removeConfirm" text="Rimuovere '%s'? Tutti i veicoli in vendita verranno rimossi." />
+        <text name="uey_zone_info" text="%d m² · circa %d veicoli" />
+        <text name="uey_zone_infoDrawing" text="%d angoli" />
+        <text name="uey_zone_unsaved" text="Applica o annulla prima le modifiche a questo piazzale." />
+        <text name="uey_zone_error_tooFewPoints" text="Un piazzale richiede almeno 3 angoli." />
+        <text name="uey_zone_error_tooManyPoints" text="Troppi angoli (massimo 64)." />
+        <text name="uey_zone_error_edgeTooShort" text="Gli angoli sono troppo vicini." />
+        <text name="uey_zone_error_selfIntersecting" text="Il perimetro si interseca." />
+        <text name="uey_zone_error_tooSmall" text="Il piazzale è troppo piccolo." />
+        <text name="uey_zone_error_overlapsYard" text="Il piazzale si sovrappone a un altro piazzale." />
+        <text name="uey_zone_error_hasSaleZones" text="Rimuovi prima le zone di vendita di questo piazzale." />
+        <text name="uey_zone_error_noRows" text="Troppo piccolo per file di veicoli." />
+        <text name="uey_zone_error_cornerRefused" text="Non è possibile mettere un angolo qui." />
     </texts>
 </l10n>

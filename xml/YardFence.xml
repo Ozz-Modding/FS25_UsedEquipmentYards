@@ -6,7 +6,7 @@
             <function>$l10n_uey_function</function>
         </functions>
         <image>store/store_yard.dds</image>
-        <price>50</price>
+        <price>0</price>
         <dailyUpkeep>0</dailyUpkeep>
         <lifetime>1000</lifetime>
         <rotation>0</rotation>
@@ -14,7 +14,7 @@
         <species>PLACEABLE</species>
         <category>fences</category>
         <canBeSold>false</canBeSold>
-        <showInStore>true</showInStore>
+        <showInStore>false</showInStore>
 
         <brush>
             <type>newFence</type>
@@ -28,7 +28,7 @@
     </base>
 
     <fence>
-        <segment id="SEGMENT" price="5" class="FenceSegment" maxVerticalAngle="45">
+        <segment id="SEGMENT" price="0" class="FenceSegment" maxVerticalAngle="45">
             <poles>
                 <pole node="pole" radius="0.0"/>
             </poles>

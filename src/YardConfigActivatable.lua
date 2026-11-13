@@ -22,7 +22,7 @@ function YardConfigActivatable:getIsActivatable()
     if g_localPlayer:getCurrentVehicle() ~= nil then return false end
 
     -- MP: only server admins can configure yards.
-    if not PlaceableUsedEquipmentYard.isAdminInMP() then return false end
+    if not UsedEquipmentYards.isAdminInMP() then return false end
 
     -- Must be inside the yard bounds.
     local px, _, pz = getWorldTranslation(g_localPlayer.rootNode)

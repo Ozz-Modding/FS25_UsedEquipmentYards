@@ -42,6 +42,11 @@
         <textColor value="$preset_fs25_colorMainLight"/>
     </Profile>
 
+    <!-- Equipment row title in the barter dialog (dimmer than the value) -->
+    <Profile name="ueyConfigTitle" extends="ueyWeightLabel" with="anchorTopLeft">
+        <textColor value="0.8 0.8 0.8 0.6"/>
+    </Profile>
+
     <!-- Table header label (green, same size as weight label) -->
     <Profile name="ueyTableHeader" extends="baseReference" with="anchorTopLeft">
         <textBold value="true"/>
@@ -65,6 +70,11 @@
 
     <!-- Generic top-left anchored container for absolute positioning -->
     <Profile name="ueySection" extends="baseReference" with="anchorTopLeft">
+    </Profile>
+
+    <!-- Top-left anchored ScrollingLayout with no background (baseReference draws white on layouts) -->
+    <Profile name="ueyScrollLayout" extends="baseReference" with="anchorTopLeft">
+        <imageColor value="0 0 0 0"/>
     </Profile>
 
     <!-- SmoothList profiles for sale zone dialog -->

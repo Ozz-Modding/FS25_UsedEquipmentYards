@@ -18,49 +18,13 @@ end
 function YardCreatedEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId,   self.yardId)
     streamWriteString(streamId,  self.yardName)
-    streamWriteFloat32(streamId, self.bounds.cx)
-    streamWriteFloat32(streamId, self.bounds.cy)
-    streamWriteFloat32(streamId, self.bounds.cz)
-    streamWriteFloat32(streamId, self.bounds.sizeX)
-    streamWriteFloat32(streamId, self.bounds.sizeZ)
-    streamWriteFloat32(streamId, self.bounds.anchorX or self.bounds.cx)
-    streamWriteFloat32(streamId, self.bounds.anchorZ or self.bounds.cz)
-
-    -- Stream polygon vertices for accurate containsPoint on clients.
-    local poly = self.bounds.polygon
-    local vertCount = (poly ~= nil) and #poly or 0
-    streamWriteInt32(streamId, vertCount)
-    if poly ~= nil then
-        for _, pt in ipairs(poly) do
-            streamWriteFloat32(streamId, pt.x)
-            streamWriteFloat32(streamId, pt.z)
-        end
-    end
+    UsedEquipmentYard.writeBoundsStream(streamId, self.bounds)
 end
 
 function YardCreatedEvent:readStream(streamId, connection)
     self.yardId   = streamReadInt32(streamId)
     self.yardName = streamReadString(streamId)
-    self.bounds = {
-        cx    = streamReadFloat32(streamId),
-        cy    = streamReadFloat32(streamId),
-        cz    = streamReadFloat32(streamId),
-        sizeX = streamReadFloat32(streamId),
-        sizeZ = streamReadFloat32(streamId),
-    }
-    self.bounds.anchorX = streamReadFloat32(streamId)
-    self.bounds.anchorZ = streamReadFloat32(streamId)
-    local vertCount = streamReadInt32(streamId)
-    if vertCount >= 3 then
-        local poly = {}
-        for i = 1, vertCount do
-            poly[i] = {
-                x = streamReadFloat32(streamId),
-                z = streamReadFloat32(streamId),
-            }
-        end
-        self.bounds.polygon = poly
-    end
+    self.bounds   = UsedEquipmentYard.readBoundsStream(streamId)
     self:run(connection)
 end
 

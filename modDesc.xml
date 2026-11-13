@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
 <modDesc descVersion="116">
     <author>Ozz</author>
-    <version>1.0.1.5</version>
+    <version>1.0.1.6</version>
     <iconFilename>icon_UsedEquipmentYards.dds</iconFilename>
     <title>
         <en>Used Equipment Yards</en>
@@ -27,10 +27,12 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Changelog:
 
+1.0.1.6:
+- Reworked yard layout. You can now easily see your yard while making it, and you can adjust it too.
+- Added Configuration to the info dialog when viewing yard equipment. Useful to see the actual vehicle spec.
+
 1.0.1.5:
 - Rework how vehicles are hidden when selling to a yard that is full - resolves some multiplayer issues.
-
-1.0.1.4:
 - Fix some occasional multiplayer issues. Thanks to @jeaboswell.
 - New setting: Yard Vehicle View Distance (default Off). Hides yard vehicles beyond 200-1000m from your camera to improve FPS on large yards.
 - Reworked save and error handling to be more defensive, improving compatibility with other mods. Removed pcall usage.
@@ -101,8 +103,6 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 1.0.1.5:
 - Überarbeitung, wie Fahrzeuge beim Verkauf an einen vollen Hof ausgeblendet werden - behebt einige Multiplayer-Probleme.
-
-1.0.1.4:
 - Behebung einiger gelegentlich auftretender Multiplayer-Probleme. Vielen Dank an @jeaboswell.
 - Neue Einstellung: Sichtweite Hof-Fahrzeuge (Standard: Aus). Blendet Hoffahrzeuge ab 200-1000 m Entfernung zur Kamera aus, um die FPS auf großen Höfen zu verbessern.
 - Speicher- und Fehlerbehandlung überarbeitet und robuster gestaltet, um die Kompatibilität mit anderen Mods zu verbessern.
@@ -173,8 +173,6 @@ Journal des modifications :
 
 1.0.1.5 :
 - Refonte de la façon dont les véhicules sont masqués lors de la vente à un parc plein - résout certains problèmes en multijoueur.
-
-1.0.1.4 :
 - Correction de certains problèmes survenant occasionnellement en multijoueur. Merci à @jeaboswell.
 - Nouveau paramètre : Distance d'affichage des véhicules du parc (désactivé par défaut). Masque les véhicules du parc au-delà de 200 à 1000 m de la caméra pour améliorer les FPS sur les grands parcs.
 - Refonte de la gestion de la sauvegarde et des erreurs pour la rendre plus robuste et améliorer la compatibilité avec les autres mods.
@@ -230,6 +228,8 @@ Journal des modifications :
         <sourceFile filename="src/UeyUtils.lua"/>
         <sourceFile filename="src/events/YardCreatedEvent.lua"/>
         <sourceFile filename="src/events/YardRemovedEvent.lua"/>
+        <sourceFile filename="src/events/YardUpdatedEvent.lua"/>
+        <sourceFile filename="src/events/YardZoneEvent.lua"/>
         <sourceFile filename="src/events/EquipmentPurchasedEvent.lua"/>
         <sourceFile filename="src/events/InitialClientStateEvent.lua"/>
         <sourceFile filename="src/events/TestDriveEvent.lua"/>
@@ -238,9 +238,12 @@ Journal des modifications :
         <sourceFile filename="src/YardCredit.lua"/>
         <sourceFile filename="src/PriceTagRenderer.lua"/>
         <sourceFile filename="src/UsedEquipmentYard.lua"/>
+        <sourceFile filename="src/YardLayout.lua"/>
+        <sourceFile filename="src/YardZone.lua"/>
         <sourceFile filename="src/YardInventory.lua"/>
         <sourceFile filename="src/YardManager.lua"/>
         <sourceFile filename="src/gui/YardConfigDialog.lua"/>
+        <sourceFile filename="src/YardConfigList.lua"/>
         <sourceFile filename="src/gui/BarterDialog.lua"/>
         <sourceFile filename="src/gui/SellBarterDialog.lua"/>
         <sourceFile filename="src/events/VehicleSoldEvent.lua"/>
@@ -270,6 +273,10 @@ Journal des modifications :
             <specialization name="husbandryFence" />
             <specialization name="usedEquipmentYard" />
         </type>
+        <!-- Build-menu entries for the yard tool; never placed (they only carry the brush). -->
+        <type name="usedEquipmentYardTool" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
+            <specialization name="placement" />
+        </type>
         <type name="usedEquipmentYardSaleZone" parent="placeable" className="Placeable" filename="$dataS/scripts/placeables/Placeable.lua">
             <specialization name="placement" />
             <specialization name="clearAreas" />
@@ -278,8 +285,11 @@ Journal des modifications :
         </type>
     </placeableTypes>
     <storeItems>
+        <!-- Legacy (hidden): still registered so pre-yard-tool savegames load. -->
         <storeItem xmlFilename="xml/YardFence.xml" />
         <storeItem xmlFilename="xml/UsedEquipmentYard.xml" />
+        <storeItem xmlFilename="xml/YardZoneTool.xml" />
+        <storeItem xmlFilename="xml/YardZoneRemoveTool.xml" />
         <storeItem xmlFilename="xml/SaleZone.xml" />
         <storeItem xmlFilename="xml/smallAdBoard.xml" />
         <storeItem xmlFilename="xml/largeAdBoard.xml" />

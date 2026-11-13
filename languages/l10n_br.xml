@@ -49,9 +49,9 @@
         <text name="uey_config_avgStockHours" text="Média de Horas em Estoque" />
         <text name="uey_config_avgStockHours_desc"
             text="Quanto tempo os veículos permanecem antes de sair." />
-        <text name="uey_config_gridSpacing" text="Espaçamento da Grade" />
-        <text name="uey_config_gridSpacing_desc"
-            text="Distância entre pontos de aparição. Menor = mais veículos." />
+        <text name="uey_config_aisleWidth" text="Largura dos Corredores" />
+        <text name="uey_config_aisleWidth_desc"
+            text="Espaço de manobra entre as fileiras. Mais largo = menos veículos." />
         <text name="uey_config_maxDuplicates" text="Máx. Duplicados" />
         <text name="uey_config_maxDuplicates_desc"
             text="Máximo de veículos idênticos permitidos no pátio ao mesmo tempo." />
@@ -109,6 +109,8 @@
         <text name="uey_barter_buyNow" text="Comprar Agora" />
         <text name="uey_barter_vehicleInfo" text="Informações do Veículo" />
         <text name="uey_barter_specs" text="Especificações" />
+        <text name="uey_barter_equipment" text="Configuração" />
+        <text name="uey_barter_equipmentNone" text="Nenhuma opção de configuração" />
         <text name="uey_barter_brand" text="Marca" />
         <text name="uey_barter_owners" text="Proprietários" />
         <text name="uey_barter_hours" text="Horas" />
@@ -245,5 +247,34 @@
         <text name="uey_inventoryReset" text="Inventário redefinido para '%s'." />
         <text name="uey_allInventoriesReset"
             text="Todos os inventários dos pátios foram redefinidos." />
+        <!-- Yard tool (build menu) -->
+        <text name="uey_tool_zone" text="Pátio de Equipamentos Usados" />
+        <text name="uey_tool_zone_function" text="Desenhe o contorno de um pátio. Os veículos à venda ficam estacionados em fileiras dentro dele. Clique em um pátio existente para remodelá-lo." />
+        <text name="uey_tool_remove" text="Remover Pátio de Equipamentos Usados" />
+        <text name="uey_tool_remove_function" text="Clique em um pátio para removê-lo junto com os veículos à venda." />
+        <text name="uey_zone_startYard" text="Iniciar novo pátio" />
+        <text name="uey_zone_editYard" text="Editar pátio" />
+        <text name="uey_zone_addCorner" text="Adicionar canto" />
+        <text name="uey_zone_removeLastCorner" text="Remover último canto" />
+        <text name="uey_zone_moveCorner" text="Mover canto" />
+        <text name="uey_zone_insertCorner" text="Adicionar canto aqui" />
+        <text name="uey_zone_deleteCorner" text="Excluir canto" />
+        <text name="uey_zone_createYard" text="Criar pátio" />
+        <text name="uey_zone_applyChanges" text="Aplicar alterações" />
+        <text name="uey_zone_undo" text="Desfazer" />
+        <text name="uey_zone_removeYard" text="Remover pátio" />
+        <text name="uey_zone_removeConfirm" text="Remover '%s'? Todos os veículos à venda serão removidos." />
+        <text name="uey_zone_info" text="%d m² · cerca de %d veículos" />
+        <text name="uey_zone_infoDrawing" text="%d cantos" />
+        <text name="uey_zone_unsaved" text="Aplique ou cancele primeiro as alterações deste pátio." />
+        <text name="uey_zone_error_tooFewPoints" text="Um pátio precisa de pelo menos 3 cantos." />
+        <text name="uey_zone_error_tooManyPoints" text="Cantos demais (no máximo 64)." />
+        <text name="uey_zone_error_edgeTooShort" text="Os cantos estão muito próximos." />
+        <text name="uey_zone_error_selfIntersecting" text="O contorno se cruza." />
+        <text name="uey_zone_error_tooSmall" text="O pátio é pequeno demais." />
+        <text name="uey_zone_error_overlapsYard" text="O pátio se sobrepõe a outro pátio." />
+        <text name="uey_zone_error_hasSaleZones" text="Remova primeiro as zonas de venda deste pátio." />
+        <text name="uey_zone_error_noRows" text="Pequeno demais para fileiras de veículos." />
+        <text name="uey_zone_error_cornerRefused" text="Não é possível colocar um canto aqui." />
     </texts>
 </l10n>

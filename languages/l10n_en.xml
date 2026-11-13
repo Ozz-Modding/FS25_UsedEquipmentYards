@@ -51,9 +51,9 @@
             text="Set spawn likelihood per category (0 = disabled)." />
         <text name="uey_config_avgStockHours" text="Average Hours in Stock" />
         <text name="uey_config_avgStockHours_desc" text="How long vehicles stay before leaving." />
-        <text name="uey_config_gridSpacing" text="Grid Spacing" />
-        <text name="uey_config_gridSpacing_desc"
-            text="Distance between spawn points. Smaller = more vehicles." />
+        <text name="uey_config_aisleWidth" text="Aisle Width" />
+        <text name="uey_config_aisleWidth_desc"
+            text="Driving room between facing rows. Wider = fewer vehicles." />
         <text name="uey_config_maxDuplicates" text="Max Duplicates" />
         <text name="uey_config_maxDuplicates_desc"
             text="Max identical vehicles allowed on the yard at once." />
@@ -112,6 +112,8 @@
         <text name="uey_barter_buyNow" text="Buy Now" />
         <text name="uey_barter_vehicleInfo" text="Vehicle Info" />
         <text name="uey_barter_specs" text="Specifications" />
+        <text name="uey_barter_equipment" text="Configuration" />
+        <text name="uey_barter_equipmentNone" text="No optional configurations" />
         <text name="uey_barter_brand" text="Brand" />
         <text name="uey_barter_owners" text="Owners" />
         <text name="uey_barter_hours" text="Hours" />
@@ -252,5 +254,34 @@
         <text name="uey_yardRemoved" text="Yard '%s' removed." />
         <text name="uey_inventoryReset" text="Inventory reset for '%s'." />
         <text name="uey_allInventoriesReset" text="All yard inventories have been reset." />
+        <!-- Yard tool (build menu) -->
+        <text name="uey_tool_zone" text="Used Equipment Yard" />
+        <text name="uey_tool_zone_function" text="Draw a yard's outline. Vehicles for sale park in rows inside it. Click an existing yard to reshape it." />
+        <text name="uey_tool_remove" text="Remove Used Equipment Yard" />
+        <text name="uey_tool_remove_function" text="Click a yard to remove it and the vehicles for sale in it." />
+        <text name="uey_zone_startYard" text="Start new yard" />
+        <text name="uey_zone_editYard" text="Edit yard" />
+        <text name="uey_zone_addCorner" text="Add corner" />
+        <text name="uey_zone_removeLastCorner" text="Remove last corner" />
+        <text name="uey_zone_moveCorner" text="Move corner" />
+        <text name="uey_zone_insertCorner" text="Add corner here" />
+        <text name="uey_zone_deleteCorner" text="Delete corner" />
+        <text name="uey_zone_createYard" text="Create yard" />
+        <text name="uey_zone_applyChanges" text="Apply changes" />
+        <text name="uey_zone_undo" text="Undo" />
+        <text name="uey_zone_removeYard" text="Remove yard" />
+        <text name="uey_zone_removeConfirm" text="Remove '%s'? All vehicles for sale there will be removed." />
+        <text name="uey_zone_info" text="%d m² · about %d vehicles" />
+        <text name="uey_zone_infoDrawing" text="%d corners" />
+        <text name="uey_zone_unsaved" text="Apply or cancel the changes to this yard first." />
+        <text name="uey_zone_error_tooFewPoints" text="A yard needs at least 3 corners." />
+        <text name="uey_zone_error_tooManyPoints" text="Too many corners (64 at most)." />
+        <text name="uey_zone_error_edgeTooShort" text="Corners are too close together." />
+        <text name="uey_zone_error_selfIntersecting" text="The outline crosses itself." />
+        <text name="uey_zone_error_tooSmall" text="The yard is too small." />
+        <text name="uey_zone_error_overlapsYard" text="The yard overlaps another yard." />
+        <text name="uey_zone_error_hasSaleZones" text="Remove this yard's sale zones first." />
+        <text name="uey_zone_error_noRows" text="Too small for any rows of vehicles." />
+        <text name="uey_zone_error_cornerRefused" text="A corner can't go there." />
     </texts>
 </l10n>

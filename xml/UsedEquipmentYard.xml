@@ -6,7 +6,7 @@
             <function>$l10n_uey_function</function>
         </functions>
         <image>store/store_yard.dds</image>
-        <price>500</price>
+        <price>0</price>
         <dailyUpkeep>0</dailyUpkeep>
         <lifetime>1000</lifetime>
         <rotation>0</rotation>
@@ -14,7 +14,7 @@
         <species>PLACEABLE</species>
         <category>misc</category>
         <canBeSold>true</canBeSold>
-        <showInStore>true</showInStore>
+        <showInStore>false</showInStore>
 
         <brush>
             <type>husbandry</type>

@@ -28,6 +28,98 @@ function UsedEquipmentYards.getYard(yardId)
     return UsedEquipmentYards.clientYards[yardId]
 end
 
+--- Every yard this machine knows: the server's own, or the client registry.
+function UsedEquipmentYards.getAllYards()
+    if UsedEquipmentYards.yardManager ~= nil then
+        return UsedEquipmentYards.yardManager.yards
+    end
+    return UsedEquipmentYards.clientYards
+end
+
+--- In multiplayer, only the server host or an admin (master user) may
+--- create, edit, remove or configure yards. In single player, always allowed.
+function UsedEquipmentYards.isAdminInMP()
+    if not g_currentMission.missionDynamicInfo.isMultiplayer then
+        return true
+    end
+    return g_currentMission:getIsServer() or g_currentMission.isMasterUser
+end
+
+--- Server: did this connection come from the host or an admin?
+--- (UserManager:getIsConnectionMasterUser never returns its result, so the
+--- user is looked up directly.)
+function UsedEquipmentYards.isConnectionAdmin(connection)
+    if connection == nil or connection:getIsLocal() then
+        return true
+    end
+    local userManager = g_currentMission.userManager
+    local user = userManager ~= nil and userManager:getUserByConnection(connection) or nil
+    return user ~= nil and user:getIsMasterUser()
+end
+
+--- How many placed sale zones are linked to a yard (works on clients too:
+--- sale zones stream their yardId).
+function UsedEquipmentYards.getConnectedSaleZoneCount(yardId)
+    local count = 0
+    if g_currentMission ~= nil and g_currentMission.placeableSystem ~= nil then
+        for _, placeable in pairs(g_currentMission.placeableSystem.placeables) do
+            local szData = placeable[PlaceableSaleZone.KEY]
+            if szData ~= nil and szData.yardId == yardId then
+                count = count + 1
+            end
+        end
+    end
+    return count
+end
+
+-- ---------------------------------------------------------------------------
+-- The yard tool in the build menu (see src/brush/UeyYardZoneBrush.lua)
+-- ---------------------------------------------------------------------------
+-- Registered while the mod's scripts load, before store items are read. In a
+-- mod's environment g_constructionBrushTypeManager prefixes the type and class
+-- names with the mod name, so the store XMLs name the brush type
+-- "FS25_UsedEquipmentYards.ueyYardZone". The brush file is sourced by
+-- addBrushType itself (it is not in modDesc's extraSourceFiles).
+UsedEquipmentYards.BRUSH_TYPE = "ueyYardZone"
+
+function UsedEquipmentYards.registerBrushType()
+    local manager = g_constructionBrushTypeManager
+    if manager == nil or manager.addBrushType == nil then
+        Logging.warning("[UsedEquipmentYards] no construction brush manager - the yard tool is unavailable")
+        return
+    end
+    manager:addBrushType(UsedEquipmentYards.BRUSH_TYPE, "UeyYardZoneBrush",
+        UsedEquipmentYards.dir .. "src/brush/UeyYardZoneBrush.lua", UsedEquipmentYards.modName)
+end
+
+UsedEquipmentYards.registerBrushType()
+
+-- ---------------------------------------------------------------------------
+-- Old saves: yards used to be an electrical box with a fence drawn around it.
+-- Those placeables are removed once the game is running; the yards themselves
+-- (outline, stock, config) live in UsedEquipmentYards.xml and stay.
+-- ---------------------------------------------------------------------------
+UsedEquipmentYards.LEGACY_REMOVAL_DELAY = 3000 -- ms after mission start
+
+function UsedEquipmentYards.removeLegacyPlaceables()
+    if g_currentMission == nil or not g_currentMission:getIsServer() or g_currentMission.placeableSystem == nil then
+        return
+    end
+    local legacy = {}
+    for _, placeable in ipairs(g_currentMission.placeableSystem.placeables) do
+        if placeable[PlaceableUsedEquipmentYard.KEY] ~= nil and not placeable.markedForDeletion then
+            legacy[#legacy + 1] = placeable
+        end
+    end
+    for _, placeable in ipairs(legacy) do
+        placeable[PlaceableUsedEquipmentYard.KEY].keepYard = true
+        placeable:delete()
+    end
+    if #legacy > 0 then
+        Logging.info("[UsedEquipmentYards] removed %d old yard building(s) and fence(s); the yards are kept", #legacy)
+    end
+end
+
 -- Recent sales memory: ring buffer of { uniqueId, price } for vehicles sold to
 -- players. Used to prevent profit from immediately selling a vehicle back.
 -- Synced to all clients and persisted to savegame.
@@ -181,9 +273,9 @@ end
 
 UsedEquipmentYards.installSaveHook()
 
--- After mission start: start fence patch timer and spawn vehicles.
+-- After mission start: schedule the old-placeable cleanup and spawn vehicles.
 FSBaseMission.onStartMission = Utils.appendedFunction(FSBaseMission.onStartMission, function()
-    UsedEquipmentYards.fencePatchTimer = UsedEquipmentYards.fencePatchDelay
+    UsedEquipmentYards.legacyRemovalTimer = UsedEquipmentYards.LEGACY_REMOVAL_DELAY
     if UsedEquipmentYards.yardManager ~= nil then
         UsedEquipmentYards.yardManager:spawnAllYards()
     end
@@ -215,81 +307,6 @@ if Attachable ~= nil then
             return superFunc(self, farmId, attacherVehicle)
         end
     )
-end
-
--- Patch fence construction brushes so yard fence posts can be placed on any land.
--- Two checks need bypassing:
---   1. ConstructionBrush:verifyAccess — checks canFarmAccessLand (runs every frame + on click)
---   2. ConstructionBrushNewFence:validateCurrentSegment — checks getIsOwnedByFarmAlongLine
--- Both hardcode farmland ownership checks that our placeable overrides cannot reach.
-
-local function isYardFenceBrush(brush)
-    return brush.fenceParentObject ~= nil
-        and brush.fenceParentObject[PlaceableUsedEquipmentYard.KEY] ~= nil
-end
-
---- Install fence construction patches. Called with a delay so we wrap
---- whatever version exists AFTER all other mods have had time to patch.
-UsedEquipmentYards.fencePatchDelay = 5000 -- ms
-UsedEquipmentYards.fencePatchTimer = nil
-
-function UsedEquipmentYards.installFencePatches()
-    if UsedEquipmentYards.fencePatchesInstalled then return end
-    UsedEquipmentYards.fencePatchesInstalled = true
-
-    if ConstructionBrush ~= nil then
-        ConstructionBrush.verifyAccess = Utils.overwrittenFunction(
-            ConstructionBrush.verifyAccess,
-            function(self, superFunc, x, y, z)
-                if isYardFenceBrush(self) then
-                    return nil
-                end
-                local screen = g_constructionScreen
-                if screen ~= nil and screen.brush ~= nil and isYardFenceBrush(screen.brush) then
-                    return nil
-                end
-                return superFunc(self, x, y, z)
-            end
-        )
-    end
-
-    -- Also patch verifyAccess directly on NewFence in case a mod map's
-    -- subclass overrides it and our ConstructionBrush patch doesn't reach it.
-    if ConstructionBrushNewFence ~= nil and ConstructionBrushNewFence.verifyAccess ~= nil then
-        ConstructionBrushNewFence.verifyAccess = Utils.overwrittenFunction(
-            ConstructionBrushNewFence.verifyAccess,
-            function(self, superFunc, x, y, z)
-                if isYardFenceBrush(self) then
-                    return nil
-                end
-                return superFunc(self, x, y, z)
-            end
-        )
-    end
-
-    if ConstructionBrushNewFence ~= nil then
-        ConstructionBrushNewFence.validateCurrentSegment = Utils.overwrittenFunction(
-            ConstructionBrushNewFence.validateCurrentSegment,
-            function(self, superFunc, x, z)
-                if isYardFenceBrush(self) then
-                    if self.currentSegment == nil then return false end
-                    local sx, _, sz = self.currentSegment:getStartPos()
-                    if sx == nil then return false end
-                    local price = self.currentSegment:getPrice()
-                    if g_currentMission:getMoney(g_localPlayer.farmId) < price then
-                        self.cursor:setErrorMessage(g_i18n:getText(ConstructionBrushNewFence.ERROR_MESSAGES
-                            [ConstructionBrushNewFence.ERROR.NOT_ENOUGH_MONEY]))
-                        return false
-                    end
-                    if price > 0 then
-                        self.cursor:setMessage(g_i18n:formatMoney(price))
-                    end
-                    return true
-                end
-                return superFunc(self, x, z)
-            end
-        )
-    end
 end
 
 -- ---------------------------------------------------------------------------
@@ -331,6 +348,14 @@ function UsedEquipmentYards.registerClientYard(yardId, yardName, bounds, config)
     end
     UsedEquipmentYards.clientYards[yardId] = yard
     UsedEquipmentYards.addActivatable(yard)
+end
+
+--- A yard's outline changed on the server (YardUpdatedEvent).
+function UsedEquipmentYards.updateClientYardBounds(yardId, bounds)
+    local yard = UsedEquipmentYards.clientYards[yardId]
+    if yard ~= nil then
+        yard.bounds = bounds
+    end
 end
 
 --- Remove a client-side yard and its activatable.
@@ -575,12 +600,12 @@ end
 -- ---------------------------------------------------------------------------
 
 function UsedEquipmentYards:update(dt)
-    -- Delayed fence patch install — ensures we're the last to wrap.
-    if UsedEquipmentYards.fencePatchTimer ~= nil then
-        UsedEquipmentYards.fencePatchTimer = UsedEquipmentYards.fencePatchTimer - dt
-        if UsedEquipmentYards.fencePatchTimer <= 0 then
-            UsedEquipmentYards.fencePatchTimer = nil
-            UsedEquipmentYards.installFencePatches()
+    -- Old yard buildings/fences are removed shortly after the game starts.
+    if UsedEquipmentYards.legacyRemovalTimer ~= nil then
+        UsedEquipmentYards.legacyRemovalTimer = UsedEquipmentYards.legacyRemovalTimer - dt
+        if UsedEquipmentYards.legacyRemovalTimer <= 0 then
+            UsedEquipmentYards.legacyRemovalTimer = nil
+            UsedEquipmentYards.removeLegacyPlaceables()
         end
     end
 

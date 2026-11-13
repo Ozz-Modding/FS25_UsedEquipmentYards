@@ -45,6 +45,7 @@ function BarterDialog.new()
     self.item = nil
     self.currentOffer = 0
     self.attrElements = {}
+    self.equipmentElements = {}
     return self
 end
 
@@ -155,6 +156,7 @@ function BarterDialog:populateDialog()
     self.wearText:setText(("%d %%"):format(math.floor((item.wear or 0) * 100)))
 
     self:populateAttributes()
+    self:populateEquipment()
     self:updateButtonStates()
 end
 
@@ -277,6 +279,69 @@ function BarterDialog:populateAttributes()
         end
     end
 
+    layout:invalidateLayout()
+end
+
+-- ---------------------------------------------------------------------------
+-- Equipment (the vehicle's configurations, YardConfigList)
+-- ---------------------------------------------------------------------------
+
+--- Configuration types in shop order, with title and whether it's a colour picker.
+function BarterDialog.getConfigTypes()
+    local manager = g_vehicleConfigurationManager
+    local types = {}
+    for _, name in ipairs(manager:getSortedConfigurationTypes()) do
+        types[#types + 1] = {
+            name = name,
+            title = manager:getConfigurationAttribute(name, "title"),
+            isColor = manager:getConfigurationSelectorType(name) == ConfigurationUtil.SELECTOR_COLOR,
+        }
+    end
+    return types
+end
+
+--- Fill one half (column 1 or 2) of an equipment line.
+function BarterDialog.setEquipmentCell(line, column, row)
+    local title = line:getDescendantByName("title" .. column)
+    local value = line:getDescendantByName("value" .. column)
+    local upgrade = line:getDescendantByName("upgrade" .. column)
+    local text = row ~= nil and row.optionName or ""
+    title:setText(row ~= nil and row.title or "")
+    value:setText(text)
+    upgrade:setText(text)
+    value:setVisible(row ~= nil and not row.isUpgrade)
+    upgrade:setVisible(row ~= nil and row.isUpgrade)
+end
+
+function BarterDialog:populateEquipment()
+    for _, elem in ipairs(self.equipmentElements) do
+        elem:delete()
+    end
+    self.equipmentElements = {}
+
+    local template = self.equipmentTemplate
+    local layout = self.equipmentLayout
+    if template == nil or layout == nil then return end
+
+    local rows = {}
+    local vehicle = self.item ~= nil and self.item.vehicle or nil
+    local storeItem = vehicle ~= nil and g_storeManager:getItemByXMLFilename(vehicle.configFileName) or nil
+    if storeItem ~= nil then
+        rows = YardConfigList.build(BarterDialog.getConfigTypes(), storeItem.configurations, vehicle.configurations)
+    end
+
+    -- Two configurations per line.
+    for i = 1, #rows, 2 do
+        local line = template:clone(layout)
+        self.equipmentElements[#self.equipmentElements + 1] = line
+        BarterDialog.setEquipmentCell(line, 1, rows[i])
+        BarterDialog.setEquipmentCell(line, 2, rows[i + 1])
+        line:setVisible(true)
+    end
+
+    if self.equipmentNoneText ~= nil then
+        self.equipmentNoneText:setVisible(#rows == 0)
+    end
     layout:invalidateLayout()
 end
 

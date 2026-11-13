@@ -174,6 +174,83 @@ function YardManager:removeYard(id)
     return ("Yard '%s' (id=%d) removed."):format(yard.name, id)
 end
 
+-- ---------------------------------------------------------------------------
+-- Yard outlines (the yard tool: YardZoneEvent)
+-- ---------------------------------------------------------------------------
+
+--- Bounds for an outline, with the terrain height at its centre.
+function YardManager.boundsForPolygon(polygon)
+    local bounds = YardZone.boundsFromPolygon(polygon)
+    if g_terrainNode ~= nil then
+        bounds.cy = getTerrainHeightAtWorldPos(g_terrainNode, bounds.cx, 0, bounds.cz)
+    end
+    return bounds
+end
+
+--- Validate an outline for a yard (yardId nil = a new one) against the others.
+function YardManager:validatePolygon(polygon, yardId)
+    local others = {}
+    for id, yard in pairs(self.yards) do
+        if id ~= yardId then
+            others[#others + 1] = YardZone.polygonOfBounds(yard.bounds)
+        end
+    end
+    return YardZone.validate(polygon, others)
+end
+
+--- Can this yard be removed? False plus a reason key while sale zones are
+--- linked to it (they'd be left pointing at nothing).
+function YardManager:canRemoveYard(id)
+    if self.yards[id] == nil then
+        return false, "noYard"
+    end
+    if UsedEquipmentYards.getConnectedSaleZoneCount(id) > 0 then
+        return false, "hasSaleZones"
+    end
+    return true
+end
+
+--- Give a yard a new outline: clients are told, and its stock is fitted to
+--- the new rows (vehicles that no longer fit are cleared out as if sold).
+function YardManager:updateYardPolygon(id, polygon)
+    local yard = self.yards[id]
+    if yard == nil then
+        return false, "noYard"
+    end
+    yard.bounds = YardManager.boundsForPolygon(polygon)
+    yard.inventory:onBoundsChanged()
+    g_server:broadcastEvent(YardUpdatedEvent.new(yard))
+    return true
+end
+
+--- Apply a YardZoneEvent request (already permission-checked).
+--- Returns true, or false and a reason.
+function YardManager:applyZoneRequest(op, yardId, polygon)
+    local OP = YardZoneEvent.OP
+    if op == OP.DELETE then
+        local ok, err = self:canRemoveYard(yardId)
+        if not ok then
+            return false, err
+        end
+        self:removeYard(yardId)
+        return true
+    end
+
+    local isUpdate = op == OP.UPDATE
+    if isUpdate and self.yards[yardId] == nil then
+        return false, "noYard"
+    end
+    local ok, err = self:validatePolygon(polygon, isUpdate and yardId or nil)
+    if not ok then
+        return false, err
+    end
+    if isUpdate then
+        return self:updateYardPolygon(yardId, polygon)
+    end
+    self:createYard(nil, YardManager.boundsForPolygon(polygon))
+    return true
+end
+
 function YardManager:resetInventory(id)
     local yard = self.yards[id]
     if yard == nil then
@@ -195,11 +272,12 @@ function YardManager:getYardListString()
     end
     local lines = {}
     for id, yard in pairs(self.yards) do
-        lines[#lines + 1] = ("[%d] %s  center:(%.1f, %.1f, %.1f)  size:%.1fx%.1f  items:%d"):format(
+        lines[#lines + 1] = ("[%d] %s  center:(%.1f, %.1f, %.1f)  size:%.1fx%.1f  items:%d  rows:%s"):format(
             id, yard.name,
             yard.bounds.cx, yard.bounds.cy, yard.bounds.cz,
             yard.bounds.sizeX, yard.bounds.sizeZ,
-            yard.inventory:getItemCount()
+            yard.inventory:getItemCount(),
+            yard.inventory:describeRows()
         )
     end
     return table.concat(lines, "\n")

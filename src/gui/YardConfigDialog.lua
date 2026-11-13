@@ -17,7 +17,7 @@ YardConfigDialog.MIN_WW_OPTIONS       = { 0, 5, 10, 15, 20 }                    
 YardConfigDialog.MAX_WW_OPTIONS       = { 5, 10, 15, 20, 0 }                      -- 5m, 10m, ..., "No maximum"
 YardConfigDialog.MAX_PRICE_OPTIONS    = { 50000, 100000, 150000, 200000, 250000, 0 } -- 0 = "No maximum"
 YardConfigDialog.AVG_STOCK_OPTIONS    = { 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132, 144, 156, 168 }
-YardConfigDialog.GRID_SPACING_OPTIONS = { 4, 5, 6, 7, 8, 9, 10 }
+YardConfigDialog.AISLE_WIDTH_OPTIONS = { 6, 7, 8, 9, 10, 12, 14 }
 YardConfigDialog.MAX_DUPLICATES_OPTIONS = { 1, 2, 3, 4, 5, 0 }              -- 0 = unlimited
 
 -- Year options for Vehicle Years mod integration. 0 = no limit.
@@ -311,19 +311,19 @@ function YardConfigDialog:populateOptions()
     end
     self.avgStockHoursOption:setState(avgStockState)
 
-    -- Grid spacing
-    local gridSpacingTexts = {}
-    for _, v in ipairs(YardConfigDialog.GRID_SPACING_OPTIONS) do
-        gridSpacingTexts[#gridSpacingTexts + 1] = tostring(v) .. " m"
+    -- Aisle width (room between facing rows of vehicles)
+    local aisleWidthTexts = {}
+    for _, v in ipairs(YardConfigDialog.AISLE_WIDTH_OPTIONS) do
+        aisleWidthTexts[#aisleWidthTexts + 1] = tostring(v) .. " m"
     end
-    self.gridSpacingOption:setTexts(gridSpacingTexts)
-    local gridSpacingState = 5 -- default index for 8
-    for i, v in ipairs(YardConfigDialog.GRID_SPACING_OPTIONS) do
-        if v == (self.config.gridSpacing or 8) then
-            gridSpacingState = i; break
+    self.aisleWidthOption:setTexts(aisleWidthTexts)
+    local aisleWidthState = 3 -- default index for 8
+    for i, v in ipairs(YardConfigDialog.AISLE_WIDTH_OPTIONS) do
+        if v == (self.config.aisleWidth or 8) then
+            aisleWidthState = i; break
         end
     end
-    self.gridSpacingOption:setState(gridSpacingState)
+    self.aisleWidthOption:setState(aisleWidthState)
 
     -- Max duplicates
     local maxDupTexts = {}
@@ -368,8 +368,8 @@ function YardConfigDialog:onAvgStockHoursChanged(state, element)
     self.config.avgStockHours = YardConfigDialog.AVG_STOCK_OPTIONS[state] or 96
 end
 
-function YardConfigDialog:onGridSpacingChanged(state, element)
-    self.config.gridSpacing = YardConfigDialog.GRID_SPACING_OPTIONS[state] or 8
+function YardConfigDialog:onAisleWidthChanged(state, element)
+    self.config.aisleWidth = YardConfigDialog.AISLE_WIDTH_OPTIONS[state] or 8
 end
 
 function YardConfigDialog:onMaxDuplicatesChanged(state, element)

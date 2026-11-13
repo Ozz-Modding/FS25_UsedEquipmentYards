@@ -27,23 +27,7 @@ function InitialClientStateEvent:writeStream(streamId, connection)
     for _, yard in pairs(yards) do
         streamWriteInt32(streamId,   yard.id)
         streamWriteString(streamId,  yard.name)
-        streamWriteFloat32(streamId, yard.bounds.cx)
-        streamWriteFloat32(streamId, yard.bounds.cy)
-        streamWriteFloat32(streamId, yard.bounds.cz)
-        streamWriteFloat32(streamId, yard.bounds.sizeX)
-        streamWriteFloat32(streamId, yard.bounds.sizeZ)
-        streamWriteFloat32(streamId, yard.bounds.anchorX or yard.bounds.cx)
-        streamWriteFloat32(streamId, yard.bounds.anchorZ or yard.bounds.cz)
-
-        local poly      = yard.bounds.polygon
-        local vertCount = (poly ~= nil) and #poly or 0
-        streamWriteInt32(streamId, vertCount)
-        if poly ~= nil then
-            for _, pt in ipairs(poly) do
-                streamWriteFloat32(streamId, pt.x)
-                streamWriteFloat32(streamId, pt.z)
-            end
-        end
+        UsedEquipmentYard.writeBoundsStream(streamId, yard.bounds)
 
         -- Yard config so clients have accurate settings for display.
         local cfg = yard.inventory.config
@@ -53,7 +37,7 @@ function InitialClientStateEvent:writeStream(streamId, connection)
         streamWriteInt32(streamId, cfg.maxWorkingWidth or 0)
         streamWriteInt32(streamId, cfg.maxPrice or 0)
         streamWriteInt32(streamId, cfg.avgStockHours or 96)
-        streamWriteInt32(streamId, cfg.gridSpacing or 8)
+        streamWriteInt32(streamId, cfg.aisleWidth or 8)
         streamWriteInt32(streamId, cfg.maxDuplicates or 2)
         streamWriteInt32(streamId, cfg.minYear or 0)
         streamWriteInt32(streamId, cfg.maxYear or 0)
@@ -121,27 +105,7 @@ function InitialClientStateEvent:readStream(streamId, connection)
     for _ = 1, count do
         local yardId   = streamReadInt32(streamId)
         local yardName = streamReadString(streamId)
-        local bounds   = {
-            cx    = streamReadFloat32(streamId),
-            cy    = streamReadFloat32(streamId),
-            cz    = streamReadFloat32(streamId),
-            sizeX = streamReadFloat32(streamId),
-            sizeZ = streamReadFloat32(streamId),
-        }
-        bounds.anchorX = streamReadFloat32(streamId)
-        bounds.anchorZ = streamReadFloat32(streamId)
-
-        local vertCount = streamReadInt32(streamId)
-        if vertCount >= 3 then
-            local poly = {}
-            for i = 1, vertCount do
-                poly[i] = {
-                    x = streamReadFloat32(streamId),
-                    z = streamReadFloat32(streamId),
-                }
-            end
-            bounds.polygon = poly
-        end
+        local bounds   = UsedEquipmentYard.readBoundsStream(streamId)
 
         -- Yard config.
         local cfg = {
@@ -151,7 +115,7 @@ function InitialClientStateEvent:readStream(streamId, connection)
             maxWorkingWidth = streamReadInt32(streamId),
             maxPrice        = streamReadInt32(streamId),
             avgStockHours   = streamReadInt32(streamId),
-            gridSpacing     = streamReadInt32(streamId),
+            aisleWidth      = streamReadInt32(streamId),
             maxDuplicates   = streamReadInt32(streamId),
             minYear         = streamReadInt32(streamId),
             maxYear         = streamReadInt32(streamId),

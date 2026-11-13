@@ -58,6 +58,57 @@ function UsedEquipmentYard:containsPoint(px, pz)
 end
 
 -- ---------------------------------------------------------------------------
+-- Network: bounds (shared by YardCreatedEvent, YardUpdatedEvent and
+-- InitialClientStateEvent so the format lives in one place)
+-- ---------------------------------------------------------------------------
+
+function UsedEquipmentYard.writeBoundsStream(streamId, bounds)
+    streamWriteFloat32(streamId, bounds.cx)
+    streamWriteFloat32(streamId, bounds.cy or 0)
+    streamWriteFloat32(streamId, bounds.cz)
+    streamWriteFloat32(streamId, bounds.sizeX)
+    streamWriteFloat32(streamId, bounds.sizeZ)
+    streamWriteFloat32(streamId, bounds.anchorX or bounds.cx)
+    streamWriteFloat32(streamId, bounds.anchorZ or bounds.cz)
+
+    local poly = bounds.polygon
+    local vertCount = (poly ~= nil) and #poly or 0
+    streamWriteInt32(streamId, vertCount)
+    if poly ~= nil then
+        for _, pt in ipairs(poly) do
+            streamWriteFloat32(streamId, pt.x)
+            streamWriteFloat32(streamId, pt.z)
+        end
+    end
+end
+
+function UsedEquipmentYard.readBoundsStream(streamId)
+    local bounds = {
+        cx    = streamReadFloat32(streamId),
+        cy    = streamReadFloat32(streamId),
+        cz    = streamReadFloat32(streamId),
+        sizeX = streamReadFloat32(streamId),
+        sizeZ = streamReadFloat32(streamId),
+    }
+    bounds.anchorX = streamReadFloat32(streamId)
+    bounds.anchorZ = streamReadFloat32(streamId)
+    local vertCount = streamReadInt32(streamId)
+    if vertCount > 0 then
+        local poly = {}
+        for i = 1, vertCount do
+            poly[i] = {
+                x = streamReadFloat32(streamId),
+                z = streamReadFloat32(streamId),
+            }
+        end
+        if vertCount >= 3 then
+            bounds.polygon = poly
+        end
+    end
+    return bounds
+end
+
+-- ---------------------------------------------------------------------------
 -- XML persistence
 -- ---------------------------------------------------------------------------
 
@@ -156,6 +207,8 @@ function UsedEquipmentYard.loadFromXML(xmlFile, key)
         }
         i = i + 1
     end
+    -- Drop repeated corners (old fence-built yards repeat the first at the end).
+    polygon = YardZone.cleanPolygon(polygon)
     if #polygon >= 3 then
         bounds.polygon = polygon
     end

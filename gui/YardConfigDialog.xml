@@ -59,11 +59,11 @@
                 <MultiTextOption profile="ueyMultiTextOption" id="avgStockHoursOption"
                     position="0px -582px" size="350px 40px" onClick="onAvgStockHoursChanged"/>
 
-                <!-- Grid Spacing -->
-                <Text profile="ueySettingLabel" text="$l10n_uey_config_gridSpacing" position="0px -634px" size="350px 24px"/>
-                <Text profile="ueySettingDesc" text="$l10n_uey_config_gridSpacing_desc" position="0px -658px" size="350px 20px"/>
-                <MultiTextOption profile="ueyMultiTextOption" id="gridSpacingOption"
-                    position="0px -682px" size="350px 40px" onClick="onGridSpacingChanged"/>
+                <!-- Aisle Width -->
+                <Text profile="ueySettingLabel" text="$l10n_uey_config_aisleWidth" position="0px -634px" size="350px 24px"/>
+                <Text profile="ueySettingDesc" text="$l10n_uey_config_aisleWidth_desc" position="0px -658px" size="350px 20px"/>
+                <MultiTextOption profile="ueyMultiTextOption" id="aisleWidthOption"
+                    position="0px -682px" size="350px 40px" onClick="onAisleWidthChanged"/>
 
                 <!-- Max Duplicates -->
                 <Text profile="ueySettingLabel" text="$l10n_uey_config_maxDuplicates" position="0px -734px" size="350px 24px"/>

@@ -1,4 +1,12 @@
--- PlaceableUsedEquipmentYard
+-- PlaceableUsedEquipmentYard  (LEGACY)
+-- Yards are now drawn with the yard tool in the build menu (UeyYardZoneBrush)
+-- and have no building. This specialization only remains so savegames from
+-- before that change still load: their yard placeables (an electrical box with
+-- a husbandry fence) are removed shortly after the game starts by
+-- UsedEquipmentYards.removeLegacyPlaceables, with keepYard set so the yard
+-- itself survives. xml/UsedEquipmentYard.xml is hidden from the build menu.
+--
+-- Original description:
 -- Custom specialization that turns a simplePlaceable with husbandryFence into
 -- a used equipment yard.
 --
@@ -74,13 +82,9 @@ function PlaceableUsedEquipmentYard.noOp() end
 
 function PlaceableUsedEquipmentYard.noOpTrue() return true end
 
---- In multiplayer, only the server host or dedicated server admin (master user)
---- may place or demolish yards. In single player, always allowed.
+--- Kept for compatibility; see UsedEquipmentYards.isAdminInMP.
 function PlaceableUsedEquipmentYard.isAdminInMP()
-    if not g_currentMission.missionDynamicInfo.isMultiplayer then
-        return true
-    end
-    return g_currentMission:getIsServer() or g_currentMission.isMasterUser
+    return UsedEquipmentYards.isAdminInMP()
 end
 
 --- Block placement in MP if not admin.
@@ -110,18 +114,9 @@ function PlaceableUsedEquipmentYard:canBeSold(superFunc)
     return true
 end
 
---- Count how many placed sale zones are linked to the given yard id.
+--- Kept for compatibility; see UsedEquipmentYards.getConnectedSaleZoneCount.
 function PlaceableUsedEquipmentYard.getConnectedSaleZoneCount(yardId)
-    local count = 0
-    if g_currentMission ~= nil and g_currentMission.placeableSystem ~= nil then
-        for _, placeable in pairs(g_currentMission.placeableSystem.placeables) do
-            local szData = placeable[PlaceableSaleZone.KEY]
-            if szData ~= nil and szData.yardId == yardId then
-                count = count + 1
-            end
-        end
-    end
-    return count
+    return UsedEquipmentYards.getConnectedSaleZoneCount(yardId)
 end
 
 function PlaceableUsedEquipmentYard:getIsOnOwnedFarmland(superFunc, x, y, z, rotY)
@@ -282,6 +277,8 @@ function PlaceableUsedEquipmentYard:onDelete()
 
     local data = self[PlaceableUsedEquipmentYard.KEY]
     if data == nil or data.yardId == nil then return end
+    -- Removed by the old-save cleanup: the yard lives on without its building.
+    if data.keepYard then return end
 
     local manager = UsedEquipmentYards.yardManager
     if manager ~= nil then
@@ -376,6 +373,8 @@ function PlaceableUsedEquipmentYard.calculateBoundsFromFence(placeable)
         end
     end
 
+    -- The fence ends where it started: drop that repeated closing corner.
+    polygon = YardZone.cleanPolygon(polygon)
     if minX == math.huge or #polygon < 3 then return nil end
 
     local cx = (minX + maxX) * 0.5

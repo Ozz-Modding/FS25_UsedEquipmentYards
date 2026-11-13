@@ -2,7 +2,7 @@
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
-    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="930px 630px">
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="930px 750px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -29,7 +29,7 @@
             <!-- ======== ROW 2: Specifications (horizontal wrap, scrollable) ======== -->
             <GuiElement profile="ueySection" position="40px -170px" size="720px 120px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_barter_specs" position="0px 0px" size="720px 22px"/>
-                <ScrollingLayout position="0px -24px" size="720px 90px" flowDirection="horizontal" numFlows="3" id="attributesLayout">
+                <ScrollingLayout profile="ueyScrollLayout" position="0px -24px" size="720px 90px" flowDirection="horizontal" numFlows="3" id="attributesLayout">
                     <GuiElement profile="fs25_itemDetailsTemplateBox" name="detailTemplate" id="attrTemplate" visible="false">
                         <Bitmap profile="fs25_itemDetailsIcon" name="icon"/>
                         <Text profile="fs25_itemDetailsText" text="" name="text" textAutoWidth="true"/>
@@ -37,8 +37,24 @@
                 </ScrollingLayout>
             </GuiElement>
 
-            <!-- ======== ROW 3: Barter Controls ======== -->
-            <GuiElement profile="ueySection" position="40px -320px" size="720px 160px">
+            <!-- ======== ROW 3: Equipment (configurations, two per line, scrollable) ======== -->
+            <GuiElement profile="ueySection" position="40px -300px" size="720px 120px">
+                <Text profile="ueyColumnHeader" text="$l10n_uey_barter_equipment" position="0px 0px" size="720px 22px"/>
+                <ScrollingLayout profile="ueyScrollLayout" position="0px -26px" size="720px 88px" flowDirection="vertical" id="equipmentLayout">
+                    <GuiElement profile="ueyWeightRow" id="equipmentTemplate" size="720px 22px" visible="false">
+                        <Text profile="ueyConfigTitle"  text="" name="title1"   position="10px 0px"  size="190px 22px"/>
+                        <Text profile="ueyWeightLabel"  text="" name="value1"   position="200px 0px" size="160px 22px"/>
+                        <Text profile="ueyTableHeader"  text="" name="upgrade1" position="200px 0px" size="160px 22px"/>
+                        <Text profile="ueyConfigTitle"  text="" name="title2"   position="370px 0px" size="190px 22px"/>
+                        <Text profile="ueyWeightLabel"  text="" name="value2"   position="560px 0px" size="160px 22px"/>
+                        <Text profile="ueyTableHeader"  text="" name="upgrade2" position="560px 0px" size="160px 22px"/>
+                    </GuiElement>
+                </ScrollingLayout>
+                <Text profile="ueySettingDesc" text="$l10n_uey_barter_equipmentNone" id="equipmentNoneText" position="10px -26px" size="700px 22px" visible="false"/>
+            </GuiElement>
+
+            <!-- ======== ROW 4: Barter Controls ======== -->
+            <GuiElement profile="ueySection" position="40px -440px" size="720px 160px">
                 <Text profile="ueyColumnHeader" text="$l10n_uey_barter_header" position="0px 0px" size="720px 22px"/>
 
                 <Text profile="ueyWeightLabel" text="$l10n_uey_barter_askingPrice" position="0px -26px" size="140px 22px"/>

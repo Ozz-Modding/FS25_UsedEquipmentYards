@@ -1,8 +1,8 @@
 # FS25 Mod: Used Equipment Yards
 
 Allows you to define custom vehicle sale yards that you can visit and buy used equipment from.
-Players draw yard boundaries in-game using the construction menu's fence drawing tool;
-equipment spawns and despawns dynamically within those areas via TTL and hourly spawn rolls.
+Players draw yard outlines in-game with the yard tool in the build menu (Buildings → Tools);
+equipment is parked in rows within those areas and spawns/despawns via TTL and hourly spawn rolls.
 
 **Author:** Ozz
 **GitHub:** https://github.com/sprkem/FS25_UsedEquipmentYards
@@ -15,15 +15,19 @@ equipment spawns and despawns dynamically within those areas via TTL and hourly 
 | `UeyUtils` | `src/UeyUtils.lua` | Defensive helpers (type checks, safe store-item spec loading) — used instead of `pcall`, which the mod does not use |
 | `YardManager` | `src/YardManager.lua` | Server-only singleton; manages all yards, save/load, hour-changed hook |
 | `UsedEquipmentYard` | `src/UsedEquipmentYard.lua` | Data class: bounds (AABB + polygon + anchor), name, id, inventory |
-| `YardInventory` | `src/YardInventory.lua` | Per-yard spawn/despawn/refresh; item list; scatter placement; TTL; test drive fines |
-| `PlaceableUsedEquipmentYard` | `src/PlaceableUsedEquipmentYard.lua` | Custom specialization: links placeable fence to YardManager |
+| `YardLayout` | `src/YardLayout.lua` | Pure geometry (no engine calls): rows/aisles inside a yard polygon, row depths from model sizes, slots. Unit tested |
+| `YardZone` | `src/YardZone.lua` | Pure outline logic: polygon geometry, validation (`YardZone.validate`), and `YardZone.Editor` (draw / close / drag / insert / delete / undo). Unit tested |
+| `UeyYardZoneBrush` | `src/brush/UeyYardZoneBrush.lua` | The yard tool in the build menu (a `ConstructionBrush`): input, Line3D/Marker3D drawing, live row preview, sends `YardZoneEvent`. Sourced by `addBrushType`, NOT in `extraSourceFiles` |
+| `YardInventory` | `src/YardInventory.lua` | Per-yard spawn/despawn/refresh; item list; row placement via `YardLayout`; TTL; test drive fines |
+| `PlaceableUsedEquipmentYard` | `src/PlaceableUsedEquipmentYard.lua` | LEGACY: the old box + fence placeable, kept only so old saves load; removed on load by `UsedEquipmentYards.removeLegacyPlaceables` (yard kept) |
 | `PriceTagRenderer` | `src/PriceTagRenderer.lua` | Replaces vehicle license plates with "For Sale" price plates |
 | `YardVisibility` | `src/YardVisibility.lua` | Client-local render culling of yard vehicles beyond a per-machine distance setting (modSettings XML) |
 | `BarterState` | `src/BarterState.lua` | Per-farm per-yard daily barter chance tracking (all clients) |
 | `YardConfigActivatable` | `src/YardConfigActivatable.lua` | "Configure Yard" prompt when inside yard bounds |
 | `YardVehicleActivatable` | `src/YardVehicleActivatable.lua` | "Barter: [name]" prompt near yard vehicles |
 | `YardConfigDialog` | `src/gui/YardConfigDialog.lua` | Config dialog: quality, dirtiness, category weights, brand weights |
-| `BarterDialog` | `src/gui/BarterDialog.lua` | Barter dialog: vehicle info, specs, offer/buy/test-drive |
+| `YardConfigList` | `src/YardConfigList.lua` | Pure: equipment rows (the vehicle's configurations, shop filtering: no colours / single-option / dependent types; price + upgrade flag). Unit tested |
+| `BarterDialog` | `src/gui/BarterDialog.lua` | Barter dialog: vehicle info, specs, equipment (configurations), offer/buy/test-drive |
 
 ### Events
 
@@ -31,6 +35,8 @@ equipment spawns and despawns dynamically within those areas via TTL and hourly 
 |---|---|---|---|
 | `YardCreatedEvent` | `src/events/YardCreatedEvent.lua` | Server → Clients | Yard creation with polygon data |
 | `YardRemovedEvent` | `src/events/YardRemovedEvent.lua` | Server → Clients | Yard deletion |
+| `YardUpdatedEvent` | `src/events/YardUpdatedEvent.lua` | Server → Clients | A yard's outline changed |
+| `YardZoneEvent` | `src/events/YardZoneEvent.lua` | Client → Server | Yard tool request: create / update outline / delete. Server checks admin (`isConnectionAdmin`) and re-validates (`YardManager:applyZoneRequest`) |
 | `EquipmentPurchasedEvent` | `src/events/EquipmentPurchasedEvent.lua` | Client → Server → Broadcast | Purchase: deduct funds, transfer ownership, restore plate |
 | `TestDriveEvent` | `src/events/TestDriveEvent.lua` | Client → Server → Broadcast | Start/return test drives |
 | `VehicleItemSyncEvent` | `src/events/VehicleItemSyncEvent.lua` | Server → Clients | Sync item data (price, testDrive state, etc.) per vehicle |
@@ -48,47 +54,89 @@ equipment spawns and despawns dynamically within those areas via TTL and hourly 
 - **Event pattern**: Follow RedTape style — `local _mt`, `emptyNew()` passes `_mt` to `Event.new`, `run()` checks `connection:getIsServer()` (false = we are the server receiving from client), broadcasts a NEW event (not `self`).
 - **SP broadcast**: `g_server:broadcastEvent()` does NOT loop back to the local client in SP. Do all server+client work in the server branch.
 
-### Placement flow
+### The yard tool (placement flow)
 
-1. Player opens construction menu → selects "Used Equipment Yard" (sheds category)
-2. Player positions the building (electrical box i3d with collision for sell detection)
-3. Husbandry brush asks "Customize fence?" → player draws fence boundary (rocks as posts)
-4. `getCanCreateMeadow` triggers yard creation (fires in both Yes/No paths)
-5. First fence vertex stored as `bounds.anchorX/anchorZ` — vehicles face away from it
+Yards are not placeables any more. Two build-menu entries (Buildings → Tools) share one brush,
+`UeyYardZoneBrush`, told apart by their brush parameter:
 
-### Placeable type definition
+| Store item | Parameter | Does |
+|---|---|---|
+| `xml/YardZoneTool.xml` | `zone` | Draw a new yard; click an existing yard to reshape it |
+| `xml/YardZoneRemoveTool.xml` | `remove` | Click a yard → confirm → removed (refused while sale zones link to it) |
 
-```xml
-<type name="usedEquipmentYard" parent="placeable" className="Placeable"
-      filename="$dataS/scripts/placeables/Placeable.lua">
-    <specialization name="placement" />
-    <specialization name="husbandryFence" />
-    <specialization name="usedEquipmentYard" />
-</type>
-```
+- Drawing: left click adds corners (refused if too close or crossing the outline); clicking the first
+  corner or right click closes it and creates the yard straight away (yards are free). An outline
+  that isn't valid yet stays open to fix, then right click creates it. Editing (an existing yard, or
+  that invalid one): drag a corner to move it, drag an edge to add a corner, middle click deletes the
+  corner under the cursor, the fourth (undo) key undoes, right click applies, Esc discards. While closed the outline is validated and the rows are previewed live
+  (`YardLayout` with the yard's config, or `DEFAULT_CONFIG` for a new yard) with area + vehicle count.
+- The brush sends `YardZoneEvent` through `g_client:getServerConnection()` in every mode (SP too);
+  the server re-checks admin and re-validates, then `createYard` / `updateYardPolygon` /
+  `removeYard`. Reshaping calls `YardInventory:onBoundsChanged` (fresh layout; stock that no longer
+  fits is cleared as if sold) and broadcasts `YardUpdatedEvent`.
+- Only the host / admins can use it in MP (`UsedEquipmentYards.isAdminInMP`). Yards may be drawn on any
+  land; they may not overlap each other.
+- `bounds.anchorX/anchorZ` (first corner) is still written for stream/save compatibility but unused.
 
-- Using `parent="placeable"` with explicit `className`/`filename` avoids the error where
-  the engine tries to `source()` the parent's script relative to the mod directory.
-- `parent="simplePlaceable"` causes `Can't load resource .../dataS/scripts/placeables/Placeable.lua`
-  because `TypeManager:addType` calls `source(filename, customEnvironment)` with the inherited
-  parent filename, and the engine resolves it relative to the mod first.
-- The `placement` specialization MUST be included — it provides `startPlacementCheck` and other
-  methods that `ConstructionBrushPlaceable` calls. Without it: `attempt to call missing method 'startPlacementCheck'`.
+### Registering a custom construction brush (lessons)
 
-### Selling/demolishing the yard
+- `g_constructionBrushTypeManager:addBrushType(typeName, className, absoluteFilename, modName)` from
+  the mod's scripts at load time (main.lua file scope), before store items load. **In a mod's
+  environment the manager is a wrapper (`mods.lua`) that prefixes both names with the mod name**, so
+  the store XML must say `<type>FS25_UsedEquipmentYards.ueyYardZone</type>`; the class resolves as
+  `_G["FS25_UsedEquipmentYards"].UeyYardZoneBrush`. The registry is reset on `unloadMapData`, so
+  re-registering each savegame load is fine.
+- `addBrushType` `source()`s the brush file itself — don't also list it in `extraSourceFiles`.
+  Construction classes (`ConstructionBrush`, `Line3D`, `GuiTopDownCursor`) already exist then.
+- The stock `ConstructionScreen` builds menu items from store items with a `brush` (category/tab) and
+  passes `<parameters><parameter>` to `setParameters`. The store item must be a loadable placeable XML
+  (`usedEquipmentYardTool` type: `placement` only) but is never placed.
+- Input: `supportsPrimaryDragging` → `onButtonPrimary(isDown, isDrag, isUp)`; a gamepad/keyboard
+  accept calls it with no arguments. Back/Esc calls `canCancel()` then `cancel()`. Button labels come
+  from `getButton{Primary,Secondary,Tertiary,Fourth}Text` (nil hides) after `setInputTextDirty()`.
+- `cursor:setMessage` / `setErrorMessage` render immediately — call them from `draw()`.
+  `cursor:setTerrainOnly(true)` makes `getHitTerrainPosition` see through parked vehicles.
+- `Line3D:visualizeLine(sx, sy, sz, ex, ey, ez, alignToTerrain, color)` (rounds to whole metres);
+  `Marker3D` and `Line3D:setLineScale` are 1.25+ — guarded, with a cross fallback for handles.
+- Decompiled construction sources: `../Reference/FS25_Lua/construction/` (rice field = polygon brush,
+  `OrchardBoundaryEditor`), `../Reference/FS25_Lua/gui/ConstructionScreen.lua`, `mods.lua`.
+- `UserManager:getIsConnectionMasterUser` never returns its result (base-game bug) — use
+  `getUserByConnection(connection):getIsMasterUser()`.
 
-- The construction mode sell brush uses **raycasting** against collision geometry.
-- The building i3d (`box.i3d`) has a collision shape (`static="true"` with collision masks).
-- `getOwnerFarmId`/`setOwnerFarmId` pass through to `superFunc` so the placing farm owns it.
-- `getIsOnOwnedFarmland` returns `true` so selling works on unowned land.
-- Clicking the electrical box in construction mode shows the sell option.
-- Fence posts (rocks) resolve to the Fence object, not the placeable.
+### Old saves (legacy placeable)
+
+- The old `usedEquipmentYard` placeable type (box + `husbandryFence`) and `xml/UsedEquipmentYard.xml` /
+  `xml/YardFence.xml` stay registered but hidden (`showInStore=false`) so old saves load.
+- 3 s after mission start the server deletes every such placeable with `keepYard = true`
+  (`PlaceableUsedEquipmentYard:onDelete` then leaves the yard alone). The fence goes with it.
+- Placeable type notes, if ever needed again: `parent="placeable"` with explicit
+  `className`/`filename` (not `simplePlaceable`), and the `placement` spec is required.
+
+## Tests
+
+Unit tests live in `tests/`, in the same style as FS25_TheContractor. Run them with `test.bat`
+(plain Lua 5.1 at `C:\Program Files (x86)\Lua\5.1\lua.exe`, or set `%LUA%`);
+`test.bat tests\test_yardLayout.lua` runs one file. `package.bat` leaves `tests/` out of the zip.
+
+- `tests/run.lua` — the runner. Each `tests/test_*.lua` file runs in its own process and stops at its
+  first failure (no `pcall`, here too). A file is a list of `test("what it checks", function() ... end)`
+  blocks using `assertEquals` / `assertNear` / `assertTrue`.
+- `tests/stubs.lua` — fake FS25 globals. `stubs.install()` gives each test a fresh `world` with builders
+  (`addStoreItem`, `addVehicle`, `obstacles`) and records (`moves`, `broadcasts`, `logs`), and
+  `world:load("src/...")` loads the real source. Extend it when code under test needs another engine call.
+  The stubs are our assumptions about the engine, not the engine: check them against
+  `../Reference/FS25_Lua` (most complete) or `../Reference/gameSource`; in-game testing is still the real check.
+
+**For all future development:** new logic gets tests in `tests/` and the whole suite is run before
+reporting back. Put engine-free logic (geometry, maths, selection, parsing) in a pure module like
+`YardLayout` so it can be tested directly; test engine-facing code through `stubs.lua`.
+Tests are functional — assert state, keys and numbers, never player-facing text.
 
 ## Console Commands (dev mode only — `g_addCheatCommands`)
 
 | Command | Description |
 |---|---|
-| `ueyListYards` | List all yards with bounds and item counts |
+| `ueyListYards` | List all yards with bounds, item counts and row depths |
 | `ueyRemoveYard <id>` | Delete a yard by id |
 | `ueyResetInventory [id\|all]` | Reset inventory for one yard or all |
 
@@ -96,7 +144,8 @@ equipment spawns and despawns dynamically within those areas via TTL and hourly 
 
 Saved to `<savegameDirectory>/UsedEquipmentYards.xml` on each autosave/manual save.
 Contains: yard definitions, inventory items (with TTL, numOwners, minPrice, testDrive state,
-testDrivenByFarms), config (quality, dirtiness, categories, brands), and barter state.
+testDrivenByFarms, footprint position/size), config (quality, dirtiness, categories, brands,
+aisleWidth), the row layout spec per yard (`inventory.layout`), and barter state.
 
 ## FS25 Conventions
 
@@ -105,43 +154,40 @@ See `~/.claude/skills/fs25-modding/SKILL.md` for the full reference.
 
 ## Lessons Learned (FS25 engine behaviour)
 
-### Placeable type with husbandry fence
-- Our type uses `parent="placeable"` + `placement` + `PlaceableHusbandryFence` specializations.
-- The husbandry brush (`ConstructionBrushHusbandry`) is set via `<brush><type>husbandry</type>`
-  in the placeable XML. Without this, the fence customization dialog never appears.
-- The fence template (`xml/YardFence.xml`) MUST be registered as a `<storeItem>` with
-  `showInStore="true"` and a `<brush><type>newFence</type>` section.
+### Husbandry fence (legacy placeable only)
+- `PlaceableHusbandryFence` loads its fence from the XML path (not the store item), and needs no-op
+  stubs for `deleteNavigationMeshPlacementCollision`, `createNavigationMeshPlacementCollision` and
+  `createNavigationMeshFromContour` (still registered by the legacy spec).
 
-### Fence customization timing
-- `onPostFinalizePlacement` fires BEFORE the "Customize fence?" dialog. Do NOT create the
-  yard or spawn vehicles there.
-- `getCanCreateMeadow` is called by the brush in BOTH "Yes" and "No" paths. We use it as
-  the trigger to create the yard. Return `false` (no meadow dialog).
-
-### Navigation mesh stubs
-- `PlaceableHusbandryFence` calls `deleteNavigationMeshPlacementCollision`,
-  `createNavigationMeshPlacementCollision`, and `createNavigationMeshFromContour`.
-  Register no-op stubs for these.
-
-### Bypassing farmland ownership for fence posts
-- Placeable overrides (`getIsOnOwnedFarmland`, `getIsOnFarmland`) only affect building placement.
-- The fence brush has TWO separate land checks patched in `main.lua`:
-  1. `ConstructionBrush:verifyAccess` — `canFarmAccessLand` check
-  2. `ConstructionBrushNewFence:validateCurrentSegment` — `getIsOwnedByFarmAlongLine`
-- Both patched via `Utils.overwrittenFunction`, guarded by `isYardFenceBrush()`.
-
-### Vehicle spawn layout
-- **Grid-based placement**: a regular grid of candidate points is built inside the fence
-  polygon at startup (`buildSpawnGrid`). Each point tracks an `occupied` flag.
-- `findSpawnPoint(width, length)` shuffles unoccupied grid points, checks the vehicle's
-  rotated footprint fits inside the yard, verifies surrounding grid points are free
-  (with `VEHICLE_CLEARANCE_BUFFER`), then runs `overlapBox` / `isClearOfExistingVehicles`
-  collision tests. Returns `nil` when no point fits (yard full).
+### Vehicle spawn layout (rows)
+- **Rows facing aisles** (`YardLayout`): the yard polygon is sliced into
+  `row | aisle | row | back gap | row | aisle ...` along a row direction. Each candidate direction
+  (every polygon edge and its perpendicular) is tried; the one with the most usable row length wins.
+  Vehicles stand front-on to the aisle edge, a `lotGap` apart, filled from the start of each row.
+- **Row depths come from the yard's models**: `YardInventory:getLayoutModels()` measures every
+  store-pool entry (`StoreItemUtil.getSizeValues`, cached per xml in `YardInventory.sizeCache`) and
+  `YardLayout.chooseBands` picks 1–3 depths (≥ 3 m apart) minimising wasted depth weighted by spawn
+  weight × width. Rows are shared between depths by demand. Models no row can hold are excluded.
+- **Slots**: a vehicle goes in the shallowest row that holds it (`findSlot`), sliding along when
+  `overlapBox` (`isSlotClear`) finds something in the way. Spawning only rolls models that fit the
+  free space right now (`freeSpace` / `fitsFreeSpace` as a pool filter).
+- **Footprint vs root**: slots are footprint centres; the root goes at
+  `YardLayout.rootFromCenter(footX, footZ, yaw, widthOffset, lengthOffset)`
+  (offsets along the vehicle's local x and front, from `getSizeValues`).
+- **Per item**: `slot = {row, u1, u2}`, `footX/footZ/spawnYaw`, `spawnWidth/Length`,
+  `spawnWidthOffset/LengthOffset` (all but `slot` saved). Occupancy is derived from items
+  (`getOccupied`); a slot is claimed (`assignSlot`) before the async load.
+- **Rebuilds** (`ensureLayout`, server only): on load (`spawn`), after a config change (next
+  `update` tick), on reset. A saved spec (`angle, vStart, rowDepths, aisleWidth`) is reused while
+  the ideal depths stay within 1 m, so adding/removing a mod doesn't reshuffle a yard.
+  `reconcileLayout` keeps vehicles that still sit in a row position, moves the rest (all out of
+  physics first, then `setAbsolutePosition`, then back in), and evicts what doesn't fit: removed
+  now if it stands where a moved vehicle goes, otherwise `ttlHours = 1` (gone at the next hour, as
+  if sold). Test-driven vehicles get their return spot (`testDrive.orig*`) moved instead.
+  During a repack, `overlapBox` ignores the vehicles being moved (`overlapIgnore` via
+  `g_currentMission:getNodeObject`).
 - `VehicleLoadingData:setPosition(x, nil, z, terrainOffset)` / `setRotation` / `setIgnoreShopOffset(true)`
-- Vehicle yaw: `parkingYaw` — faces away from the anchor point ± jitter.
-- Sequential spawning; yard capacity is bounded only by available grid space (no hard cap).
-- Grid points are marked occupied before async vehicle load so the next spawn sees them.
-- Test-driven vehicles' original positions are reserved in `rebuildPlacedPositions`.
+- Config `aisleWidth` (dialog: 6–14 m) replaced the old `gridSpacing`.
 
 ### Vehicle spawning API
 - `VehicleLoadingData.new()`, `:setStoreItem()`, `:setConfigurations()`,
@@ -181,6 +227,9 @@ See `~/.claude/skills/fs25-modding/SKILL.md` for the full reference.
   extending it with `anchorTopLeft` for absolute positioning in custom dialogs.
 - `ScrollingLayout` with `flowDirection="vertical"` clips and scrolls overflow content.
   Height must be smaller than total content height to trigger scrolling.
+- A `ScrollingLayout` with no profile is anchored bottom-left, so a negative `position` y is measured
+  from the parent's bottom. Use `ueyScrollLayout` (top-left, transparent): `baseReference`-based
+  profiles like `ueySection` draw a white background on a layout.
 - Dynamic rows: define a hidden template in XML, clone it per entry in Lua via
   `template:clone()`. Access children by index (`row.elements[1]`, `row.elements[2]`).
   `getDescendantById` does NOT work on cloned elements.

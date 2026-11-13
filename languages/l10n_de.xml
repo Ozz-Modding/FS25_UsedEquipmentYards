@@ -52,9 +52,9 @@
         <text name="uey_config_avgStockHours" text="Durchschnittliche Standzeit" />
         <text name="uey_config_avgStockHours_desc"
             text="Wie lange Fahrzeuge bleiben, bevor sie verschwinden." />
-        <text name="uey_config_gridSpacing" text="Rasterabstand" />
-        <text name="uey_config_gridSpacing_desc"
-            text="Abstand zwischen Spawnpunkten. Kleiner = mehr Fahrzeuge." />
+        <text name="uey_config_aisleWidth" text="Gangbreite" />
+        <text name="uey_config_aisleWidth_desc"
+            text="Fahrraum zwischen gegenüberliegenden Reihen. Breiter = weniger Fahrzeuge." />
         <text name="uey_config_maxDuplicates" text="Max. Duplikate" />
         <text name="uey_config_maxDuplicates_desc"
             text="Max. identische Fahrzeuge gleichzeitig auf dem Hof." />
@@ -115,6 +115,8 @@
         <text name="uey_barter_buyNow" text="Sofort kaufen" />
         <text name="uey_barter_vehicleInfo" text="Fahrzeuginfo" />
         <text name="uey_barter_specs" text="Spezifikationen" />
+        <text name="uey_barter_equipment" text="Konfiguration" />
+        <text name="uey_barter_equipmentNone" text="Keine Konfigurationsoptionen" />
         <text name="uey_barter_brand" text="Marke" />
         <text name="uey_barter_owners" text="Vorbesitzer" />
         <text name="uey_barter_hours" text="Stunden" />
@@ -260,5 +262,34 @@
         <text name="uey_yardRemoved" text="Hof '%s' entfernt." />
         <text name="uey_inventoryReset" text="Inventar fuer '%s' zurueckgesetzt." />
         <text name="uey_allInventoriesReset" text="Alle Hofinventare wurden zurueckgesetzt." />
+        <!-- Yard tool (build menu) -->
+        <text name="uey_tool_zone" text="Gebrauchtmaschinenhof" />
+        <text name="uey_tool_zone_function" text="Zeichne den Umriss eines Hofs. Zum Verkauf stehende Fahrzeuge parken darin in Reihen. Klicke einen bestehenden Hof an, um ihn umzuformen." />
+        <text name="uey_tool_remove" text="Gebrauchtmaschinenhof entfernen" />
+        <text name="uey_tool_remove_function" text="Klicke einen Hof an, um ihn samt der dort angebotenen Fahrzeuge zu entfernen." />
+        <text name="uey_zone_startYard" text="Neuen Hof beginnen" />
+        <text name="uey_zone_editYard" text="Hof bearbeiten" />
+        <text name="uey_zone_addCorner" text="Ecke hinzufügen" />
+        <text name="uey_zone_removeLastCorner" text="Letzte Ecke entfernen" />
+        <text name="uey_zone_moveCorner" text="Ecke verschieben" />
+        <text name="uey_zone_insertCorner" text="Hier Ecke einfügen" />
+        <text name="uey_zone_deleteCorner" text="Ecke löschen" />
+        <text name="uey_zone_createYard" text="Hof erstellen" />
+        <text name="uey_zone_applyChanges" text="Änderungen übernehmen" />
+        <text name="uey_zone_undo" text="Rückgängig" />
+        <text name="uey_zone_removeYard" text="Hof entfernen" />
+        <text name="uey_zone_removeConfirm" text="'%s' entfernen? Alle dort angebotenen Fahrzeuge werden entfernt." />
+        <text name="uey_zone_info" text="%d m² · etwa %d Fahrzeuge" />
+        <text name="uey_zone_infoDrawing" text="%d Ecken" />
+        <text name="uey_zone_unsaved" text="Übernimm oder verwirf zuerst die Änderungen an diesem Hof." />
+        <text name="uey_zone_error_tooFewPoints" text="Ein Hof braucht mindestens 3 Ecken." />
+        <text name="uey_zone_error_tooManyPoints" text="Zu viele Ecken (höchstens 64)." />
+        <text name="uey_zone_error_edgeTooShort" text="Ecken liegen zu dicht beieinander." />
+        <text name="uey_zone_error_selfIntersecting" text="Der Umriss kreuzt sich selbst." />
+        <text name="uey_zone_error_tooSmall" text="Der Hof ist zu klein." />
+        <text name="uey_zone_error_overlapsYard" text="Der Hof überschneidet einen anderen Hof." />
+        <text name="uey_zone_error_hasSaleZones" text="Entferne zuerst die Verkaufszonen dieses Hofs." />
+        <text name="uey_zone_error_noRows" text="Zu klein für Fahrzeugreihen." />
+        <text name="uey_zone_error_cornerRefused" text="Hier kann keine Ecke gesetzt werden." />
     </texts>
 </l10n>

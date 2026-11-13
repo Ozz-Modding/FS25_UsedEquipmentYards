@@ -30,7 +30,7 @@ function YardConfigChangedEvent:writeStream(streamId, connection)
     streamWriteInt32(streamId, cfg.maxWorkingWidth or 0)
     streamWriteInt32(streamId, cfg.maxPrice or 0)
     streamWriteInt32(streamId, cfg.avgStockHours or 96)
-    streamWriteInt32(streamId, cfg.gridSpacing or 8)
+    streamWriteInt32(streamId, cfg.aisleWidth or 8)
     streamWriteInt32(streamId, cfg.maxDuplicates or 2)
     streamWriteInt32(streamId, cfg.minYear or 0)
     streamWriteInt32(streamId, cfg.maxYear or 0)
@@ -71,7 +71,7 @@ function YardConfigChangedEvent:readStream(streamId, connection)
         maxWorkingWidth = streamReadInt32(streamId),
         maxPrice        = streamReadInt32(streamId),
         avgStockHours   = streamReadInt32(streamId),
-        gridSpacing     = streamReadInt32(streamId),
+        aisleWidth      = streamReadInt32(streamId),
         maxDuplicates   = streamReadInt32(streamId),
         minYear         = streamReadInt32(streamId),
         maxYear         = streamReadInt32(streamId),
