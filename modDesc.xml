@@ -101,6 +101,10 @@ GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Änderungsprotokoll:
 
+1.0.1.6:
+- Hof-Layout überarbeitet. Du kannst deinen Hof jetzt beim Erstellen gut sehen und ihn auch nachträglich anpassen.
+- Ausstattung zum Infodialog von Hofgeräten hinzugefügt. Nützlich, um die tatsächliche Fahrzeugkonfiguration zu sehen.
+
 1.0.1.5:
 - Überarbeitung, wie Fahrzeuge beim Verkauf an einen vollen Hof ausgeblendet werden - behebt einige Multiplayer-Probleme.
 - Behebung einiger gelegentlich auftretender Multiplayer-Probleme. Vielen Dank an @jeaboswell.
@@ -170,6 +174,10 @@ Lorsque vous dessinez un parc pour la première fois, rien n'apparaît immédiat
 GitHub: https://github.com/sprkem/FS25_UsedEquipmentYards
 
 Journal des modifications :
+
+1.0.1.6 :
+- Refonte de l'agencement des parcs. Vous pouvez désormais bien voir votre parc pendant sa création, et aussi le modifier.
+- Ajout de l'équipement dans la fenêtre d'informations des véhicules du parc. Pratique pour voir la configuration réelle du véhicule.
 
 1.0.1.5 :
 - Refonte de la façon dont les véhicules sont masqués lors de la vente à un parc plein - résout certains problèmes en multijoueur.
